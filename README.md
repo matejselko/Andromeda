@@ -28,12 +28,12 @@ Runs on your machine. AES-256 encrypted. No cloud. No accounts.
 docker run -d \
   --name andromeda \
   --restart unless-stopped \
-  -p 3000:3000 \
+  -p 3456:3000 \
   -v andromeda-data:/data \
   ghcr.io/matejselko/andromeda:latest
 ```
 
-Open **http://localhost:3000**
+Open **http://localhost:3456**
 
 ---
 
