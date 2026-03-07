@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  andromeda:
+    image: ghcr.io/matejselko/andromeda:latest
+    container_name: andromeda
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - andromeda-data:/data
+    environment:
+      - DATA_FILE=/data/vault.enc
+
+volumes:
+  andromeda-data:
