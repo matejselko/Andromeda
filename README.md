@@ -86,6 +86,6 @@ Click **⬇ Export** inside the app to download a backup at any time.
 
 ✦ · · · ✦ · · · · ✦ · · ✦ · · · · · ✦ · · · ✦
 
-*Note: This project is 100% generated with [Claude.ai](https://claude.ai) because I hate programming.*
+*Note: I hate programming.*
 
 </div>
