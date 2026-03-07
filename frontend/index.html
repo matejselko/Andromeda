@@ -636,6 +636,21 @@
   .empty-title { font-size: 1rem; font-weight: 400; color: var(--dim); margin-bottom: 0.4rem; }
   .empty-sub { font-size: 0.82rem; color: rgba(255,255,255,0.2); }
 
+  .entry-card.pinned {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.07);
+  }
+  .entry-card.pinned .pin-indicator {
+    display: block;
+  }
+  .pin-indicator {
+    display: none;
+    position: absolute;
+    top: 0.75rem; right: 0.75rem;
+    font-size: 0.65rem;
+    opacity: 0.4;
+  }
+
   /* scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -736,9 +751,9 @@
       </div>
       <div class="filter-row">
         <button class="pill-btn active" onclick="setFilter('all',this)">All</button>
-        <button class="pill-btn" onclick="setFilter('github',this)">GitHub</button>
-        <button class="pill-btn" onclick="setFilter('2fa',this)">2FA</button>
-        <button class="pill-btn" onclick="setFilter('backup',this)">Backup</button>
+        <button class="pill-btn" onclick="setFilter('recovery',this)">Recovery</button>
+        <button class="pill-btn" onclick="setFilter('passphrase',this)">Passphrases</button>
+        <button class="pill-btn" onclick="setFilter('bitlocker',this)">BitLocker</button>
         <button class="pill-btn" onclick="setFilter('other',this)">Other</button>
       </div>
       <button class="add-btn" onclick="openAddModal()">+ Add Entry</button>
@@ -779,9 +794,9 @@
 
     <label class="form-label">Type</label>
     <select class="form-select" id="f-type">
-      <option value="github">GitHub</option>
-      <option value="2fa">2FA Backup</option>
-      <option value="backup">Backup Codes</option>
+      <option value="recovery">Recovery Codes</option>
+      <option value="passphrase">Passphrases</option>
+      <option value="bitlocker">BitLocker</option>
       <option value="other">Other</option>
     </select>
 
@@ -797,9 +812,6 @@
     </div>
   </div>
 </div>
-
-<div id="toast"></div>
-
 <script>
 // ═══════════════════════════════════════════
 // STAR CANVAS
@@ -824,7 +836,6 @@ function initStars() {
       alpha: Math.random(),
       speed: Math.random() * 0.003 + 0.001,
       phase: Math.random() * Math.PI * 2,
-      // drawn style: some are '+' cross, most are dots
       cross: Math.random() > 0.85
     });
   }
@@ -894,15 +905,21 @@ document.addEventListener('mouseout', e => {
 });
 
 // ═══════════════════════════════════════════
-// LIQUID GLASS MOUSE EFFECT on cards
+// LIQUID GLASS MOUSE EFFECT — throttled to fix flicker
 // ═══════════════════════════════════════════
+let mouseMoveScheduled = false;
 document.addEventListener('mousemove', e => {
-  document.querySelectorAll('.entry-card,.feature-card,.enter-btn').forEach(el => {
-    const rect = el.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-    el.style.setProperty('--mx', x + '%');
-    el.style.setProperty('--my', y + '%');
+  if (mouseMoveScheduled) return;
+  mouseMoveScheduled = true;
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.entry-card,.feature-card,.enter-btn').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+      const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+      el.style.setProperty('--mx', x + '%');
+      el.style.setProperty('--my', y + '%');
+    });
+    mouseMoveScheduled = false;
   });
 });
 
@@ -925,7 +942,7 @@ document.addEventListener('mousemove', e => {
 })();
 
 // ═══════════════════════════════════════════
-// ENTER BTN glow follow
+// ENTER BTN
 // ═══════════════════════════════════════════
 const enterBtn = document.getElementById('enter-btn');
 if (enterBtn) {
@@ -936,61 +953,57 @@ if (enterBtn) {
 }
 
 // ═══════════════════════════════════════════
-// ICON DATABASE
+// ICON DATABASE — real logos via Simple Icons CDN
 // ═══════════════════════════════════════════
 const ICONS = [
-  { id:'github', label:'GitHub', emoji:'🐙' },
-  { id:'google', label:'Google', emoji:'🔵' },
-  { id:'proton', label:'Proton', emoji:'🟣' },
-  { id:'ente', label:'Ente', emoji:'📷' },
-  { id:'apple', label:'Apple', emoji:'🍎' },
-  { id:'microsoft', label:'Microsoft', emoji:'🪟' },
-  { id:'amazon', label:'Amazon', emoji:'📦' },
-  { id:'aws', label:'AWS', emoji:'☁️' },
-  { id:'cloudflare', label:'Cloudflare', emoji:'🌐' },
-  { id:'discord', label:'Discord', emoji:'💬' },
-  { id:'dropbox', label:'Dropbox', emoji:'📥' },
-  { id:'facebook', label:'Facebook', emoji:'👥' },
-  { id:'instagram', label:'Instagram', emoji:'📸' },
-  { id:'twitter', label:'Twitter', emoji:'🐦' },
-  { id:'linkedin', label:'LinkedIn', emoji:'💼' },
-  { id:'netflix', label:'Netflix', emoji:'🎬' },
-  { id:'spotify', label:'Spotify', emoji:'🎵' },
-  { id:'steam', label:'Steam', emoji:'🎮' },
-  { id:'twitch', label:'Twitch', emoji:'📡' },
-  { id:'bitwarden', label:'Bitwarden', emoji:'🔑' },
-  { id:'1password', label:'1Password', emoji:'🔐' },
-  { id:'authy', label:'Authy', emoji:'🛡️' },
-  { id:'binance', label:'Binance', emoji:'🟡' },
-  { id:'coinbase', label:'Coinbase', emoji:'🔵' },
-  { id:'digitalocean', label:'DigitalOcean', emoji:'🌊' },
-  { id:'docker', label:'Docker', emoji:'🐳' },
-  { id:'gitlab', label:'GitLab', emoji:'🦊' },
-  { id:'heroku', label:'Heroku', emoji:'🟣' },
-  { id:'linode', label:'Linode', emoji:'🟢' },
-  { id:'notion', label:'Notion', emoji:'📝' },
-  { id:'paypal', label:'PayPal', emoji:'💳' },
-  { id:'reddit', label:'Reddit', emoji:'🤖' },
-  { id:'signal', label:'Signal', emoji:'✉️' },
-  { id:'slack', label:'Slack', emoji:'💬' },
-  { id:'stripe', label:'Stripe', emoji:'💰' },
-  { id:'telegram', label:'Telegram', emoji:'✈️' },
-  { id:'uber', label:'Uber', emoji:'🚗' },
-  { id:'vultr', label:'Vultr', emoji:'⚡' },
-  { id:'wordpress', label:'WordPress', emoji:'📰' },
-  { id:'youtube', label:'YouTube', emoji:'▶️' },
-  { id:'zoom', label:'Zoom', emoji:'📹' },
-  { id:'namecheap', label:'Namecheap', emoji:'🌐' },
-  { id:'godaddy', label:'GoDaddy', emoji:'🌐' },
-  { id:'vercel', label:'Vercel', emoji:'▲' },
-  { id:'netlify', label:'Netlify', emoji:'🌿' },
-  { id:'hetzner', label:'Hetzner', emoji:'🖥️' },
-  { id:'backblaze', label:'Backblaze', emoji:'🔥' },
-  { id:'plex', label:'Plex', emoji:'🎞️' },
-  { id:'nextcloud', label:'Nextcloud', emoji:'☁️' },
-  { id:'synology', label:'Synology', emoji:'💾' },
-  { id:'other', label:'Other', emoji:'⚡' },
+  { id:'github',       label:'GitHub',       slug:'github' },
+  { id:'google',       label:'Google',       slug:'google' },
+  { id:'proton',       label:'Proton',       slug:'proton' },
+  { id:'apple',        label:'Apple',        slug:'apple' },
+  { id:'microsoft',    label:'Microsoft',    slug:'microsoft' },
+  { id:'amazon',       label:'Amazon',       slug:'amazon' },
+  { id:'aws',          label:'AWS',          slug:'amazonaws' },
+  { id:'cloudflare',   label:'Cloudflare',   slug:'cloudflare' },
+  { id:'discord',      label:'Discord',      slug:'discord' },
+  { id:'dropbox',      label:'Dropbox',      slug:'dropbox' },
+  { id:'facebook',     label:'Facebook',     slug:'facebook' },
+  { id:'instagram',    label:'Instagram',    slug:'instagram' },
+  { id:'twitter',      label:'X / Twitter',  slug:'x' },
+  { id:'linkedin',     label:'LinkedIn',     slug:'linkedin' },
+  { id:'netflix',      label:'Netflix',      slug:'netflix' },
+  { id:'spotify',      label:'Spotify',      slug:'spotify' },
+  { id:'steam',        label:'Steam',        slug:'steam' },
+  { id:'twitch',       label:'Twitch',       slug:'twitch' },
+  { id:'bitwarden',    label:'Bitwarden',    slug:'bitwarden' },
+  { id:'1password',    label:'1Password',    slug:'1password' },
+  { id:'binance',      label:'Binance',      slug:'binance' },
+  { id:'coinbase',     label:'Coinbase',     slug:'coinbase' },
+  { id:'digitalocean', label:'DigitalOcean', slug:'digitalocean' },
+  { id:'docker',       label:'Docker',       slug:'docker' },
+  { id:'gitlab',       label:'GitLab',       slug:'gitlab' },
+  { id:'notion',       label:'Notion',       slug:'notion' },
+  { id:'paypal',       label:'PayPal',       slug:'paypal' },
+  { id:'reddit',       label:'Reddit',       slug:'reddit' },
+  { id:'signal',       label:'Signal',       slug:'signal' },
+  { id:'slack',        label:'Slack',        slug:'slack' },
+  { id:'telegram',     label:'Telegram',     slug:'telegram' },
+  { id:'vercel',       label:'Vercel',       slug:'vercel' },
+  { id:'netlify',      label:'Netlify',      slug:'netlify' },
+  { id:'hetzner',      label:'Hetzner',      slug:'hetzner' },
+  { id:'nextcloud',    label:'Nextcloud',    slug:'nextcloud' },
+  { id:'synology',     label:'Synology',     slug:'synology' },
+  { id:'youtube',      label:'YouTube',      slug:'youtube' },
+  { id:'zoom',         label:'Zoom',         slug:'zoom' },
+  { id:'wordpress',    label:'WordPress',    slug:'wordpress' },
+  { id:'stripe',       label:'Stripe',       slug:'stripe' },
+  { id:'namecheap',    label:'Namecheap',    slug:'namecheap' },
+  { id:'other',        label:'Other',        slug:null },
 ];
+
+function iconImg(ic, size = 22) {
+  if (!ic || !ic.slug) return `<span style="font-size:1.1rem;opacity:0.5">⚡</span>`;
+  return `<img src="https://cdn.simpleicons.org/${ic.slug}/ffffff" width="${size}" height="${size}" alt="${ic.label}" style="filter:brightness(0) invert(1);opacity:0.85" onerror="this.style.display='none';this.nextSibling.style.display='inline'" /><span style="display:none;font-size:1.1rem">⚡</span>`;
+}
 
 let selectedIcon = 'other';
 
@@ -1002,7 +1015,7 @@ function renderIconGrid(filter = '') {
     : ICONS;
   grid.innerHTML = filtered.map(ic => `
     <div class="icon-option${selectedIcon===ic.id?' selected':''}" onclick="selectIcon('${ic.id}')" title="${ic.label}">
-      ${ic.emoji}
+      ${iconImg(ic, 20)}
     </div>
   `).join('');
 }
@@ -1030,9 +1043,9 @@ async function deriveKey(password, salt) {
 
 async function encryptData(data, password) {
   const salt = crypto.getRandomValues(new Uint8Array(32));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveKey(password, salt);
-  const enc = new TextEncoder();
+  const iv   = crypto.getRandomValues(new Uint8Array(12));
+  const key  = await deriveKey(password, salt);
+  const enc  = new TextEncoder();
   const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(data)));
   const out = new Uint8Array(32 + 12 + encrypted.byteLength);
   out.set(salt, 0); out.set(iv, 32); out.set(new Uint8Array(encrypted), 44);
@@ -1040,17 +1053,16 @@ async function encryptData(data, password) {
 }
 
 async function decryptData(b64, password) {
-  const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const raw  = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
   const salt = raw.slice(0, 32), iv = raw.slice(32, 44), data = raw.slice(44);
-  const key = await deriveKey(password, salt);
-  const dec = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+  const key  = await deriveKey(password, salt);
+  const dec  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
   return JSON.parse(new TextDecoder().decode(dec));
 }
 
 async function saveVault() {
   if (!state.password) return;
   const blob = await encryptData({ entries: state.entries }, state.password);
-  // Try server first, fallback to localStorage
   try {
     const res = await fetch('/api/vault/save', {
       method: 'POST',
@@ -1058,13 +1070,14 @@ async function saveVault() {
       body: JSON.stringify({ blob })
     });
     if (!res.ok) throw new Error();
+    // Also keep localStorage in sync as backup
+    localStorage.setItem('andromeda_vault', blob);
   } catch {
     localStorage.setItem('andromeda_vault', blob);
   }
 }
 
 async function loadVault() {
-  // Try server first, fallback to localStorage
   try {
     const res = await fetch('/api/vault/load');
     if (res.ok) {
@@ -1078,8 +1091,24 @@ async function loadVault() {
 }
 
 // ═══════════════════════════════════════════
-// NAVIGATION
+// NAVIGATION — skip welcome if vault exists
 // ═══════════════════════════════════════════
+async function init() {
+  let hasVault = !!localStorage.getItem('andromeda_vault');
+  try {
+    const res = await fetch('/api/vault/exists');
+    if (res.ok) { const d = await res.json(); hasVault = d.exists; }
+  } catch {}
+
+  if (hasVault) {
+    // Skip welcome, go straight to lock screen
+    document.getElementById('welcome-page').style.display = 'none';
+    document.getElementById('app-page').classList.add('active');
+    document.getElementById('lock-overlay').classList.add('active');
+  }
+  // else: stay on welcome page, user clicks Enter
+}
+
 async function navigateToApp() {
   let hasVault = !!localStorage.getItem('andromeda_vault');
   try {
@@ -1091,22 +1120,17 @@ async function navigateToApp() {
     document.getElementById('app-page').classList.add('active');
     document.getElementById('lock-overlay').classList.add('active');
   } else {
-    showSetupPage();
+    showSetupModal();
   }
 }
 
-function showSetupPage() {
-  // inline setup for first-time
-  document.getElementById('welcome-page').style.display = 'none';
-  document.getElementById('app-page').classList.remove('active');
-  showSetupModal();
-}
+// Run on page load
+init();
 
 // ═══════════════════════════════════════════
-// FIRST-TIME SETUP (inline modal over stars)
+// FIRST-TIME SETUP
 // ═══════════════════════════════════════════
 function showSetupModal() {
-  // Create setup overlay dynamically
   const div = document.createElement('div');
   div.id = 'setup-overlay';
   div.style.cssText = 'position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;padding:2rem;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px)';
@@ -1117,13 +1141,11 @@ function showSetupModal() {
         <div class="step-dot" id="sdot-1"></div>
         <div class="step-dot" id="sdot-2"></div>
       </div>
-
       <div class="setup-step active" id="sstep-0">
         <div class="setup-title">Welcome to<br/>Andromeda</div>
         <div class="setup-subtitle">Let's set up your encrypted vault. This only takes a moment.</div>
         <button class="btn-next" onclick="setupNext(1)">Get Started →</button>
       </div>
-
       <div class="setup-step" id="sstep-1">
         <div class="setup-title">Create your<br/>master password</div>
         <div class="setup-subtitle">This password encrypts everything. There is no recovery option — keep it safe.</div>
@@ -1143,16 +1165,16 @@ function showSetupModal() {
           <button class="btn-next" onclick="setupNext(2)">Continue →</button>
         </div>
       </div>
-
       <div class="setup-step" id="sstep-2">
         <div class="setup-title">You're all set!</div>
-        <div class="setup-subtitle">Your vault is ready. Start adding recovery codes to keep them safe and organized.</div>
+        <div class="setup-subtitle">Your vault is ready. Start adding recovery codes to keep them safe.</div>
         <div style="font-size:3rem;text-align:center;margin:1.5rem 0;opacity:0.6">🔐</div>
         <button class="btn-next" style="width:100%" onclick="finishSetup()">Open Vault →</button>
       </div>
     </div>
   `;
   document.body.appendChild(div);
+  pauseStars();
 }
 
 let setupPassword = '';
@@ -1162,29 +1184,30 @@ function setupNext(step) {
     const pw1 = document.getElementById('setup-pw1').value;
     const pw2 = document.getElementById('setup-pw2').value;
     if (pw1.length < 6) { document.getElementById('setup-err').textContent = 'Password must be at least 6 characters'; return; }
-    if (pw1 !== pw2) { document.getElementById('setup-err').textContent = 'Passwords do not match'; return; }
+    if (pw1 !== pw2)    { document.getElementById('setup-err').textContent = 'Passwords do not match'; return; }
     setupPassword = pw1;
   }
   for (let i = 0; i < 3; i++) {
-    const el = document.getElementById(`sstep-${i}`);
+    const el  = document.getElementById(`sstep-${i}`);
     const dot = document.getElementById(`sdot-${i}`);
-    if (el) { el.classList.remove('active'); }
+    if (el)  el.classList.remove('active');
     if (dot) { dot.classList.remove('active','done'); if (i < step) dot.classList.add('done'); }
   }
   const active = document.getElementById(`sstep-${step}`);
-  const adot = document.getElementById(`sdot-${step}`);
+  const adot   = document.getElementById(`sdot-${step}`);
   if (active) active.classList.add('active');
-  if (adot) adot.classList.add('active');
+  if (adot)   adot.classList.add('active');
 }
 
 function finishSetup() {
   state.password = setupPassword;
-  state.entries = [];
+  state.entries  = [];
   state.unlocked = true;
   saveVault();
   const overlay = document.getElementById('setup-overlay');
   if (overlay) overlay.remove();
   document.getElementById('app-page').classList.add('active');
+  resumeStars();
   renderEntries();
   showToast('Vault created successfully');
 }
@@ -1198,10 +1221,10 @@ async function unlockVault() {
   try {
     state.password = pw;
     const vault = await loadVault();
-    state.entries = vault.entries || [];
+    state.entries  = vault.entries || [];
     state.unlocked = true;
     document.getElementById('lock-overlay').classList.remove('active');
-    document.getElementById('unlock-pw').value = '';
+    document.getElementById('unlock-pw').value    = '';
     document.getElementById('unlock-error').textContent = '';
     renderEntries();
   } catch {
@@ -1213,7 +1236,7 @@ async function unlockVault() {
 function lockVault() {
   state.password = ''; state.unlocked = false; state.entries = [];
   document.getElementById('lock-overlay').classList.add('active');
-  document.getElementById('unlock-pw').value = '';
+  document.getElementById('unlock-pw').value    = '';
   document.getElementById('unlock-error').textContent = '';
 }
 
@@ -1221,35 +1244,39 @@ function lockVault() {
 // VAULT CRUD
 // ═══════════════════════════════════════════
 async function saveEntry() {
-  const name = document.getElementById('f-name').value.trim();
-  const type = document.getElementById('f-type').value;
-  const rawCodes = document.getElementById('f-codes').value;
-  const notes = document.getElementById('f-notes').value.trim();
-  const editId = document.getElementById('edit-id').value;
+  const name    = document.getElementById('f-name').value.trim();
+  const type    = document.getElementById('f-type').value;
+  const rawCodes= document.getElementById('f-codes').value;
+  const notes   = document.getElementById('f-notes').value.trim();
+  const editId  = document.getElementById('edit-id').value;
 
-  if (!name) return showToast('Enter a service name');
-  if (!rawCodes.trim()) return showToast('Enter at least one code');
+  if (!name)           { showToast('Enter a service name'); return; }
+  if (!rawCodes.trim()){ showToast('Enter at least one code'); return; }
 
   const codes = rawCodes.split('\n').map(c => c.trim()).filter(Boolean).map(c => ({ code: c, used: false }));
-  const icon = selectedIcon;
-  const iconLabel = ICONS.find(i => i.id === icon);
-  const entry = { name, type, codes, notes, icon, iconEmoji: iconLabel?.emoji || '⚡' };
+  const icon  = selectedIcon;
+  const icObj = ICONS.find(i => i.id === icon) || ICONS[ICONS.length - 1];
+  const entry = { name, type, codes, notes, icon, iconSlug: icObj.slug || null };
 
   if (editId) {
     const idx = state.entries.findIndex(e => e.id === editId);
     if (idx > -1) {
-      // preserve used state from old codes by matching
       const oldCodes = state.entries[idx].codes || [];
       entry.codes = codes.map(c => {
         const old = oldCodes.find(o => o.code === c.code);
         return old ? { ...c, used: old.used } : c;
       });
+      entry.pinned = state.entries[idx].pinned || false;
       state.entries[idx] = { ...state.entries[idx], ...entry, updatedAt: new Date().toISOString() };
     }
   } else {
-    state.entries.push({ id: crypto.randomUUID(), ...entry, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    state.entries.push({
+      id: crypto.randomUUID(), ...entry, pinned: false,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+    });
   }
-  saveVault();
+
+  await saveVault();
   closeModal();
   renderEntries();
   showToast(editId ? 'Entry updated' : 'Entry saved');
@@ -1271,6 +1298,15 @@ function toggleCodeUsed(entryId, idx) {
   renderEntries();
 }
 
+function togglePin(id) {
+  const entry = state.entries.find(e => e.id === id);
+  if (!entry) return;
+  entry.pinned = !entry.pinned;
+  saveVault();
+  renderEntries();
+  showToast(entry.pinned ? 'Pinned' : 'Unpinned');
+}
+
 // ═══════════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════════
@@ -1283,11 +1319,17 @@ function setFilter(f, el) {
 
 function renderEntries() {
   const q = (document.getElementById('search-input')?.value || '').toLowerCase();
-  const filtered = state.entries.filter(e => {
+  let filtered = state.entries.filter(e => {
     if (state.filter !== 'all' && e.type !== state.filter) return false;
     if (q && !e.name.toLowerCase().includes(q) && !(e.notes||'').toLowerCase().includes(q)) return false;
     return true;
   });
+
+  // Pinned entries first
+  filtered = [
+    ...filtered.filter(e => e.pinned),
+    ...filtered.filter(e => !e.pinned)
+  ];
 
   const grid = document.getElementById('entries-grid');
   if (!grid) return;
@@ -1298,27 +1340,33 @@ function renderEntries() {
   }
 
   grid.innerHTML = filtered.map(e => {
-    const used = e.codes.filter(c => c.used).length;
-    const total = e.codes.length;
+    const used      = e.codes.filter(c => c.used).length;
+    const total     = e.codes.length;
     const remaining = total - used;
-    const date = new Date(e.createdAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+    const date      = new Date(e.createdAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+    const icObj     = ICONS.find(i => i.id === e.icon) || null;
+    const iconHtml  = iconImg(icObj, 22);
+
     const codesHtml = e.codes.map((c,i) => `
       <div class="code-chip${c.used?' used':''}" onclick="toggleCodeUsed('${e.id}',${i})">
         <span class="code-chip-text">${esc(c.code)}</span>
         <span class="code-tick">${c.used?'↩':'✓'}</span>
       </div>
     `).join('');
+
     return `
-      <div class="entry-card" data-id="${e.id}">
+      <div class="entry-card${e.pinned?' pinned':''}" data-id="${e.id}">
+        ${e.pinned ? '<span class="pin-indicator">📌</span>' : ''}
         <div class="card-header">
           <div style="display:flex;align-items:center;gap:0.8rem">
-            <div class="card-icon">${e.iconEmoji||'⚡'}</div>
+            <div class="card-icon">${iconHtml}</div>
             <div>
               <div class="card-name">${esc(e.name)}</div>
               <div class="card-service">${e.notes?esc(e.notes):'<span style="opacity:0.3">No notes</span>'}</div>
             </div>
           </div>
           <div class="card-actions">
+            <div class="card-action-btn${e.pinned?' active':''}" onclick="togglePin('${e.id}')" title="${e.pinned?'Unpin':'Pin'}">📌</div>
             <div class="card-action-btn" onclick="copyAll('${e.id}')" title="Copy unused codes">⎘</div>
             <div class="card-action-btn" onclick="editEntry('${e.id}')" title="Edit">✎</div>
             <div class="card-action-btn del" onclick="deleteEntry('${e.id}')" title="Delete">✕</div>
@@ -1335,10 +1383,10 @@ function renderEntries() {
 
   // re-attach mouse tracking
   document.querySelectorAll('.entry-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
+    card.addEventListener('mousemove', ev => {
       const r = card.getBoundingClientRect();
-      card.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
-      card.style.setProperty('--my', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+      card.style.setProperty('--mx', ((ev.clientX-r.left)/r.width*100).toFixed(1)+'%');
+      card.style.setProperty('--my', ((ev.clientY-r.top)/r.height*100).toFixed(1)+'%');
     });
   });
 }
@@ -1349,11 +1397,11 @@ function renderEntries() {
 function openAddModal() {
   selectedIcon = 'other';
   document.getElementById('modal-title').textContent = 'Add Entry';
-  document.getElementById('edit-id').value = '';
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-type').value = '2fa';
-  document.getElementById('f-codes').value = '';
-  document.getElementById('f-notes').value = '';
+  document.getElementById('edit-id').value   = '';
+  document.getElementById('f-name').value    = '';
+  document.getElementById('f-type').value    = 'recovery';
+  document.getElementById('f-codes').value   = '';
+  document.getElementById('f-notes').value   = '';
   document.getElementById('icon-search').value = '';
   renderIconGrid();
   document.getElementById('modal').classList.add('open');
@@ -1365,18 +1413,21 @@ function editEntry(id) {
   if (!e) return;
   selectedIcon = e.icon || 'other';
   document.getElementById('modal-title').textContent = 'Edit Entry';
-  document.getElementById('edit-id').value = e.id;
-  document.getElementById('f-name').value = e.name;
-  document.getElementById('f-type').value = e.type;
-  document.getElementById('f-codes').value = e.codes.map(c=>c.code).join('\n');
-  document.getElementById('f-notes').value = e.notes || '';
+  document.getElementById('edit-id').value   = e.id;
+  document.getElementById('f-name').value    = e.name;
+  document.getElementById('f-type').value    = e.type;
+  document.getElementById('f-codes').value   = e.codes.map(c=>c.code).join('\n');
+  document.getElementById('f-notes').value   = e.notes || '';
   document.getElementById('icon-search').value = '';
   renderIconGrid();
   document.getElementById('modal').classList.add('open');
   pauseStars();
 }
 
-function closeModal() { document.getElementById('modal').classList.remove('open'); resumeStars(); }
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  resumeStars();
+}
 
 // ═══════════════════════════════════════════
 // UTILS
@@ -1391,8 +1442,9 @@ function copyAll(id) {
 function exportVault() {
   const data = JSON.stringify({ entries: state.entries, exportedAt: new Date().toISOString() }, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `andromeda-backup-${Date.now()}.json`;
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `andromeda-backup-${Date.now()}.json`;
   a.click(); URL.revokeObjectURL(url);
   showToast('Vault exported');
 }
