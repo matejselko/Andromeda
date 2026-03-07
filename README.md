@@ -1,8 +1,6 @@
 <div align="center">
 
-```
-                                              ✦ · · · ✦ · · · · ✦ · · ✦ · · · · · ✦ · · · ✦
-```
+✦ · · · ✦ · · · · ✦ · · ✦ · · · · · ✦ · · · ✦
 
 # ✦ Andromeda
 
@@ -84,11 +82,9 @@ Click **⬇ Export** inside the app to download a backup at any time.
 
 ---
 
-```
-✦ · · · ✦ · · · · ✦ · · ✦ · · · · · ✦ · · · ✦
-```
-
 <div align="center">
+
+✦ · · · ✦ · · · · ✦ · · ✦ · · · · · ✦ · · · ✦
 
 *Note: This project is 100% generated with [Claude.ai](https://claude.ai) because I hate programming.*
 
