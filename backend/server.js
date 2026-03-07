@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3000;
 
 const vaultLimiter = RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs for vault operations
+  max: 100,                  // 100 requests per IP per window
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' }
