@@ -664,7 +664,7 @@
     <div class="nav-links">
       <a href="#features" class="nav-link">Features</a>
       <a href="setup.html" class="nav-link">Setup</a>
-      <a href="https://github.com/matejselko/andromeda" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/yourusername/andromeda" class="nav-link" target="_blank">GitHub</a>
     </div>
   </nav>
 
@@ -852,11 +852,23 @@ function drawStar(s, t) {
 }
 
 let t = 0;
+let animPaused = false;
+let animFrame = null;
+
 function animateStars() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   t++;
   stars.forEach(s => drawStar(s, t));
-  requestAnimationFrame(animateStars);
+  animFrame = requestAnimationFrame(animateStars);
+}
+
+function pauseStars() {
+  animPaused = true;
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+}
+
+function resumeStars() {
+  if (animPaused) { animPaused = false; animateStars(); }
 }
 
 resizeCanvas(); initStars(); animateStars();
@@ -1345,6 +1357,7 @@ function openAddModal() {
   document.getElementById('icon-search').value = '';
   renderIconGrid();
   document.getElementById('modal').classList.add('open');
+  pauseStars();
 }
 
 function editEntry(id) {
@@ -1360,9 +1373,10 @@ function editEntry(id) {
   document.getElementById('icon-search').value = '';
   renderIconGrid();
   document.getElementById('modal').classList.add('open');
+  pauseStars();
 }
 
-function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); resumeStars(); }
 
 // ═══════════════════════════════════════════
 // UTILS
