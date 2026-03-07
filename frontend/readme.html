@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Andromeda — Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #000;
+    --surface: rgba(255,255,255,0.04);
+    --surface2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: rgba(255,255,255,0.9);
+    --muted: rgba(255,255,255,0.45);
+    --dim: rgba(255,255,255,0.25);
+    --white: #fff;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.75;
+    cursor: none;
+  }
+
+  #cursor {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 18px; height: 18px;
+    border: 1.5px solid rgba(255,255,255,0.6);
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+    transition: width 0.2s, height 0.2s;
+    mix-blend-mode: difference;
+  }
+  #cursor.h { width: 32px; height: 32px; background: rgba(255,255,255,0.08); }
+
+  canvas#stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 240px;
+    background: rgba(0,0,0,0.7);
+    border-right: 1px solid var(--border);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    z-index: 50;
+    padding: 2rem 0;
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 0 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .sidebar-logo h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem; font-weight: 400;
+    margin-bottom: 0.15rem;
+  }
+  .sidebar-logo span {
+    font-size: 0.72rem; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  .nav-section { padding: 0 1rem 1.5rem; }
+  .nav-section-label {
+    font-size: 0.65rem; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--dim); padding: 0 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+  .nav-link {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 10px;
+    font-size: 0.83rem; font-weight: 400;
+    color: var(--muted);
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: none;
+  }
+  .nav-link:hover { color: var(--white); background: var(--surface2); }
+  .nav-link.active { color: var(--white); background: var(--surface2); }
+
+  /* ── CONTENT ── */
+  .content {
+    margin-left: 240px;
+    padding: 4rem 4rem 4rem 4rem;
+    max-width: 900px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── SECTIONS ── */
+  .doc-section {
+    margin-bottom: 5rem;
+    scroll-margin-top: 2rem;
+  }
+
+  .hero-doc {
+    text-align: center;
+    padding: 5rem 0 4rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 5rem;
+  }
+  .hero-doc .badge-row {
+    display: flex; gap: 0.5rem; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 2rem;
+  }
+  .badge {
+    padding: 0.3rem 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    font-size: 0.72rem; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .badge.green { border-color: rgba(100,255,180,0.25); color: rgba(100,255,180,0.7); }
+  .badge.blue { border-color: rgba(100,180,255,0.25); color: rgba(100,180,255,0.7); }
+
+  .hero-doc h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 400; line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .hero-doc .tagline {
+    font-size: 1.05rem; font-weight: 300;
+    color: var(--muted); max-width: 500px; margin: 0 auto 2.5rem;
+  }
+
+  .btn-doc {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1.8rem;
+    border-radius: 50px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem; font-weight: 500;
+    text-decoration: none; cursor: none;
+    transition: all 0.3s;
+  }
+  .btn-doc.primary {
+    background: rgba(255,255,255,0.88);
+    border: 1px solid rgba(255,255,255,0.88);
+    color: #000;
+  }
+  .btn-doc.primary:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.15); }
+  .btn-doc.secondary {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+  }
+  .btn-doc.secondary:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+
+  /* ── TYPOGRAPHY ── */
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem; font-weight: 400;
+    margin-bottom: 0.6rem; line-height: 1.2;
+  }
+  h3 {
+    font-size: 1rem; font-weight: 600;
+    margin: 2rem 0 0.6rem;
+    color: var(--text);
+  }
+  p { color: var(--muted); margin-bottom: 1rem; }
+  a { color: var(--text); text-underline-offset: 3px; }
+
+  .section-intro {
+    font-size: 0.92rem; color: var(--muted);
+    margin-bottom: 2rem; max-width: 600px;
+  }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0 1.5rem;
+    position: relative; overflow: hidden;
+  }
+  .code-block::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  }
+  .code-block pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code-block .copy-btn {
+    position: absolute; top: 0.75rem; right: 0.75rem;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.72rem; color: var(--muted);
+    cursor: none; transition: all 0.2s;
+  }
+  .code-block .copy-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+
+  .code-lang {
+    font-size: 0.65rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.1em 0.4em;
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: 14px;
+    padding: 1.1rem 1.4rem;
+    margin: 1.5rem 0;
+    display: flex; gap: 0.75rem;
+    font-size: 0.85rem; line-height: 1.65;
+  }
+  .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
+  .callout.info { background: rgba(100,180,255,0.06); border: 1px solid rgba(100,180,255,0.15); color: rgba(180,210,255,0.75); }
+  .callout.warn { background: rgba(255,200,80,0.06); border: 1px solid rgba(255,200,80,0.18); color: rgba(255,220,130,0.75); }
+  .callout.danger { background: rgba(255,100,100,0.06); border: 1px solid rgba(255,100,100,0.18); color: rgba(255,160,160,0.75); }
+  .callout.success { background: rgba(80,255,160,0.06); border: 1px solid rgba(80,255,160,0.18); color: rgba(140,255,190,0.75); }
+
+  /* ── STEPS ── */
+  .steps { counter-reset: step; margin: 1.5rem 0; }
+  .step {
+    display: flex; gap: 1.25rem;
+    margin-bottom: 2rem; position: relative;
+  }
+  .step::before {
+    content: '';
+    position: absolute; left: 19px; top: 40px;
+    width: 1px; height: calc(100% - 10px);
+    background: var(--border);
+  }
+  .step:last-child::before { display: none; }
+  .step-num {
+    width: 40px; height: 40px; flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem; color: var(--muted);
+    counter-increment: step;
+  }
+  .step-body { flex: 1; padding-top: 0.5rem; }
+  .step-title { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+  .step-desc { font-size: 0.83rem; color: var(--muted); }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%; border-collapse: collapse;
+    margin: 1.5rem 0; font-size: 0.83rem;
+  }
+  th {
+    text-align: left; padding: 0.6rem 1rem;
+    font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--dim);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  tr:hover td { background: var(--surface); }
+  td:first-child { color: rgba(255,255,255,0.65); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+
+  /* ── FEATURES LIST ── */
+  .features-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+  .feat-row {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    transition: border-color 0.25s;
+    cursor: none;
+  }
+  .feat-row:hover { border-color: var(--border2); }
+  .feat-emoji { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.05rem; }
+  .feat-text h4 { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
+  .feat-text p { font-size: 0.8rem; color: var(--muted); margin: 0; line-height: 1.55; }
+
+  /* ── FOOTER NOTE ── */
+  .footer-note {
+    margin-top: 8rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .footer-note p {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.18);
+    font-weight: 300;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(20px);
+    border-radius: 30px; padding: 0.6rem 1.4rem;
+    font-size: 0.82rem; color: var(--white);
+    z-index: 999; opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.3,0.64,1);
+    transform: translateY(10px);
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .content { margin-left: 0; padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<canvas id="stars"></canvas>
+
+<div id="toast"></div>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>Andromeda</h1>
+    <span>Documentation</span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a href="#intro" class="nav-link active">✦ Introduction</a>
+    <a href="#features" class="nav-link">⊞ Features</a>
+    <a href="#security" class="nav-link">⊠ Security</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">For Image Hosters</div>
+    <a href="#setup-prereqs" class="nav-link">① Prerequisites</a>
+    <a href="#setup-build" class="nav-link">② Build Image</a>
+    <a href="#setup-publish" class="nav-link">③ Publish to GHCR</a>
+    <a href="#setup-config" class="nav-link">④ Configuration</a>
+    <a href="#setup-https" class="nav-link">⑤ HTTPS Setup</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">For Users</div>
+    <a href="#install-docker" class="nav-link">🐳 Docker Install</a>
+    <a href="#install-manual" class="nav-link">⚙ Manual Install</a>
+    <a href="#first-run" class="nav-link">🚀 First Run</a>
+    <a href="#backup" class="nav-link">📦 Backup & Restore</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Reference</div>
+    <a href="#env-vars" class="nav-link">⚡ Environment Vars</a>
+    <a href="#faq" class="nav-link">? FAQ</a>
+  </div>
+</nav>
+
+<div class="content">
+
+  <!-- HERO -->
+  <div class="hero-doc" id="intro">
+    <div class="badge-row">
+      <span class="badge green">✓ offline-first</span>
+      <span class="badge blue">AES-256-GCM</span>
+      <span class="badge">docker ready</span>
+      <span class="badge">self-hosted</span>
+      <span class="badge green">500+ icons</span>
+    </div>
+    <h1>Andromeda</h1>
+    <p class="tagline">A self-hosted, fully offline recovery code vault with end-to-end encryption. No cloud. No tracking. Just yours.</p>
+    <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+      <a href="index.html" class="btn-doc primary">Open Vault →</a>
+      <a href="https://github.com/yourusername/andromeda" class="btn-doc secondary" target="_blank">GitHub</a>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="doc-section" id="features">
+    <h2>Features</h2>
+    <p class="section-intro">Everything you need to store recovery codes safely — and nothing you don't.</p>
+    <div class="features-list">
+      <div class="feat-row"><span class="feat-emoji">🔒</span><div class="feat-text"><h4>AES-256-GCM Encryption</h4><p>All vault data is encrypted in your browser using the Web Crypto API before anything touches the server. PBKDF2-SHA256 with 310,000 iterations derives your key. The server stores only an opaque blob.</p></div></div>
+      <div class="feat-row"><span class="feat-emoji">🌐</span><div class="feat-text"><h4>Fully Offline After Setup</h4><p>Zero outbound network calls. No telemetry, no analytics, no CDN dependencies after initial load. DNS resolves to your machine only.</p></div></div>
+      <div class="feat-row"><span class="feat-emoji">🎨</span><div class="feat-text"><h4>500+ Service Icons</h4><p>Built-in icon library covering Proton, Ente, Google, GitHub, AWS, Cloudflare, Bitwarden, Discord and hundreds more — all locally served as emoji or SVG.</p></div></div>
+      <div class="feat-row"><span class="feat-emoji">🐳</span><div class="feat-text"><h4>Docker Native</h4><p>Single container. Runs on amd64 and arm64 (Raspberry Pi, Apple Silicon). One <code>docker run</code> or <code>docker compose up</code>.</p></div></div>
+      <div class="feat-row"><span class="feat-emoji">✓</span><div class="feat-text"><h4>Usage Tracking</h4><p>Click any code to mark it as used. Struck-through, dimmed, always visible. Remaining count shown on each card.</p></div></div>
+      <div class="feat-row"><span class="feat-emoji">📦</span><div class="feat-text"><h4>Export Encrypted Backup</h4><p>Download your vault as a <code>.json</code> anytime. Re-import on another Andromeda instance. The backup is still encrypted — your password is never exported.</p></div></div>
+      <div class="feat-row"><span class="feat-emoji">🖥</span><div class="feat-text"><h4>Liquid Glass UI</h4><p>Pure black-and-white iOS-inspired interface with mouse-reactive glass panels, animated star field, and a custom cursor. No dependencies — no React, no Vue.</p></div></div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="doc-section" id="security">
+    <h2>Security Model</h2>
+    <p class="section-intro">The encryption happens entirely in your browser. The server is a dumb store.</p>
+    <table>
+      <thead><tr><th>Layer</th><th>Method</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Encryption</td><td>AES-256-GCM</td><td>Authenticated encryption with 128-bit auth tag</td></tr>
+        <tr><td>Key derivation</td><td>PBKDF2-SHA256</td><td>310,000 iterations, 256-bit random salt per save</td></tr>
+        <tr><td>IV</td><td>96-bit random</td><td>Generated fresh every save via <code>getRandomValues</code></td></tr>
+        <tr><td>Storage</td><td>Single blob</td><td>Server stores only ciphertext — useless without password</td></tr>
+        <tr><td>Transport</td><td>HTTPS (recommended)</td><td>Use Caddy or Traefik in front for TLS termination</td></tr>
+      </tbody>
+    </table>
+    <div class="callout danger">
+      <span class="callout-icon">⚠</span>
+      <div><strong>No password recovery.</strong> If you lose your master password, your data is gone. There is no backdoor. Keep your password somewhere safe.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════ FOR IMAGE HOSTERS ══════════════ -->
+  <div class="doc-section" id="setup-prereqs">
+    <h2>For Image Hosters</h2>
+    <p class="section-intro">This section is for you — the person building and publishing the Docker image for others to use.</p>
+
+    <h3 id="setup-prereqs">① Prerequisites</h3>
+    <div class="features-list" style="gap:0.5rem">
+      <div class="feat-row"><span class="feat-emoji">🐳</span><div class="feat-text"><h4>Docker + Docker Buildx</h4><p>Install Docker Desktop or Docker Engine 24+. Buildx is bundled in Docker Desktop; for CLI installs run <code>docker buildx install</code>.</p></div></div>
+      <div class="feat-row"><span class="feat-emoji">🐙</span><div class="feat-text"><h4>GitHub account</h4><p>You'll push the image to GitHub Container Registry (GHCR). Create a repo and a Personal Access Token with <code>write:packages</code> scope.</p></div></div>
+      <div class="feat-row"><span class="feat-emoji">🖥</span><div class="feat-text"><h4>Node.js 20+ (optional)</h4><p>Only needed if you want to test locally before building the image.</p></div></div>
+    </div>
+  </div>
+
+  <div class="doc-section" id="setup-build">
+    <h3>② Clone & Build the Image</h3>
+    <div class="code-block">
+      <div class="code-lang">bash</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># Clone the repo
+git clone https://github.com/yourusername/andromeda.git
+cd andromeda
+
+# Build multi-arch image (amd64 + arm64)
+docker buildx create --use --name andromeda-builder
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --tag ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest \
+  --tag ghcr.io/YOUR_GITHUB_USERNAME/andromeda:1.0.0 \
+  --load \
+  .
+
+# Test locally first
+docker run -p 3000:3000 ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest</pre>
+    </div>
+    <div class="callout info">
+      <span class="callout-icon">ℹ</span>
+      <div>Replace <code>YOUR_GITHUB_USERNAME</code> with your actual GitHub username throughout.</div>
+    </div>
+  </div>
+
+  <div class="doc-section" id="setup-publish">
+    <h3>③ Publish to GitHub Container Registry</h3>
+    <div class="code-block">
+      <div class="code-lang">bash</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># Log in to GHCR
+echo YOUR_GITHUB_PAT | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+
+# Push the image
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --tag ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest \
+  --tag ghcr.io/YOUR_GITHUB_USERNAME/andromeda:1.0.0 \
+  --push \
+  .</pre>
+    </div>
+    <p>After pushing, go to your GitHub repo → <strong>Packages</strong> → set the package visibility to <strong>Public</strong> so users can pull without authentication.</p>
+
+    <h3>Automated via GitHub Actions</h3>
+    <p>The repo includes <code>.github/workflows/docker.yml</code> which automatically builds and pushes on every push to <code>main</code> and on version tags. Just push your code — CI handles the rest.</p>
+    <div class="code-block">
+      <div class="code-lang">bash</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># Tag a release to trigger a versioned build
+git tag v1.0.0
+git push origin v1.0.0</pre>
+    </div>
+  </div>
+
+  <div class="doc-section" id="setup-config">
+    <h3>④ Configuration Reference</h3>
+    <div id="env-vars">
+    <table>
+      <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>PORT</td><td>3000</td><td>HTTP port the server listens on</td></tr>
+        <tr><td>DATA_FILE</td><td>/data/vault.enc</td><td>Path to the encrypted vault file</td></tr>
+        <tr><td>NODE_ENV</td><td>production</td><td>Set to <code>development</code> for verbose logs</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="callout success">
+      <span class="callout-icon">✓</span>
+      <div>Andromeda does <strong>not</strong> require any secrets or API keys to run. The encryption happens entirely in the browser.</div>
+    </div>
+  </div>
+
+  <div class="doc-section" id="setup-https">
+    <h3>⑤ HTTPS with Caddy (Recommended)</h3>
+    <p>Put Caddy in front of Andromeda for automatic TLS certificates via Let's Encrypt.</p>
+    <div class="code-block">
+      <div class="code-lang">Caddyfile</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>vault.yourdomain.com {
+    reverse_proxy andromeda:3000
+}</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-lang">docker-compose.yml — with Caddy</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>version: '3.9'
+services:
+  andromeda:
+    image: ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest
+    expose: ["3000"]
+    volumes:
+      - andromeda-data:/data
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:alpine
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [andromeda]
+    restart: unless-stopped
+
+volumes:
+  andromeda-data:
+  caddy-data:
+  caddy-config:</pre>
+    </div>
+  </div>
+
+  <!-- ══════════════ FOR USERS ══════════════ -->
+  <div class="doc-section" id="install-docker">
+    <h2>Installation — For Users</h2>
+    <p class="section-intro">Deploy Andromeda on your own machine in under 2 minutes.</p>
+
+    <h3>🐳 Option A — Docker Run (simplest)</h3>
+    <div class="code-block">
+      <div class="code-lang">bash</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>docker run -d \
+  --name andromeda \
+  --restart unless-stopped \
+  -p 3000:3000 \
+  -v andromeda-data:/data \
+  ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest</pre>
+    </div>
+    <p>Then open <code>http://localhost:3000</code> in your browser.</p>
+
+    <h3>🐳 Option B — Docker Compose (recommended)</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Download the compose file</div>
+          <div class="code-block" style="margin-top:0.5rem">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre>curl -O https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/andromeda/main/docker-compose.yml</pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Start Andromeda</div>
+          <div class="code-block" style="margin-top:0.5rem">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <pre>docker compose up -d</pre>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Open in browser</div>
+          <div class="step-desc">Navigate to <code>http://localhost:3000</code> and follow the first-run setup wizard.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-section" id="install-manual">
+    <h3>⚙ Option C — Manual (Node.js)</h3>
+    <div class="code-block">
+      <div class="code-lang">bash</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># Requires Node.js 20+
+git clone https://github.com/YOUR_GITHUB_USERNAME/andromeda.git
+cd andromeda/backend
+npm install
+node server.js</pre>
+    </div>
+    <p>The server serves the frontend from <code>../frontend/</code> automatically.</p>
+  </div>
+
+  <div class="doc-section" id="first-run">
+    <h3>🚀 First Run</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Open Andromeda</div>
+          <div class="step-desc">Navigate to your Andromeda URL. You'll see the welcome screen with stars.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Click "Enter Andromeda"</div>
+          <div class="step-desc">Since no vault exists yet, the setup wizard appears automatically.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Create a master password</div>
+          <div class="step-desc">Choose a strong password. This is the <strong>only key</strong> to your vault. Write it down and store it somewhere safe (a password manager, for example).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Add your first entry</div>
+          <div class="step-desc">Click <strong>+ Add Entry</strong>, select a service icon, paste your recovery codes one per line, and save.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout warn">
+      <span class="callout-icon">💡</span>
+      <div>On subsequent visits, clicking <em>Enter Andromeda</em> will show the unlock screen. Enter your master password to decrypt and access your vault.</div>
+    </div>
+  </div>
+
+  <div class="doc-section" id="backup">
+    <h3>📦 Backup & Restore</h3>
+    <h3>Export your vault</h3>
+    <p>Click <strong>⬇ Export</strong> in the top bar to download a <code>.json</code> backup. This file is encrypted — it's safe to store in cloud storage.</p>
+
+    <h3>Backup the Docker volume</h3>
+    <div class="code-block">
+      <div class="code-lang">bash</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># Create a backup archive
+docker run --rm \
+  -v andromeda-data:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/andromeda-backup-$(date +%Y%m%d).tar.gz /data
+
+# Restore from backup
+docker run --rm \
+  -v andromeda-data:/data \
+  -v $(pwd):/backup \
+  alpine tar xzf /backup/andromeda-backup-YYYYMMDD.tar.gz -C /</pre>
+    </div>
+
+    <h3>Migrate to a new server</h3>
+    <div class="code-block">
+      <div class="code-lang">bash</div>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># On the old server: copy the vault file
+docker cp andromeda:/data/vault.enc ./vault.enc
+
+# On the new server: restore it
+docker cp ./vault.enc andromeda:/data/vault.enc</pre>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="doc-section" id="faq">
+    <h2>FAQ</h2>
+
+    <h3>Does Andromeda work without internet?</h3>
+    <p>Yes, completely. After the container starts, everything runs locally. No external requests are made. Even the fonts are embedded.</p>
+
+    <h3>Where is my data stored?</h3>
+    <p>In a Docker named volume (<code>andromeda-data</code>) at <code>/data/vault.enc</code> inside the container. The file is always encrypted — even reading it directly from disk reveals nothing without your master password.</p>
+
+    <h3>Can I run multiple instances?</h3>
+    <p>Yes, but each instance has its own separate vault file. There is no sync between instances.</p>
+
+    <h3>What happens if I forget my password?</h3>
+    <p>Your data is gone. This is by design — Andromeda has no password recovery, no server-side key escrow, and no backdoor. Keep your master password in another password manager.</p>
+
+    <h3>Can I use it without Docker?</h3>
+    <p>Yes. Clone the repo and run <code>node backend/server.js</code>. Node.js 20+ required. The vault file is saved to <code>/data/vault.enc</code> by default — change <code>DATA_FILE</code> to a local path.</p>
+  </div>
+
+  <!-- FOOTER NOTE -->
+  <div class="footer-note">
+    <p>
+      ───────────────────────────────────────────────────────────────────<br><br>
+      Note: This project is 100% generated with Claude.ai because I hate programming.
+    </p>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+// Stars
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+function init() {
+  stars = Array.from({length: Math.floor(canvas.width*canvas.height/9000)}, () => ({
+    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+    r: Math.random()*1.1+0.15, phase: Math.random()*Math.PI*2,
+    speed: Math.random()*0.004+0.001, cross: Math.random()>0.88
+  }));
+}
+let t=0;
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  t++;
+  stars.forEach(s => {
+    const a = (Math.sin(t*s.speed+s.phase)*0.5+0.5)*0.55+0.05;
+    ctx.globalAlpha = a;
+    if (s.cross) {
+      ctx.strokeStyle='white'; ctx.lineWidth=0.5; ctx.beginPath();
+      ctx.moveTo(s.x-s.r*2.5,s.y); ctx.lineTo(s.x+s.r*2.5,s.y);
+      ctx.moveTo(s.x,s.y-s.r*2.5); ctx.lineTo(s.x,s.y+s.r*2.5);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  });
+  requestAnimationFrame(draw);
+}
+resize(); init(); draw();
+window.addEventListener('resize',()=>{resize();init();});
+
+// Cursor
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => { cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
+document.addEventListener('mouseover', e => { if (e.target.matches('a,button,.feat-row,.nav-link')) cur.classList.add('h'); });
+document.addEventListener('mouseout', e => { if (e.target.matches('a,button,.feat-row,.nav-link')) cur.classList.remove('h'); });
+
+// Copy buttons
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
+    btn.textContent = 'Copied!';
+    showToast('Copied to clipboard');
+    setTimeout(() => btn.textContent='Copy', 2000);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// Active nav on scroll
+const sections = document.querySelectorAll('[id]');
+const links = document.querySelectorAll('.nav-link');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
