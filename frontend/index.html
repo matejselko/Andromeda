@@ -8,745 +8,261 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --white: #ffffff;
-    --off-white: rgba(255,255,255,0.85);
-    --dim: rgba(255,255,255,0.5);
-    --faint: rgba(255,255,255,0.2);
+    --white: #ffffff; --off-white: rgba(255,255,255,0.85);
+    --dim: rgba(255,255,255,0.5); --faint: rgba(255,255,255,0.2);
     --fainter: rgba(255,255,255,0.08);
-    --black: #000000;
-    --glass: rgba(255,255,255,0.08);
-    --glass-border: rgba(255,255,255,0.15);
-    --glass-hover: rgba(255,255,255,0.13);
+    --glass: rgba(255,255,255,0.08); --glass-border: rgba(255,255,255,0.15);
   }
+  html, body { height:100%; background:#000; color:#fff; font-family:'Outfit',sans-serif; overflow-x:hidden; cursor:none; }
 
-  html, body {
-    height: 100%;
-    background: #000;
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    overflow-x: hidden;
-    cursor: none;
-  }
+  #cursor { position:fixed; pointer-events:none; z-index:9999; width:18px; height:18px; border:1.5px solid rgba(255,255,255,0.6); border-radius:50%; transform:translate(-50%,-50%); transition:width .18s,height .18s,background .18s; mix-blend-mode:difference; }
+  #cursor.hover { width:34px; height:34px; background:rgba(255,255,255,0.08); }
 
-  /* ═══ CUSTOM CURSOR ═══ */
-  #cursor {
-    position: fixed; pointer-events: none; z-index: 9999;
-    width: 20px; height: 20px;
-    border: 1.5px solid rgba(255,255,255,0.7);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.2s, height 0.2s, background 0.2s, border-color 0.2s;
-    mix-blend-mode: difference;
-  }
-  #cursor.hover {
-    width: 36px; height: 36px;
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.9);
-  }
+  #star-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
-  /* ═══ STAR CANVAS ═══ */
-  #star-canvas {
-    position: fixed; inset: 0; z-index: 0;
-    pointer-events: none;
-  }
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+  @keyframes modalPop { from{transform:scale(.93) translateY(18px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+  @keyframes slideIn  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes cardIn   { from{opacity:0;transform:translateY(14px) scale(.98)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes chipIn   { from{opacity:0;transform:translateX(-8px) scale(.96)} to{opacity:1;transform:translateX(0) scale(1)} }
+  @keyframes spin     { to{transform:rotate(360deg)} }
 
-  /* ═══ WELCOME PAGE ═══ */
-  #welcome-page {
-    position: relative; z-index: 1;
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center;
-  }
+  /* ─── WELCOME ─── */
+  #welcome-page { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; }
+  .top-nav { width:100%; padding:2rem 3rem; display:flex; align-items:center; justify-content:space-between; animation:fadeDown .8s ease .2s both; }
+  .nav-logo { display:flex; align-items:center; gap:.55rem; font-size:.88rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); }
+  .nav-links { display:flex; gap:.4rem; }
+  .nav-link { padding:.38rem .95rem; border-radius:30px; font-size:.8rem; color:var(--dim); text-decoration:none; background:var(--fainter); border:1px solid transparent; transition:all .25s; cursor:none; }
+  .nav-link:hover { color:#fff; background:var(--glass); border-color:var(--glass-border); }
+  .hero { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:4rem 2rem 2rem; }
+  .hero-constellation { width:72px; height:72px; margin-bottom:2.2rem; animation:fadeUp .9s ease .4s both; }
+  .hero-eyebrow { font-size:.72rem; font-weight:400; letter-spacing:.26em; text-transform:uppercase; color:var(--faint); margin-bottom:1.1rem; animation:fadeUp .9s ease .5s both; }
+  .hero-title { font-family:'DM Serif Display',serif; font-size:clamp(3.8rem,10vw,7.5rem); font-weight:400; line-height:.93; color:#fff; margin-bottom:1.4rem; animation:fadeUp .9s ease .6s both; }
+  .hero-sub { font-size:.98rem; font-weight:300; color:var(--dim); max-width:400px; line-height:1.75; margin-bottom:2.8rem; animation:fadeUp .9s ease .75s both; }
+  .enter-btn { position:relative; padding:.95rem 2.6rem; background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.22); border-radius:50px; color:#fff; font-family:'Outfit',sans-serif; font-size:.92rem; font-weight:500; cursor:none; text-decoration:none; backdrop-filter:blur(20px); transition:all .35s cubic-bezier(.34,1.56,.64,1); animation:fadeUp .9s ease .9s both; }
+  .enter-btn:hover { background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.45); transform:translateY(-3px) scale(1.02); box-shadow:0 18px 55px rgba(255,255,255,0.07); }
 
-  /* NAV */
-  .top-nav {
-    width: 100%;
-    padding: 2rem 3rem;
-    display: flex; align-items: center; justify-content: space-between;
-    animation: fadeDown 1s ease 0.3s both;
-  }
-  .nav-logo {
-    display: flex; align-items: center; gap: 0.6rem;
-    font-size: 0.9rem; font-weight: 500; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--dim);
-  }
-  .nav-logo svg { opacity: 0.6; }
-  .nav-links { display: flex; gap: 0.4rem; }
-  .nav-link {
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    font-size: 0.82rem; font-weight: 400;
-    color: var(--dim);
-    text-decoration: none;
-    background: var(--fainter);
-    border: 1px solid transparent;
-    transition: all 0.3s;
-    cursor: none;
-  }
-  .nav-link:hover {
-    color: var(--white);
-    background: var(--glass);
-    border-color: var(--glass-border);
-  }
+  .features-section { width:100%; max-width:1100px; padding:4rem 2rem 6rem; animation:fadeUp .9s ease 1.1s both; }
+  .section-label { text-align:center; font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; color:var(--faint); margin-bottom:2.8rem; }
+  .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,0.06); border-radius:22px; overflow:hidden; border:1px solid rgba(255,255,255,0.07); }
+  .feature-card { background:rgba(0,0,0,0.8); padding:1.8rem 1.6rem; transition:background .28s; }
+  .feature-card:hover { background:rgba(255,255,255,0.04); }
+  .feature-icon { font-size:1.4rem; margin-bottom:.85rem; display:block; }
+  .feature-name { font-size:.88rem; font-weight:500; color:#fff; margin-bottom:.45rem; }
+  .feature-desc { font-size:.78rem; font-weight:300; color:var(--dim); line-height:1.65; }
 
-  /* HERO */
-  .hero {
-    flex: 1;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center;
-    padding: 4rem 2rem 2rem;
-    gap: 0;
-  }
+  /* ─── APP ─── */
+  #app-page { display:none; position:relative; z-index:1; min-height:100vh; flex-direction:column; }
+  #app-page.active { display:flex; animation:fadeIn .3s ease; }
 
-  .hero-constellation {
-    width: 80px; height: 80px;
-    margin-bottom: 2.5rem;
-    animation: fadeUp 1s ease 0.5s both;
-    position: relative;
-  }
+  .vault-nav { padding:1.1rem 2rem; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(0,0,0,0.7); backdrop-filter:blur(30px); position:sticky; top:0; z-index:50; }
+  .vault-nav-logo { font-family:'DM Serif Display',serif; font-size:1.15rem; color:#fff; display:flex; align-items:center; gap:.5rem; }
+  .vault-nav-right { display:flex; gap:.45rem; }
+  .pill-btn { padding:.42rem 1rem; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:30px; font-family:'Outfit',sans-serif; font-size:.78rem; color:var(--dim); cursor:none; transition:all .22s; display:flex; align-items:center; gap:.32rem; white-space:nowrap; }
+  .pill-btn:hover { color:#fff; border-color:rgba(255,255,255,0.28); background:rgba(255,255,255,0.1); }
+  .pill-btn.active { color:#fff; background:rgba(255,255,255,0.11); border-color:rgba(255,255,255,0.22); }
 
-  .hero-eyebrow {
-    font-size: 0.75rem; font-weight: 400;
-    letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--faint);
-    margin-bottom: 1.2rem;
-    animation: fadeUp 1s ease 0.6s both;
-  }
+  .vault-main { flex:1; padding:2rem; max-width:1200px; width:100%; margin:0 auto; }
+  .vault-toolbar { display:flex; align-items:center; gap:.85rem; margin-bottom:2rem; flex-wrap:wrap; }
+  .search-wrap { position:relative; flex:1; min-width:200px; }
+  .search-wrap svg { position:absolute; left:.95rem; top:50%; transform:translateY(-50%); opacity:.3; pointer-events:none; }
+  .search-input { width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:50px; padding:.6rem 1rem .6rem 2.7rem; color:#fff; font-family:'Outfit',sans-serif; font-size:.83rem; outline:none; transition:all .22s; }
+  .search-input:focus { border-color:rgba(255,255,255,0.28); background:rgba(255,255,255,0.08); }
+  .search-input::placeholder { color:rgba(255,255,255,0.22); }
+  .filter-row { display:flex; gap:.38rem; flex-wrap:wrap; }
+  .add-btn { padding:.6rem 1.3rem; background:rgba(255,255,255,0.87); border:none; border-radius:50px; font-family:'Outfit',sans-serif; font-size:.83rem; font-weight:600; color:#000; cursor:none; transition:all .28s; white-space:nowrap; }
+  .add-btn:hover { background:#fff; transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,255,255,0.16); }
 
-  .hero-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(4rem, 10vw, 7.5rem);
-    font-weight: 400;
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    color: var(--white);
-    margin-bottom: 1.5rem;
-    animation: fadeUp 1s ease 0.7s both;
-  }
+  /* ─── CARDS ─── */
+  .entries-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; }
+  .entry-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:1.35rem; transition:border-color .28s,background .28s,box-shadow .28s,transform .28s; position:relative; overflow:hidden; cursor:none; animation:cardIn .35s ease both; }
+  .entry-card::after { content:''; position:absolute; inset:0; background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.055) 0%,transparent 62%); opacity:0; transition:opacity .3s; pointer-events:none; border-radius:inherit; }
+  .entry-card:hover { border-color:rgba(255,255,255,0.16); background:rgba(255,255,255,0.07); transform:translateY(-3px); box-shadow:0 18px 55px rgba(0,0,0,0.5); }
+  .entry-card:hover::after { opacity:1; }
+  .entry-card.pinned { border-color:rgba(255,255,255,0.22); background:rgba(255,255,255,0.055); }
+  .pin-badge { position:absolute; top:.75rem; right:.75rem; font-size:.6rem; opacity:.45; pointer-events:none; }
+  .card-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1rem; gap:.6rem; }
+  .card-icon { width:40px; height:40px; border-radius:11px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+  .card-meta { flex:1; min-width:0; }
+  .card-name { font-size:.93rem; font-weight:500; margin-bottom:.12rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .card-note { font-size:.73rem; color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .card-actions { display:flex; gap:.28rem; opacity:0; transition:opacity .18s; flex-shrink:0; }
+  .entry-card:hover .card-actions { opacity:1; }
+  .card-action-btn { width:27px; height:27px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.09); border-radius:7px; display:flex; align-items:center; justify-content:center; cursor:none; transition:all .18s; color:var(--dim); font-size:.72rem; }
+  .card-action-btn:hover { background:rgba(255,255,255,0.13); color:#fff; border-color:rgba(255,255,255,0.22); }
+  .card-action-btn.del:hover { color:#ff6b6b; border-color:rgba(255,107,107,0.35); background:rgba(255,107,107,0.07); }
+  .card-action-btn.is-pinned { color:rgba(255,255,255,0.55); }
+  .codes-list { display:flex; flex-direction:column; gap:.28rem; margin-bottom:1rem; }
+  .code-chip { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:7px; padding:.4rem .7rem; font-family:monospace; font-size:.78rem; color:rgba(255,255,255,0.65); display:flex; align-items:center; justify-content:space-between; gap:.5rem; cursor:none; transition:all .18s; }
+  .code-chip:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.16); }
+  .code-chip.used { opacity:.3; text-decoration:line-through; }
+  .code-chip-text { font-family:monospace; letter-spacing:.07em; flex:1; }
+  .code-tick { font-size:.6rem; opacity:0; transition:opacity .18s; flex-shrink:0; }
+  .code-chip:hover .code-tick { opacity:1; }
+  .card-footer { display:flex; align-items:center; justify-content:space-between; padding-top:.85rem; border-top:1px solid rgba(255,255,255,0.05); }
+  .card-remaining { font-size:.7rem; color:var(--dim); }
+  .type-badge { font-size:.62rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; padding:.18rem .6rem; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09); color:rgba(255,255,255,0.4); }
 
-  .hero-sub {
-    font-size: 1rem; font-weight: 300;
-    color: var(--dim);
-    max-width: 420px;
-    line-height: 1.7;
-    margin-bottom: 3rem;
-    animation: fadeUp 1s ease 0.85s both;
-  }
+  /* ─── FORMS ─── */
+  .form-label { display:block; font-size:.7rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-bottom:.45rem; }
+  .form-label small { font-size:.65rem; font-weight:300; text-transform:none; letter-spacing:0; color:rgba(255,255,255,0.2); margin-left:.4rem; }
+  .form-input,.form-select { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.11); border-radius:13px; padding:.82rem 1.05rem; color:#fff; font-family:'Outfit',sans-serif; font-size:.88rem; outline:none; margin-bottom:1.15rem; transition:border-color .22s,background .22s; }
+  .form-input:focus,.form-select:focus { border-color:rgba(255,255,255,0.38); background:rgba(255,255,255,0.09); }
+  .form-input::placeholder { color:rgba(255,255,255,0.22); }
+  .form-select option { background:#111; }
+  .pw-wrap { position:relative; }
+  .pw-toggle { position:absolute; right:.95rem; top:50%; transform:translateY(-55%); background:none; border:none; color:var(--dim); cursor:none; font-size:.95rem; transition:color .18s; }
+  .pw-toggle:hover { color:#fff; }
+  .btn-next,.btn-back { font-family:'Outfit',sans-serif; font-size:.88rem; font-weight:500; cursor:none; border-radius:50px; padding:.78rem 1.85rem; transition:all .26s; border:1px solid; }
+  .btn-next { background:rgba(255,255,255,0.88); border-color:rgba(255,255,255,0.88); color:#000; }
+  .btn-next:hover { background:#fff; transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,255,255,0.18); }
+  .btn-next:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+  .btn-back { background:transparent; border-color:rgba(255,255,255,0.13); color:var(--dim); }
+  .btn-back:hover { border-color:rgba(255,255,255,0.32); color:#fff; }
 
-  .enter-btn {
-    position: relative;
-    padding: 1rem 2.8rem;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 50px;
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    cursor: none;
-    text-decoration: none;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    animation: fadeUp 1s ease 1s both;
-    overflow: hidden;
-  }
-  .enter-btn::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.15) 0%, transparent 70%);
-    opacity: 0; transition: opacity 0.3s;
-    border-radius: inherit;
-  }
-  .enter-btn:hover {
-    background: rgba(255,255,255,0.16);
-    border-color: rgba(255,255,255,0.5);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 20px 60px rgba(255,255,255,0.08), 0 0 0 1px rgba(255,255,255,0.1);
-  }
-  .enter-btn:hover::before { opacity: 1; }
-  .enter-btn span { position: relative; z-index: 1; }
+  /* ─── MODAL ─── */
+  .modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.72); backdrop-filter:blur(10px); display:none; align-items:flex-start; justify-content:center; padding:2vh 1rem; overflow-y:auto; }
+  .modal-overlay.open { display:flex; animation:fadeIn .2s ease; }
+  .modal { background:rgba(14,14,14,0.97); border:1px solid rgba(255,255,255,0.11); border-radius:26px; padding:2.3rem; width:100%; max-width:480px; margin:auto; box-shadow:0 50px 120px rgba(0,0,0,0.9); animation:modalPop .32s cubic-bezier(.34,1.56,.64,1); backdrop-filter:blur(40px); }
+  .modal h2 { font-family:'DM Serif Display',serif; font-size:1.65rem; font-weight:400; margin-bottom:1.6rem; }
+  .modal-actions { display:flex; justify-content:flex-end; gap:.65rem; margin-top:1.6rem; padding-top:1.2rem; border-top:1px solid rgba(255,255,255,0.07); }
 
-  /* ═══ FEATURES SECTION ═══ */
-  .features-section {
-    width: 100%;
-    max-width: 1100px;
-    padding: 4rem 2rem 6rem;
-    animation: fadeUp 1s ease 1.2s both;
-  }
+  /* ─── ICON PICKER ─── */
+  .icon-picker-wrap { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:13px; padding:.9rem; margin-bottom:1.15rem; }
+  .icon-picker-search { width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:9px; padding:.5rem .85rem; color:#fff; font-family:'Outfit',sans-serif; font-size:.8rem; outline:none; margin-bottom:.75rem; transition:border-color .2s; }
+  .icon-picker-search:focus { border-color:rgba(255,255,255,0.3); }
+  .icon-picker-search::placeholder { color:rgba(255,255,255,0.22); }
+  .icon-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:.35rem; max-height:160px; overflow-y:auto; }
+  .icon-option { aspect-ratio:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.07); border-radius:9px; display:flex; align-items:center; justify-content:center; cursor:none; transition:all .18s; padding:.35rem; }
+  .icon-option:hover { background:rgba(255,255,255,0.11); border-color:rgba(255,255,255,0.22); transform:scale(1.08); }
+  .icon-option.selected { background:rgba(255,255,255,0.14); border-color:rgba(255,255,255,0.48); }
 
-  .section-label {
-    text-align: center;
-    font-size: 0.72rem; font-weight: 400;
-    letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--faint);
-    margin-bottom: 3rem;
-  }
+  /* ─── CODE CHIP INPUT ─── */
+  .codes-section { margin-bottom:1.15rem; }
+  .codes-chips-list { display:flex; flex-direction:column; gap:.25rem; margin-bottom:.45rem; min-height:0; }
+  .code-input-chip { background:rgba(255,255,255,0.055); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:.38rem .7rem; font-family:monospace; font-size:.83rem; color:rgba(255,255,255,0.8); display:flex; align-items:center; justify-content:space-between; gap:.5rem; animation:chipIn .18s ease both; }
+  .code-input-chip .chip-text { flex:1; letter-spacing:.05em; }
+  .code-input-chip .chip-remove { opacity:.35; cursor:none; font-size:.7rem; transition:opacity .15s; flex-shrink:0; padding:.1rem .2rem; }
+  .code-input-chip .chip-remove:hover { opacity:.9; }
+  .code-entry-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.11); border-radius:10px; padding:.68rem 1rem; color:#fff; font-family:monospace; font-size:.85rem; outline:none; transition:border-color .22s; }
+  .code-entry-input:focus { border-color:rgba(255,255,255,0.38); }
+  .code-entry-input::placeholder { color:rgba(255,255,255,0.18); font-family:'Outfit',sans-serif; font-size:.82rem; }
+  .code-hint { font-size:.7rem; color:rgba(255,255,255,0.18); margin-top:.3rem; }
 
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 24px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.08);
-  }
+  /* ─── UPLOAD ─── */
+  .upload-zone { border:1px dashed rgba(255,255,255,0.18); border-radius:13px; padding:1.35rem; text-align:center; cursor:none; transition:all .22s; margin-bottom:1.15rem; }
+  .upload-zone:hover,.upload-zone.drag { border-color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.035); }
+  .upload-zone p { font-size:.8rem; color:var(--dim); }
+  .upload-zone strong { color:#fff; }
+  .upload-result { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:.7rem .95rem; margin-bottom:.5rem; font-size:.78rem; color:var(--dim); animation:slideIn .2s ease; }
+  .upload-result strong { color:#fff; display:block; margin-bottom:.22rem; }
 
-  .feature-card {
-    background: rgba(0,0,0,0.8);
-    padding: 2rem 1.75rem;
-    transition: background 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-  .feature-card::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.05) 0%, transparent 60%);
-    opacity: 0; transition: opacity 0.4s;
-  }
-  .feature-card:hover { background: rgba(255,255,255,0.04); }
-  .feature-card:hover::before { opacity: 1; }
+  /* ─── TOAST ─── */
+  #toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(10px); background:rgba(255,255,255,0.11); border:1px solid rgba(255,255,255,0.18); backdrop-filter:blur(20px); border-radius:30px; padding:.6rem 1.45rem; font-size:.83rem; color:#fff; z-index:9999; opacity:0; transition:all .32s cubic-bezier(.34,1.3,.64,1); pointer-events:none; white-space:nowrap; }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-  .feature-icon {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    display: block;
-  }
-  .feature-name {
-    font-size: 0.9rem; font-weight: 500;
-    color: var(--white);
-    margin-bottom: 0.5rem;
-  }
-  .feature-desc {
-    font-size: 0.8rem; font-weight: 300;
-    color: var(--dim);
-    line-height: 1.65;
-  }
+  /* ─── LOCK ─── */
+  #lock-overlay { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.88); backdrop-filter:blur(22px); display:none; align-items:center; justify-content:center; }
+  #lock-overlay.active { display:flex; animation:fadeIn .25s ease; }
+  .lock-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.11); border-radius:26px; padding:2.8rem; width:100%; max-width:380px; text-align:center; backdrop-filter:blur(40px); animation:modalPop .4s cubic-bezier(.34,1.56,.64,1); }
+  .lock-icon { margin-bottom:1.1rem; animation:fadeUp .5s ease both; }
+  .lock-card h2 { font-family:'DM Serif Display',serif; font-size:1.75rem; margin-bottom:.38rem; }
+  .lock-card p { color:var(--dim); font-size:.83rem; margin-bottom:1.8rem; }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  /* ─── SETUP ─── */
+  .setup-overlay { position:fixed; inset:0; z-index:150; display:flex; align-items:center; justify-content:center; padding:2rem; background:rgba(0,0,0,0.65); backdrop-filter:blur(10px); animation:fadeIn .28s ease both; }
+  .setup-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.11); border-radius:26px; padding:2.8rem; width:100%; max-width:500px; backdrop-filter:blur(40px); box-shadow:0 40px 100px rgba(0,0,0,0.85); animation:modalPop .5s cubic-bezier(.34,1.56,.64,1) both; }
+  .step-bar { display:flex; gap:.38rem; margin-bottom:2.2rem; }
+  .step-seg { height:2.5px; border-radius:2px; background:rgba(255,255,255,0.12); flex:1; transition:background .4s; }
+  .step-seg.done { background:rgba(255,255,255,0.75); }
+  .step-seg.active { background:rgba(255,255,255,0.42); }
+  .setup-step { display:none; animation:slideIn .3s ease both; }
+  .setup-step.active { display:block; }
+  .setup-title { font-family:'DM Serif Display',serif; font-size:1.9rem; margin-bottom:.45rem; line-height:1.1; }
+  .setup-sub { font-size:.83rem; font-weight:300; color:var(--dim); margin-bottom:1.9rem; line-height:1.65; }
 
-  /* ═══ APP PAGE (vault) ═══ */
-  #app-page {
-    display: none;
-    position: relative; z-index: 1;
-    min-height: 100vh;
-    flex-direction: column;
-  }
-  #app-page.active { display: flex; }
+  /* ─── EMPTY ─── */
+  .empty-state { grid-column:1/-1; text-align:center; padding:6rem 2rem; animation:fadeIn .4s ease; }
+  .empty-icon { font-size:3rem; margin-bottom:.9rem; opacity:.18; }
+  .empty-title { font-size:.95rem; color:var(--dim); margin-bottom:.38rem; }
+  .empty-sub { font-size:.8rem; color:rgba(255,255,255,0.18); }
 
-  /* ═══ SETUP WIZARD ═══ */
-  #setup-page {
-    display: none;
-    position: relative; z-index: 1;
-    min-height: 100vh;
-    align-items: center; justify-content: center;
-    padding: 2rem;
-  }
-  #setup-page.active { display: flex; }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.14); border-radius:2px; }
 
-  .setup-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 28px;
-    padding: 3rem;
-    width: 100%; max-width: 520px;
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
-    box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-    animation: fadeUp 0.6s ease both;
-  }
-
-  .setup-step { display: none; }
-  .setup-step.active { display: block; }
-
-  .step-indicator {
-    display: flex; gap: 0.4rem; margin-bottom: 2.5rem;
-  }
-  .step-dot {
-    height: 3px; border-radius: 2px;
-    background: rgba(255,255,255,0.15);
-    flex: 1; transition: background 0.4s;
-  }
-  .step-dot.done { background: rgba(255,255,255,0.8); }
-  .step-dot.active { background: rgba(255,255,255,0.5); }
-
-  .setup-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem; font-weight: 400;
-    margin-bottom: 0.5rem;
-  }
-  .setup-subtitle {
-    font-size: 0.85rem; font-weight: 300;
-    color: var(--dim); margin-bottom: 2rem; line-height: 1.6;
-  }
-
-  .form-label {
-    display: block;
-    font-size: 0.72rem; font-weight: 500;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--dim); margin-bottom: 0.5rem;
-  }
-  .form-input, .form-select {
-    width: 100%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 14px;
-    padding: 0.85rem 1.1rem;
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.9rem;
-    outline: none;
-    margin-bottom: 1.2rem;
-    transition: border-color 0.25s, background 0.25s;
-  }
-  .form-input:focus, .form-select:focus {
-    border-color: rgba(255,255,255,0.4);
-    background: rgba(255,255,255,0.09);
-  }
-  .form-input::placeholder { color: rgba(255,255,255,0.25); }
-  .form-select option { background: #111; }
-
-  .pw-wrap { position: relative; }
-  .pw-toggle {
-    position: absolute; right: 1rem; top: 50%; transform: translateY(-55%);
-    background: none; border: none; color: var(--dim); cursor: none;
-    font-size: 1rem; padding: 0; transition: color 0.2s;
-  }
-  .pw-toggle:hover { color: var(--white); }
-
-  .btn-next, .btn-back {
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.9rem; font-weight: 500;
-    cursor: none; border-radius: 50px;
-    padding: 0.8rem 2rem;
-    transition: all 0.3s;
-    border: 1px solid;
-  }
-  .btn-next {
-    background: rgba(255,255,255,0.9);
-    border-color: rgba(255,255,255,0.9);
-    color: #000;
-  }
-  .btn-next:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.2); }
-  .btn-back {
-    background: transparent;
-    border-color: rgba(255,255,255,0.15);
-    color: var(--dim);
-    margin-right: 0.75rem;
-  }
-  .btn-back:hover { border-color: rgba(255,255,255,0.35); color: var(--white); }
-
-  /* ═══ MAIN VAULT UI ═══ */
-  .vault-nav {
-    padding: 1.2rem 2rem;
-    display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    position: sticky; top: 0; z-index: 50;
-  }
-  .vault-nav-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.2rem; color: var(--white);
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-  .vault-nav-right { display: flex; gap: 0.5rem; }
-
-  .pill-btn {
-    padding: 0.45rem 1.1rem;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 30px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.8rem; font-weight: 400;
-    color: var(--dim); cursor: none;
-    transition: all 0.25s;
-    display: flex; align-items: center; gap: 0.35rem;
-  }
-  .pill-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
-  .pill-btn.active { color: var(--white); background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
-
-  .vault-main { flex: 1; padding: 2rem; max-width: 1200px; width: 100%; margin: 0 auto; }
-
-  .vault-toolbar {
-    display: flex; align-items: center; gap: 1rem;
-    margin-bottom: 2rem; flex-wrap: wrap;
-  }
-  .search-wrap { position: relative; flex: 1; min-width: 220px; }
-  .search-wrap svg { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); opacity: 0.35; pointer-events: none; }
-  .search-input {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 50px;
-    padding: 0.65rem 1rem 0.65rem 2.8rem;
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.85rem; outline: none;
-    transition: all 0.25s;
-  }
-  .search-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); }
-  .search-input::placeholder { color: rgba(255,255,255,0.25); }
-
-  .filter-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-
-  .add-btn {
-    padding: 0.65rem 1.4rem;
-    background: rgba(255,255,255,0.88);
-    border: none;
-    border-radius: 50px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.85rem; font-weight: 600;
-    color: #000; cursor: none;
-    transition: all 0.3s;
-    white-space: nowrap;
-  }
-  .add-btn:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.18); }
-
-  /* ═══ ENTRY CARDS ═══ */
-  .entries-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-  }
-
-  .entry-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 1.4rem;
-    transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
-    position: relative; overflow: hidden;
-    cursor: none;
-  }
-  .entry-card::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.06) 0%, transparent 65%);
-    opacity: 0; transition: opacity 0.35s;
-    pointer-events: none; border-radius: inherit;
-  }
-  .entry-card:hover {
-    border-color: rgba(255,255,255,0.18);
-    background: rgba(255,255,255,0.07);
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-  .entry-card:hover::after { opacity: 1; }
-
-  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
-  .card-icon {
-    width: 42px; height: 42px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.1);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem;
-    overflow: hidden;
-  }
-  .card-icon img { width: 28px; height: 28px; object-fit: contain; }
-
-  .card-actions { display: flex; gap: 0.3rem; opacity: 0; transition: opacity 0.2s; }
-  .entry-card:hover .card-actions { opacity: 1; }
-  .card-action-btn {
-    width: 28px; height: 28px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: none; transition: all 0.2s;
-    color: var(--dim); font-size: 0.75rem;
-  }
-  .card-action-btn:hover { background: rgba(255,255,255,0.14); color: var(--white); border-color: rgba(255,255,255,0.25); }
-  .card-action-btn.del:hover { color: #ff6b6b; border-color: rgba(255,107,107,0.4); background: rgba(255,107,107,0.08); }
-
-  .card-name { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.15rem; }
-  .card-service { font-size: 0.75rem; color: var(--dim); margin-bottom: 1.1rem; }
-
-  .codes-list { display: flex; flex-direction: column; gap: 0.3rem; }
-  .code-chip {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    padding: 0.45rem 0.75rem;
-    font-family: 'Outfit', monospace;
-    font-size: 0.8rem; color: rgba(255,255,255,0.7);
-    display: flex; align-items: center; justify-content: space-between;
-    cursor: none; transition: all 0.2s;
-  }
-  .code-chip:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.18); }
-  .code-chip.used { opacity: 0.35; text-decoration: line-through; }
-  .code-chip-text { font-family: 'Outfit', monospace; letter-spacing: 0.06em; }
-  .code-tick { font-size: 0.65rem; opacity: 0; transition: opacity 0.2s; }
-  .code-chip:hover .code-tick { opacity: 1; }
-
-  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid rgba(255,255,255,0.06); }
-  .card-remaining { font-size: 0.72rem; color: var(--dim); }
-  .type-badge {
-    font-size: 0.65rem; font-weight: 500;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 0.2rem 0.65rem;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.5);
-  }
-
-  /* ═══ MODAL ═══ */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    display: none; align-items: center; justify-content: center; padding: 1rem;
-    animation: fadeIn 0.2s ease;
-  }
-  .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: rgba(20,20,20,0.9);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 28px;
-    padding: 2.5rem;
-    width: 100%; max-width: 480px;
-    max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 50px 120px rgba(0,0,0,0.9);
-    animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
-  }
-
-  @keyframes modalPop {
-    from { transform: scale(0.92) translateY(20px); opacity: 0; }
-    to { transform: scale(1) translateY(0); opacity: 1; }
-  }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-  .modal h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.7rem; font-weight: 400;
-    margin-bottom: 1.75rem;
-  }
-  .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.75rem; }
-
-  /* ═══ ICON PICKER ═══ */
-  .icon-picker-wrap {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 14px;
-    padding: 1rem;
-    margin-bottom: 1.2rem;
-    max-height: 200px; overflow-y: auto;
-  }
-  .icon-picker-search {
-    width: 100%;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    padding: 0.55rem 0.9rem;
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.82rem; outline: none;
-    margin-bottom: 0.8rem;
-    transition: border-color 0.2s;
-  }
-  .icon-picker-search:focus { border-color: rgba(255,255,255,0.3); }
-  .icon-picker-search::placeholder { color: rgba(255,255,255,0.25); }
-
-  .icon-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 0.4rem;
-  }
-  .icon-option {
-    aspect-ratio: 1;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: none; transition: all 0.2s; font-size: 1rem;
-    padding: 0.4rem;
-  }
-  .icon-option img { width: 100%; height: 100%; object-fit: contain; }
-  .icon-option:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); transform: scale(1.1); }
-  .icon-option.selected { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); }
-
-  /* ═══ TOAST ═══ */
-  #toast {
-    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px);
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 30px;
-    padding: 0.65rem 1.5rem;
-    font-size: 0.85rem; color: var(--white);
-    z-index: 999; opacity: 0;
-    transition: all 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
-    pointer-events: none;
-  }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ═══ LOCK OVERLAY ═══ */
-  #lock-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    display: none; align-items: center; justify-content: center;
-  }
-  #lock-overlay.active { display: flex; }
-
-  .lock-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 28px;
-    padding: 3rem;
-    width: 100%; max-width: 400px;
-    text-align: center;
-    backdrop-filter: blur(40px);
-    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .lock-card h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.8rem; margin-bottom: 0.4rem;
-  }
-  .lock-card p { color: var(--dim); font-size: 0.85rem; margin-bottom: 2rem; }
-
-  /* ═══ EMPTY STATE ═══ */
-  .empty-state {
-    grid-column: 1/-1;
-    text-align: center; padding: 6rem 2rem;
-  }
-  .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.2; }
-  .empty-title { font-size: 1rem; font-weight: 400; color: var(--dim); margin-bottom: 0.4rem; }
-  .empty-sub { font-size: 0.82rem; color: rgba(255,255,255,0.2); }
-
-  .entry-card.pinned {
-    border-color: rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.07);
-  }
-  .entry-card.pinned .pin-indicator {
-    display: block;
-  }
-  .pin-indicator {
-    display: none;
-    position: absolute;
-    top: 0.75rem; right: 0.75rem;
-    font-size: 0.65rem;
-    opacity: 0.4;
-  }
-
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-
-  @media (max-width: 768px) {
-    .features-grid { grid-template-columns: 1fr; }
-    .hero-title { font-size: 3.5rem; }
-    .top-nav { padding: 1.5rem; }
-    .nav-links { display: none; }
+  @media (max-width:768px) {
+    .features-grid { grid-template-columns:1fr; }
+    .hero-title { font-size:3.2rem; }
+    .top-nav { padding:1.4rem 1.5rem; }
+    .nav-links { display:none; }
+    .vault-main { padding:1.2rem; }
   }
 </style>
 </head>
 <body>
-
 <div id="cursor"></div>
 <canvas id="star-canvas"></canvas>
 
-<!-- ═══════════ WELCOME PAGE ═══════════ -->
+<!-- ══════════════════ WELCOME ══════════════════ -->
 <div id="welcome-page">
   <nav class="top-nav">
     <div class="nav-logo">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0-10 10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M22 12a10 10 0 0 1-10 10"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0-10 10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M22 12a10 10 0 0 1-10 10"/></svg>
       Andromeda
     </div>
     <div class="nav-links">
       <a href="#features" class="nav-link">Features</a>
-      <a href="setup.html" class="nav-link">Setup</a>
-      <a href="https://github.com/yourusername/andromeda" class="nav-link" target="_blank">GitHub</a>
+      <a href="readme.html" class="nav-link">Docs</a>
+      <a href="https://github.com/matejselko/andromeda" class="nav-link" target="_blank">GitHub</a>
     </div>
   </nav>
-
   <div class="hero">
     <div class="hero-constellation" id="hero-svg"></div>
     <p class="hero-eyebrow">Self-hosted · Encrypted · Offline</p>
     <h1 class="hero-title">Andromeda</h1>
     <p class="hero-sub">Your recovery codes, secured locally. AES-256 encrypted. No cloud. No tracking. Just yours.</p>
-    <a href="app.html" class="enter-btn" id="enter-btn">
-      <span>Enter Andromeda →</span>
-    </a>
+    <a href="#" class="enter-btn" id="enter-btn">Enter Andromeda →</a>
   </div>
-
   <div class="features-section" id="features">
     <p class="section-label">Everything you need</p>
     <div class="features-grid">
-      <div class="feature-card glass-card">
-        <span class="feature-icon">🔒</span>
-        <div class="feature-name">AES-256-GCM Encryption</div>
-        <div class="feature-desc">Military-grade encryption with PBKDF2 key derivation. Your data is unreadable without your master password.</div>
-      </div>
-      <div class="feature-card glass-card">
-        <span class="feature-icon">🌐</span>
-        <div class="feature-name">Fully Offline</div>
-        <div class="feature-desc">Zero internet required after setup. All encryption happens on your device. No telemetry, no analytics.</div>
-      </div>
-      <div class="feature-card glass-card">
-        <span class="feature-icon">🎨</span>
-        <div class="feature-name">Service Icon Library</div>
-        <div class="feature-desc">500+ brand icons built-in — Proton, Google, Ente, GitHub, AWS and many more, all locally served.</div>
-      </div>
-      <div class="feature-card glass-card">
-        <span class="feature-icon">🐳</span>
-        <div class="feature-name">Docker Native</div>
-        <div class="feature-desc">One command deployment. Persistent encrypted volume. Runs anywhere Docker runs.</div>
-      </div>
-      <div class="feature-card glass-card">
-        <span class="feature-icon">✓</span>
-        <div class="feature-name">Usage Tracking</div>
-        <div class="feature-desc">Mark recovery codes as used. Always know which codes remain available at a glance.</div>
-      </div>
-      <div class="feature-card glass-card">
-        <span class="feature-icon">📦</span>
-        <div class="feature-name">Export & Backup</div>
-        <div class="feature-desc">Export your vault as an encrypted file anytime. Import on a new machine in seconds.</div>
-      </div>
+      <div class="feature-card"><span class="feature-icon">🔒</span><div class="feature-name">AES-256-GCM Encryption</div><div class="feature-desc">Military-grade with PBKDF2 key derivation. Unreadable without your master password.</div></div>
+      <div class="feature-card"><span class="feature-icon">🌐</span><div class="feature-name">Fully Offline</div><div class="feature-desc">Zero internet required after setup. All encryption happens locally. No telemetry.</div></div>
+      <div class="feature-card"><span class="feature-icon">🎨</span><div class="feature-name">Real Brand Icons</div><div class="feature-desc">GitHub, Google, Proton, Discord, Bitwarden and dozens more — actual logos.</div></div>
+      <div class="feature-card"><span class="feature-icon">🐳</span><div class="feature-name">Docker Native</div><div class="feature-desc">One command deployment. Persistent encrypted volume. Runs anywhere Docker runs.</div></div>
+      <div class="feature-card"><span class="feature-icon">📌</span><div class="feature-name">Pin & Organise</div><div class="feature-desc">Pin important entries, filter by type, search instantly across all your codes.</div></div>
+      <div class="feature-card"><span class="feature-icon">📁</span><div class="feature-name">File Import</div><div class="feature-desc">Upload .txt, .json or .csv files — codes are auto-read and previewed before saving.</div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ VAULT APP ═══════════ -->
+<!-- ══════════════════ APP ══════════════════ -->
 <div id="app-page">
   <nav class="vault-nav">
     <div class="vault-nav-logo">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0-10 10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M22 12a10 10 0 0 1-10 10"/></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0-10 10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M22 12a10 10 0 0 1-10 10"/></svg>
       Andromeda
     </div>
     <div class="vault-nav-right">
-      <button class="pill-btn" onclick="exportVault()">⬇ Export</button>
-      <button class="pill-btn" onclick="lockVault()">⊠ Lock</button>
+      <button class="pill-btn" onclick="exportVault()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+      <button class="pill-btn" onclick="lockVault()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Lock
+      </button>
     </div>
   </nav>
-
   <div class="vault-main">
     <div class="vault-toolbar">
       <div class="search-wrap">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input class="search-input" type="text" placeholder="Search services…" id="search-input" oninput="renderEntries()" />
       </div>
       <div class="filter-row">
@@ -762,707 +278,798 @@
   </div>
 </div>
 
-<!-- ═══════════ LOCK SCREEN ═══════════ -->
+<!-- ══════════════════ LOCK SCREEN ══════════════════ -->
 <div id="lock-overlay">
   <div class="lock-card">
-    <div style="font-size:2.5rem;margin-bottom:1.2rem;opacity:0.6">⊠</div>
+    <div class="lock-icon">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
     <h2>Vault Locked</h2>
     <p>Enter your master password to unlock</p>
-    <div class="pw-wrap" style="margin-bottom:1.2rem">
-      <input class="form-input" type="password" id="unlock-pw" placeholder="Master password…" onkeydown="if(event.key==='Enter')unlockVault()" style="margin-bottom:0" />
+    <div class="pw-wrap" style="margin-bottom:1.1rem">
+      <input class="form-input" type="password" id="unlock-pw" placeholder="Master password…"
+        onkeydown="if(event.key==='Enter')unlockVault()" style="margin-bottom:0" />
       <button class="pw-toggle" onclick="togglePw('unlock-pw',this)">👁</button>
     </div>
-    <div style="color:#ff6b6b;font-size:0.8rem;margin-bottom:1rem;min-height:1.2em" id="unlock-error"></div>
-    <button class="btn-next" style="width:100%" onclick="unlockVault()">Unlock</button>
+    <div style="color:#ff6b6b;font-size:.78rem;margin-bottom:.9rem;min-height:1.1em" id="unlock-error"></div>
+    <button class="btn-next" id="unlock-btn" style="width:100%" onclick="unlockVault()">Unlock</button>
   </div>
 </div>
 
-<!-- ═══════════ ADD/EDIT MODAL ═══════════ -->
+<!-- ══════════════════ ADD/EDIT MODAL ══════════════════ -->
 <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h2 id="modal-title">Add Entry</h2>
     <input type="hidden" id="edit-id" />
 
     <label class="form-label">Service Name</label>
-    <input class="form-input" id="f-name" placeholder="GitHub, Google, Proton…" />
+    <input class="form-input" id="f-name" placeholder="GitHub, Google, Proton…" autocomplete="off" />
 
     <label class="form-label">Icon</label>
     <div class="icon-picker-wrap">
-      <input class="icon-picker-search" id="icon-search" placeholder="Search icons…" oninput="filterIcons(this.value)" />
+      <input class="icon-picker-search" id="icon-search" placeholder="Search icons…" oninput="renderIconGrid(this.value)" autocomplete="off" />
       <div class="icon-grid" id="icon-grid"></div>
     </div>
 
     <label class="form-label">Type</label>
-    <select class="form-select" id="f-type">
+    <select class="form-select" id="f-type" onchange="onTypeChange()">
       <option value="recovery">Recovery Codes</option>
       <option value="passphrase">Passphrases</option>
       <option value="bitlocker">BitLocker</option>
       <option value="other">Other</option>
     </select>
 
-    <label class="form-label">Recovery Codes <span style="font-weight:300;text-transform:none;letter-spacing:0;color:rgba(255,255,255,0.2)">(one per line)</span></label>
-    <textarea class="form-input" id="f-codes" style="resize:vertical;min-height:120px;font-family:monospace" placeholder="xxxx-xxxx&#10;yyyy-yyyy&#10;zzzz-zzzz"></textarea>
+    <!-- Codes section — changes based on type -->
+    <div id="codes-section">
+      <label class="form-label" id="codes-label">Codes <small>Press Enter after each code</small></label>
+      <div class="codes-section">
+        <div class="codes-chips-list" id="codes-chips"></div>
+        <input class="code-entry-input" id="code-entry" placeholder="Type a code and press Enter…" autocomplete="off" />
+        <div class="code-hint" id="code-hint">Paste multiple codes at once — they'll all be added</div>
+      </div>
+    </div>
 
-    <label class="form-label">Notes</label>
-    <input class="form-input" id="f-notes" placeholder="Account email, username…" />
+    <label class="form-label">Import from file <small>optional — auto-reads codes</small></label>
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+      <p><strong>Click to upload</strong> or drag & drop</p>
+      <p style="font-size:.72rem;margin-top:.25rem;opacity:.6">.txt · .json · .csv</p>
+      <input type="file" id="file-input" accept=".txt,.json,.csv,.bek" style="display:none" onchange="handleFile(this)" />
+    </div>
+    <div id="upload-result"></div>
+
+    <label class="form-label">Notes <small>email, username…</small></label>
+    <input class="form-input" id="f-notes" placeholder="Optional notes" autocomplete="off" />
 
     <div class="modal-actions">
       <button class="btn-back" onclick="closeModal()">Cancel</button>
-      <button class="btn-next" onclick="saveEntry()">Save</button>
+      <button class="btn-next" id="save-btn" onclick="saveEntry()">Save Entry</button>
     </div>
   </div>
 </div>
+
+<div id="toast"></div>
+
 <script>
-// ═══════════════════════════════════════════
-// STAR CANVAS
-// ═══════════════════════════════════════════
+'use strict';
+
+// ════════════════════════════════════════════
+// STARS
+// ════════════════════════════════════════════
 const canvas = document.getElementById('star-canvas');
-const ctx = canvas.getContext('2d');
-let stars = [];
+const ctx    = canvas.getContext('2d');
+let stars = [], sT = 0, sPaused = false, sFrame = null;
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-
-function initStars() {
+function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+function initStars(){
   stars = [];
-  const count = Math.floor((canvas.width * canvas.height) / 8000);
-  for (let i = 0; i < count; i++) {
-    stars.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.2 + 0.2,
-      alpha: Math.random(),
-      speed: Math.random() * 0.003 + 0.001,
-      phase: Math.random() * Math.PI * 2,
-      cross: Math.random() > 0.85
-    });
-  }
+  const n = Math.floor((canvas.width * canvas.height) / 8500);
+  for(let i=0;i<n;i++) stars.push({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    r:Math.random()*1.1+0.2, spd:Math.random()*.003+.001,
+    ph:Math.random()*Math.PI*2, cross:Math.random()>.87
+  });
 }
-
-function drawStar(s, t) {
-  const a = (Math.sin(t * s.speed + s.phase) * 0.5 + 0.5) * 0.7 + 0.05;
+function drawStar(s){
+  const a = (Math.sin(sT*s.spd+s.ph)*.5+.5)*.68+.04;
   ctx.globalAlpha = a;
-  if (s.cross) {
-    ctx.strokeStyle = 'rgba(255,255,255,1)';
-    ctx.lineWidth = 0.5;
+  if(s.cross){
+    ctx.strokeStyle='#fff'; ctx.lineWidth=.45;
     ctx.beginPath();
-    ctx.moveTo(s.x - s.r * 2.5, s.y);
-    ctx.lineTo(s.x + s.r * 2.5, s.y);
-    ctx.moveTo(s.x, s.y - s.r * 2.5);
-    ctx.lineTo(s.x, s.y + s.r * 2.5);
+    ctx.moveTo(s.x-s.r*2.4,s.y); ctx.lineTo(s.x+s.r*2.4,s.y);
+    ctx.moveTo(s.x,s.y-s.r*2.4); ctx.lineTo(s.x,s.y+s.r*2.4);
     ctx.stroke();
   } else {
-    ctx.fillStyle = 'rgba(255,255,255,1)';
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
   }
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha=1;
 }
+function animStars(){ ctx.clearRect(0,0,canvas.width,canvas.height); sT++; stars.forEach(drawStar); sFrame=requestAnimationFrame(animStars); }
+function pauseStars(){ sPaused=true; if(sFrame){cancelAnimationFrame(sFrame);sFrame=null;} }
+function resumeStars(){ if(sPaused){sPaused=false;animStars();} }
+resizeCanvas(); initStars(); animStars();
+window.addEventListener('resize',()=>{ resizeCanvas(); initStars(); });
 
-let t = 0;
-let animPaused = false;
-let animFrame = null;
-
-function animateStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  t++;
-  stars.forEach(s => drawStar(s, t));
-  animFrame = requestAnimationFrame(animateStars);
-}
-
-function pauseStars() {
-  animPaused = true;
-  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
-}
-
-function resumeStars() {
-  if (animPaused) { animPaused = false; animateStars(); }
-}
-
-resizeCanvas(); initStars(); animateStars();
-window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
-
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // CURSOR
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 const cursor = document.getElementById('cursor');
-document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
-});
-document.addEventListener('mouseover', e => {
-  if (e.target.matches('a,button,.entry-card,.icon-option,.code-chip,.nav-link,.pill-btn,.add-btn,.btn-next,.btn-back,.card-action-btn')) {
-    cursor.classList.add('hover');
-  }
-});
-document.addEventListener('mouseout', e => {
-  if (e.target.matches('a,button,.entry-card,.icon-option,.code-chip,.nav-link,.pill-btn,.add-btn,.btn-next,.btn-back,.card-action-btn')) {
-    cursor.classList.remove('hover');
-  }
-});
+const HOVER_SEL = 'a,button,.entry-card,.icon-option,.code-chip,.pill-btn,.add-btn,.card-action-btn,.upload-zone,.code-entry-input,.chip-remove';
+document.addEventListener('mousemove',e=>{ cursor.style.left=e.clientX+'px'; cursor.style.top=e.clientY+'px'; });
+document.addEventListener('mouseover',e=>{ if(e.target.closest(HOVER_SEL)) cursor.classList.add('hover'); });
+document.addEventListener('mouseout', e=>{ if(e.target.closest(HOVER_SEL)) cursor.classList.remove('hover'); });
 
-// ═══════════════════════════════════════════
-// LIQUID GLASS MOUSE EFFECT — throttled to fix flicker
-// ═══════════════════════════════════════════
-let mouseMoveScheduled = false;
-document.addEventListener('mousemove', e => {
-  if (mouseMoveScheduled) return;
-  mouseMoveScheduled = true;
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.entry-card,.feature-card,.enter-btn').forEach(el => {
-      const rect = el.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-      const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-      el.style.setProperty('--mx', x + '%');
-      el.style.setProperty('--my', y + '%');
+// Mouse glow on cards — throttled
+let mgQ=false;
+document.addEventListener('mousemove',e=>{
+  if(mgQ)return; mgQ=true;
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('.entry-card,.feature-card').forEach(el=>{
+      const r=el.getBoundingClientRect();
+      el.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+      el.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
     });
-    mouseMoveScheduled = false;
+    mgQ=false;
   });
 });
 
-// ═══════════════════════════════════════════
-// HERO CONSTELLATION SVG
-// ═══════════════════════════════════════════
-(function() {
-  const pts = [[40,10],[70,25],[60,55],[30,65],[15,40],[55,80]];
-  const lines = [[0,1],[1,2],[2,3],[3,4],[4,0],[2,5]];
-  let svg = `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">`;
-  lines.forEach(([a,b]) => {
-    svg += `<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>`;
-  });
-  pts.forEach((p,i) => {
-    svg += `<circle cx="${p[0]}" cy="${p[1]}" r="${i===0?2.5:1.5}" fill="white" opacity="${i===0?0.9:0.5}"/>`;
-  });
-  svg += `</svg>`;
-  const el = document.getElementById('hero-svg');
-  if (el) el.innerHTML = svg;
+// ════════════════════════════════════════════
+// HERO SVG
+// ════════════════════════════════════════════
+(function(){
+  const pts=[[40,10],[70,25],[60,55],[30,65],[15,40],[55,80]],lines=[[0,1],[1,2],[2,3],[3,4],[4,0],[2,5]];
+  let s=`<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">`;
+  lines.forEach(([a,b])=>s+=`<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>`);
+  pts.forEach((p,i)=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="${i===0?2.4:1.4}" fill="white" opacity="${i===0?0.85:0.45}"/>`);
+  s+=`</svg>`;
+  const el=document.getElementById('hero-svg');
+  if(el) el.innerHTML=s;
 })();
 
-// ═══════════════════════════════════════════
-// ENTER BTN
-// ═══════════════════════════════════════════
-const enterBtn = document.getElementById('enter-btn');
-if (enterBtn) {
-  enterBtn.addEventListener('click', e => {
-    e.preventDefault();
-    navigateToApp();
-  });
-}
+document.getElementById('enter-btn').addEventListener('click',e=>{ e.preventDefault(); navigateToApp(); });
 
-// ═══════════════════════════════════════════
-// ICON DATABASE — real logos via Simple Icons CDN
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
+// ICON LIBRARY
+// ════════════════════════════════════════════
 const ICONS = [
-  { id:'github',       label:'GitHub',       slug:'github' },
-  { id:'google',       label:'Google',       slug:'google' },
-  { id:'proton',       label:'Proton',       slug:'proton' },
-  { id:'apple',        label:'Apple',        slug:'apple' },
-  { id:'microsoft',    label:'Microsoft',    slug:'microsoft' },
-  { id:'amazon',       label:'Amazon',       slug:'amazon' },
-  { id:'aws',          label:'AWS',          slug:'amazonaws' },
-  { id:'cloudflare',   label:'Cloudflare',   slug:'cloudflare' },
-  { id:'discord',      label:'Discord',      slug:'discord' },
-  { id:'dropbox',      label:'Dropbox',      slug:'dropbox' },
-  { id:'facebook',     label:'Facebook',     slug:'facebook' },
-  { id:'instagram',    label:'Instagram',    slug:'instagram' },
-  { id:'twitter',      label:'X / Twitter',  slug:'x' },
-  { id:'linkedin',     label:'LinkedIn',     slug:'linkedin' },
-  { id:'netflix',      label:'Netflix',      slug:'netflix' },
-  { id:'spotify',      label:'Spotify',      slug:'spotify' },
-  { id:'steam',        label:'Steam',        slug:'steam' },
-  { id:'twitch',       label:'Twitch',       slug:'twitch' },
-  { id:'bitwarden',    label:'Bitwarden',    slug:'bitwarden' },
-  { id:'1password',    label:'1Password',    slug:'1password' },
-  { id:'binance',      label:'Binance',      slug:'binance' },
-  { id:'coinbase',     label:'Coinbase',     slug:'coinbase' },
-  { id:'digitalocean', label:'DigitalOcean', slug:'digitalocean' },
-  { id:'docker',       label:'Docker',       slug:'docker' },
-  { id:'gitlab',       label:'GitLab',       slug:'gitlab' },
-  { id:'notion',       label:'Notion',       slug:'notion' },
-  { id:'paypal',       label:'PayPal',       slug:'paypal' },
-  { id:'reddit',       label:'Reddit',       slug:'reddit' },
-  { id:'signal',       label:'Signal',       slug:'signal' },
-  { id:'slack',        label:'Slack',        slug:'slack' },
-  { id:'telegram',     label:'Telegram',     slug:'telegram' },
-  { id:'vercel',       label:'Vercel',       slug:'vercel' },
-  { id:'netlify',      label:'Netlify',      slug:'netlify' },
-  { id:'hetzner',      label:'Hetzner',      slug:'hetzner' },
-  { id:'nextcloud',    label:'Nextcloud',    slug:'nextcloud' },
-  { id:'synology',     label:'Synology',     slug:'synology' },
-  { id:'youtube',      label:'YouTube',      slug:'youtube' },
-  { id:'zoom',         label:'Zoom',         slug:'zoom' },
-  { id:'wordpress',    label:'WordPress',    slug:'wordpress' },
-  { id:'stripe',       label:'Stripe',       slug:'stripe' },
-  { id:'namecheap',    label:'Namecheap',    slug:'namecheap' },
-  { id:'other',        label:'Other',        slug:null },
+  {id:'github',     label:'GitHub',      slug:'github'},
+  {id:'google',     label:'Google',      slug:'google'},
+  {id:'proton',     label:'Proton',      slug:'proton'},
+  {id:'apple',      label:'Apple',       slug:'apple'},
+  {id:'microsoft',  label:'Microsoft',   slug:'microsoft'},
+  {id:'amazon',     label:'Amazon',      slug:'amazon'},
+  {id:'aws',        label:'AWS',         slug:'amazonaws'},
+  {id:'cloudflare', label:'Cloudflare',  slug:'cloudflare'},
+  {id:'discord',    label:'Discord',     slug:'discord'},
+  {id:'dropbox',    label:'Dropbox',     slug:'dropbox'},
+  {id:'facebook',   label:'Facebook',    slug:'facebook'},
+  {id:'instagram',  label:'Instagram',   slug:'instagram'},
+  {id:'twitter',    label:'X/Twitter',   slug:'x'},
+  {id:'linkedin',   label:'LinkedIn',    slug:'linkedin'},
+  {id:'netflix',    label:'Netflix',     slug:'netflix'},
+  {id:'spotify',    label:'Spotify',     slug:'spotify'},
+  {id:'steam',      label:'Steam',       slug:'steam'},
+  {id:'twitch',     label:'Twitch',      slug:'twitch'},
+  {id:'bitwarden',  label:'Bitwarden',   slug:'bitwarden'},
+  {id:'1password',  label:'1Password',   slug:'1password'},
+  {id:'binance',    label:'Binance',     slug:'binance'},
+  {id:'coinbase',   label:'Coinbase',    slug:'coinbase'},
+  {id:'digitalocean',label:'DigitalOcean',slug:'digitalocean'},
+  {id:'docker',     label:'Docker',      slug:'docker'},
+  {id:'gitlab',     label:'GitLab',      slug:'gitlab'},
+  {id:'notion',     label:'Notion',      slug:'notion'},
+  {id:'paypal',     label:'PayPal',      slug:'paypal'},
+  {id:'reddit',     label:'Reddit',      slug:'reddit'},
+  {id:'signal',     label:'Signal',      slug:'signal'},
+  {id:'slack',      label:'Slack',       slug:'slack'},
+  {id:'telegram',   label:'Telegram',    slug:'telegram'},
+  {id:'vercel',     label:'Vercel',      slug:'vercel'},
+  {id:'netlify',    label:'Netlify',     slug:'netlify'},
+  {id:'hetzner',    label:'Hetzner',     slug:'hetzner'},
+  {id:'nextcloud',  label:'Nextcloud',   slug:'nextcloud'},
+  {id:'synology',   label:'Synology',    slug:'synology'},
+  {id:'youtube',    label:'YouTube',     slug:'youtube'},
+  {id:'zoom',       label:'Zoom',        slug:'zoom'},
+  {id:'wordpress',  label:'WordPress',   slug:'wordpress'},
+  {id:'stripe',     label:'Stripe',      slug:'stripe'},
+  {id:'namecheap',  label:'Namecheap',   slug:'namecheap'},
+  {id:'other',      label:'Other',       slug:null},
 ];
 
-function iconImg(ic, size = 22) {
-  if (!ic || !ic.slug) return `<span style="font-size:1.1rem;opacity:0.5">⚡</span>`;
-  return `<img src="https://cdn.simpleicons.org/${ic.slug}/ffffff" width="${size}" height="${size}" alt="${ic.label}" style="filter:brightness(0) invert(1);opacity:0.85" onerror="this.style.display='none';this.nextSibling.style.display='inline'" /><span style="display:none;font-size:1.1rem">⚡</span>`;
+function iconImg(ic, size=22){
+  if(!ic||!ic.slug) return `<span style="font-size:.95rem;opacity:.35">⚡</span>`;
+  return `<img src="https://cdn.simpleicons.org/${ic.slug}/ffffff" width="${size}" height="${size}" alt="${ic.label}" style="opacity:.82" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'⚡',style:'font-size:.9rem;opacity:.35'}))" />`;
 }
 
 let selectedIcon = 'other';
-
-function renderIconGrid(filter = '') {
-  const grid = document.getElementById('icon-grid');
-  if (!grid) return;
-  const filtered = filter
-    ? ICONS.filter(i => i.label.toLowerCase().includes(filter.toLowerCase()))
-    : ICONS;
-  grid.innerHTML = filtered.map(ic => `
-    <div class="icon-option${selectedIcon===ic.id?' selected':''}" onclick="selectIcon('${ic.id}')" title="${ic.label}">
-      ${iconImg(ic, 20)}
-    </div>
-  `).join('');
+function renderIconGrid(filter=''){
+  const grid = document.getElementById('icon-grid'); if(!grid) return;
+  const f = filter ? ICONS.filter(i=>i.label.toLowerCase().includes(filter.toLowerCase())) : ICONS;
+  grid.innerHTML = f.map(ic=>`<div class="icon-option${selectedIcon===ic.id?' selected':''}" onclick="selectIcon('${ic.id}')" title="${ic.label}">${iconImg(ic,17)}</div>`).join('');
 }
-
-function filterIcons(q) { renderIconGrid(q); }
-function selectIcon(id) {
+function selectIcon(id){
   selectedIcon = id;
-  document.querySelectorAll('.icon-option').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.icon-option').forEach(el=>el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
 }
 
-// ═══════════════════════════════════════════
-// STATE & CRYPTO
-// ═══════════════════════════════════════════
-let state = { unlocked: false, password: '', entries: [], filter: 'all' };
+// ════════════════════════════════════════════
+// TYPE-AWARE LABELS
+// ════════════════════════════════════════════
+const TYPE_CONFIG = {
+  recovery:   { label:'Recovery Codes', placeholder:'xxxx-xxxx-xxxx', hint:'One code per line, or paste all at once', autoSpace:false },
+  passphrase: { label:'Passphrases',    placeholder:'correct horse battery staple', hint:'One passphrase per line', autoSpace:false },
+  bitlocker:  { label:'BitLocker Keys', placeholder:'XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX', hint:'48-digit BitLocker key — will be auto-formatted', autoSpace:true },
+  other:      { label:'Keys / Codes',   placeholder:'Enter key or code', hint:'One entry per line', autoSpace:false },
+};
 
-async function deriveKey(password, salt) {
-  const enc = new TextEncoder();
-  const km = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
-  return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt, iterations: 310000, hash: 'SHA-256' },
-    km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
-  );
+function onTypeChange(){
+  const type = document.getElementById('f-type').value;
+  const cfg  = TYPE_CONFIG[type] || TYPE_CONFIG.other;
+  const label  = document.getElementById('codes-label');
+  const input  = document.getElementById('code-entry');
+  const hint   = document.getElementById('code-hint');
+  if(label) label.innerHTML = `${cfg.label} <small>Press Enter after each</small>`;
+  if(input) input.placeholder = cfg.placeholder;
+  if(hint)  hint.textContent  = cfg.hint;
 }
 
-async function encryptData(data, password) {
-  const salt = crypto.getRandomValues(new Uint8Array(32));
-  const iv   = crypto.getRandomValues(new Uint8Array(12));
-  const key  = await deriveKey(password, salt);
-  const enc  = new TextEncoder();
-  const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(data)));
-  const out = new Uint8Array(32 + 12 + encrypted.byteLength);
-  out.set(salt, 0); out.set(iv, 32); out.set(new Uint8Array(encrypted), 44);
+// ════════════════════════════════════════════
+// CODE CHIP INPUT — fixed, no re-init race
+// ════════════════════════════════════════════
+let pendingCodes = [];
+
+function setupCodeInput(){
+  const inp = document.getElementById('code-entry');
+  if(!inp) return;
+  // Remove old listeners by replacing node
+  const fresh = inp.cloneNode(true);
+  inp.parentNode.replaceChild(fresh, inp);
+  const el = document.getElementById('code-entry');
+
+  el.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === 'Tab'){
+      e.preventDefault();
+      const v = this.value.trim();
+      if(v){ addPendingCodes(v); this.value = ''; }
+    }
+  });
+  el.addEventListener('paste', function(e){
+    e.preventDefault();
+    const txt = (e.clipboardData||window.clipboardData).getData('text');
+    addPendingCodes(txt); this.value = '';
+  });
+}
+
+function formatBitLocker(raw){
+  // Strip all non-hex/non-digit, group into 6-char blocks
+  const clean = raw.replace(/[^0-9A-Fa-f]/g,'');
+  const groups = [];
+  for(let i=0;i<clean.length;i+=6) groups.push(clean.slice(i,i+6).toUpperCase());
+  return groups.join('-');
+}
+
+function autoSpaceCode(raw){
+  const type = document.getElementById('f-type')?.value;
+  if(type === 'bitlocker') return formatBitLocker(raw);
+  return raw;
+}
+
+function addPendingCodes(text){
+  const type = document.getElementById('f-type')?.value;
+  const lines = text.split(/[\n\r,;]+/).map(c=>c.trim()).filter(Boolean);
+  let added = 0;
+  lines.forEach(c=>{
+    const formatted = autoSpaceCode(c);
+    if(formatted && !pendingCodes.includes(formatted)){
+      pendingCodes.push(formatted);
+      added++;
+    }
+  });
+  renderPendingChips();
+  return added;
+}
+
+function removePending(i){
+  pendingCodes.splice(i,1);
+  renderPendingChips();
+}
+
+function renderPendingChips(){
+  const wrap = document.getElementById('codes-chips'); if(!wrap) return;
+  wrap.innerHTML = pendingCodes.map((c,i)=>`
+    <div class="code-input-chip">
+      <span class="chip-text">${esc(c)}</span>
+      <span class="chip-remove" onclick="removePending(${i})" title="Remove">✕</span>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════
+// FILE UPLOAD
+// ════════════════════════════════════════════
+let _fileCodes = null;
+
+function handleFile(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const text = ev.target.result;
+    const result = document.getElementById('upload-result');
+    let codes = [];
+
+    try {
+      const json = JSON.parse(text);
+      if(Array.isArray(json))       codes = json.map(x=>typeof x==='string'?x:(x.code||x.key||x.value||'').toString()).filter(Boolean);
+      else if(json.codes)           codes = json.codes.map(x=>typeof x==='string'?x:x.code||'').filter(Boolean);
+      else if(json.keys)            codes = json.keys.map(x=>typeof x==='string'?x:x.key||'').filter(Boolean);
+      else if(json.recovery_codes)  codes = json.recovery_codes.map(x=>typeof x==='string'?x:x.code||'').filter(Boolean);
+    } catch {
+      codes = text.split(/[\n\r]+/).map(c=>c.trim()).filter(c=>c.length>2&&!c.startsWith('#')&&!c.startsWith('//'));
+    }
+
+    if(!codes.length){
+      result.innerHTML = `<div class="upload-result" style="color:#ff6b6b">Could not find any codes in this file.</div>`;
+      return;
+    }
+    _fileCodes = codes;
+    result.innerHTML = `
+      <div class="upload-result">
+        <strong>Found ${codes.length} code${codes.length!==1?'s':''} — ${esc(file.name)}</strong>
+        ${codes.slice(0,3).map(c=>`<div style="font-family:monospace;font-size:.76rem;opacity:.55;margin-top:.15rem">${esc(c)}</div>`).join('')}
+        ${codes.length>3?`<div style="opacity:.35;font-size:.72rem;margin-top:.1rem">…and ${codes.length-3} more</div>`:''}
+      </div>
+      <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+        <button class="btn-next" style="flex:1;padding:.6rem 1rem;font-size:.82rem" onclick="confirmImport()">Add ${codes.length} codes ✓</button>
+        <button class="btn-back" style="padding:.6rem 1rem;font-size:.82rem" onclick="clearUpload()">Cancel</button>
+      </div>`;
+  };
+  reader.readAsText(file);
+}
+
+function confirmImport(){
+  if(!_fileCodes) return;
+  const n = addPendingCodes(_fileCodes.join('\n'));
+  showToast(`Added ${n} codes from file`);
+  clearUpload();
+}
+function clearUpload(){
+  document.getElementById('upload-result').innerHTML='';
+  document.getElementById('file-input').value='';
+  _fileCodes = null;
+}
+
+// Drag and drop
+(function(){
+  const zone = document.getElementById('upload-zone');
+  if(!zone) return;
+  zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', ()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop', e=>{
+    e.preventDefault(); zone.classList.remove('drag');
+    const f = e.dataTransfer.files[0]; if(!f) return;
+    handleFile({files:[f]});
+  });
+})();
+
+// ════════════════════════════════════════════
+// CRYPTO
+// ════════════════════════════════════════════
+async function deriveKey(pw, salt){
+  const enc = new TextEncoder();
+  const km  = await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:310000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function encryptData(data, pw){
+  const salt=crypto.getRandomValues(new Uint8Array(32)), iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(pw,salt), enc=new TextEncoder();
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(JSON.stringify(data)));
+  const out=new Uint8Array(32+12+ct.byteLength);
+  out.set(salt,0); out.set(iv,32); out.set(new Uint8Array(ct),44);
   return btoa(String.fromCharCode(...out));
 }
-
-async function decryptData(b64, password) {
-  const raw  = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-  const salt = raw.slice(0, 32), iv = raw.slice(32, 44), data = raw.slice(44);
-  const key  = await deriveKey(password, salt);
-  const dec  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+async function decryptData(b64, pw){
+  const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+  const salt=raw.slice(0,32), iv=raw.slice(32,44), data=raw.slice(44);
+  const key=await deriveKey(pw,salt);
+  const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,data);
   return JSON.parse(new TextDecoder().decode(dec));
 }
 
-async function saveVault() {
-  if (!state.password) return;
-  const blob = await encryptData({ entries: state.entries }, state.password);
+// ════════════════════════════════════════════
+// VAULT STORAGE — localStorage PRIMARY, server secondary
+// ════════════════════════════════════════════
+const LS_KEY = 'andromeda_vault';
+let state = { unlocked:false, password:'', entries:[], filter:'all' };
+
+async function saveVault(){
+  if(!state.password) return;
+  const blob = await encryptData({entries:state.entries}, state.password);
+  // Always localStorage first — it always works
+  localStorage.setItem(LS_KEY, blob);
+  // Best-effort server sync
   try {
-    const res = await fetch('/api/vault/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ blob })
-    });
-    if (!res.ok) throw new Error();
-    // Also keep localStorage in sync as backup
-    localStorage.setItem('andromeda_vault', blob);
-  } catch {
-    localStorage.setItem('andromeda_vault', blob);
-  }
+    await fetch('/api/vault/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({blob})});
+  } catch { /* offline or server down — localStorage is the source of truth */ }
 }
 
-async function loadVault() {
+async function loadVault(){
+  // Try server first, fall back to localStorage
   try {
     const res = await fetch('/api/vault/load');
-    if (res.ok) {
-      const data = await res.json();
-      if (data.blob) return decryptData(data.blob, state.password);
-    }
+    if(res.ok){ const d=await res.json(); if(d.blob) return decryptData(d.blob,state.password); }
   } catch {}
-  const raw = localStorage.getItem('andromeda_vault');
-  if (!raw) return { entries: [] };
+  const raw = localStorage.getItem(LS_KEY);
+  if(!raw) throw new Error('no vault');
   return decryptData(raw, state.password);
 }
 
-// ═══════════════════════════════════════════
-// NAVIGATION — skip welcome if vault exists
-// ═══════════════════════════════════════════
-async function init() {
-  let hasVault = !!localStorage.getItem('andromeda_vault');
-  try {
-    const res = await fetch('/api/vault/exists');
-    if (res.ok) { const d = await res.json(); hasVault = d.exists; }
-  } catch {}
+function hasVaultStored(){
+  // Check localStorage synchronously — no fetch needed for basic check
+  return !!localStorage.getItem(LS_KEY);
+}
 
-  if (hasVault) {
-    // Skip welcome, go straight to lock screen
+// ════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════
+async function init(){
+  if(hasVaultStored()){
     document.getElementById('welcome-page').style.display = 'none';
     document.getElementById('app-page').classList.add('active');
     document.getElementById('lock-overlay').classList.add('active');
+    return;
   }
-  // else: stay on welcome page, user clicks Enter
-}
-
-async function navigateToApp() {
-  let hasVault = !!localStorage.getItem('andromeda_vault');
+  // Check server too (vault might exist on server but not in this browser's localStorage)
   try {
     const res = await fetch('/api/vault/exists');
-    if (res.ok) { const d = await res.json(); hasVault = d.exists; }
+    if(res.ok){ const d=await res.json(); if(d.exists){
+      document.getElementById('welcome-page').style.display = 'none';
+      document.getElementById('app-page').classList.add('active');
+      document.getElementById('lock-overlay').classList.add('active');
+    }}
   } catch {}
-  document.getElementById('welcome-page').style.display = 'none';
-  if (hasVault) {
-    document.getElementById('app-page').classList.add('active');
-    document.getElementById('lock-overlay').classList.add('active');
-  } else {
-    showSetupModal();
-  }
+  // else stay on welcome page
 }
-
-// Run on page load
 init();
 
-// ═══════════════════════════════════════════
-// FIRST-TIME SETUP
-// ═══════════════════════════════════════════
-function showSetupModal() {
+async function navigateToApp(){
+  if(hasVaultStored()){
+    document.getElementById('welcome-page').style.display='none';
+    document.getElementById('app-page').classList.add('active');
+    document.getElementById('lock-overlay').classList.add('active');
+    return;
+  }
+  try {
+    const res=await fetch('/api/vault/exists');
+    if(res.ok){const d=await res.json();if(d.exists){
+      document.getElementById('welcome-page').style.display='none';
+      document.getElementById('app-page').classList.add('active');
+      document.getElementById('lock-overlay').classList.add('active');
+      return;
+    }}
+  } catch {}
+  // No vault — setup
+  document.getElementById('welcome-page').style.display='none';
+  showSetupModal();
+}
+
+// ════════════════════════════════════════════
+// SETUP
+// ════════════════════════════════════════════
+let _setupPw = '';
+function showSetupModal(){
   const div = document.createElement('div');
+  div.className = 'setup-overlay';
   div.id = 'setup-overlay';
-  div.style.cssText = 'position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;padding:2rem;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px)';
   div.innerHTML = `
     <div class="setup-card">
-      <div class="step-indicator">
-        <div class="step-dot active" id="sdot-0"></div>
-        <div class="step-dot" id="sdot-1"></div>
-        <div class="step-dot" id="sdot-2"></div>
+      <div class="step-bar">
+        <div class="step-seg active" id="sseg-0"></div>
+        <div class="step-seg" id="sseg-1"></div>
+        <div class="step-seg" id="sseg-2"></div>
       </div>
       <div class="setup-step active" id="sstep-0">
         <div class="setup-title">Welcome to<br/>Andromeda</div>
-        <div class="setup-subtitle">Let's set up your encrypted vault. This only takes a moment.</div>
-        <button class="btn-next" onclick="setupNext(1)">Get Started →</button>
+        <div class="setup-sub">Set up your encrypted vault in 30 seconds.</div>
+        <button class="btn-next" onclick="setupGo(1)">Get Started →</button>
       </div>
       <div class="setup-step" id="sstep-1">
-        <div class="setup-title">Create your<br/>master password</div>
-        <div class="setup-subtitle">This password encrypts everything. There is no recovery option — keep it safe.</div>
-        <label class="form-label">Master Password</label>
-        <div class="pw-wrap">
-          <input class="form-input" type="password" id="setup-pw1" placeholder="Choose a strong password…" />
-          <button class="pw-toggle" onclick="togglePw('setup-pw1',this)">👁</button>
-        </div>
-        <label class="form-label">Confirm Password</label>
-        <div class="pw-wrap">
-          <input class="form-input" type="password" id="setup-pw2" placeholder="Confirm password…" />
-          <button class="pw-toggle" onclick="togglePw('setup-pw2',this)">👁</button>
-        </div>
-        <div style="color:#ff6b6b;font-size:0.8rem;min-height:1.2em;margin-bottom:1rem" id="setup-err"></div>
-        <div style="display:flex;gap:0.5rem">
-          <button class="btn-back" onclick="setupNext(0)">← Back</button>
-          <button class="btn-next" onclick="setupNext(2)">Continue →</button>
+        <div class="setup-title">Master password</div>
+        <div class="setup-sub">This encrypts everything. No recovery option — save it somewhere safe.</div>
+        <label class="form-label">Password</label>
+        <div class="pw-wrap"><input class="form-input" type="password" id="spw1" placeholder="Choose a strong password…"/><button class="pw-toggle" onclick="togglePw('spw1',this)">👁</button></div>
+        <label class="form-label">Confirm</label>
+        <div class="pw-wrap"><input class="form-input" type="password" id="spw2" placeholder="Repeat password…"/><button class="pw-toggle" onclick="togglePw('spw2',this)">👁</button></div>
+        <div id="setup-err" style="color:#ff6b6b;font-size:.78rem;min-height:1.1em;margin-bottom:1rem"></div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn-back" onclick="setupGo(0)">← Back</button>
+          <button class="btn-next" onclick="setupGo(2)">Continue →</button>
         </div>
       </div>
       <div class="setup-step" id="sstep-2">
-        <div class="setup-title">You're all set!</div>
-        <div class="setup-subtitle">Your vault is ready. Start adding recovery codes to keep them safe.</div>
-        <div style="font-size:3rem;text-align:center;margin:1.5rem 0;opacity:0.6">🔐</div>
+        <div class="setup-title">All set!</div>
+        <div class="setup-sub">Your encrypted vault is ready. Start adding codes to keep them safe.</div>
+        <div style="font-size:2.8rem;text-align:center;margin:1.5rem 0;opacity:.55">🔐</div>
         <button class="btn-next" style="width:100%" onclick="finishSetup()">Open Vault →</button>
       </div>
-    </div>
-  `;
+    </div>`;
   document.body.appendChild(div);
   pauseStars();
 }
 
-let setupPassword = '';
-
-function setupNext(step) {
-  if (step === 2) {
-    const pw1 = document.getElementById('setup-pw1').value;
-    const pw2 = document.getElementById('setup-pw2').value;
-    if (pw1.length < 6) { document.getElementById('setup-err').textContent = 'Password must be at least 6 characters'; return; }
-    if (pw1 !== pw2)    { document.getElementById('setup-err').textContent = 'Passwords do not match'; return; }
-    setupPassword = pw1;
+function setupGo(step){
+  if(step===2){
+    const p1=document.getElementById('spw1').value, p2=document.getElementById('spw2').value;
+    if(p1.length<6){ document.getElementById('setup-err').textContent='Minimum 6 characters'; return; }
+    if(p1!==p2)    { document.getElementById('setup-err').textContent='Passwords do not match'; return; }
+    _setupPw = p1;
   }
-  for (let i = 0; i < 3; i++) {
-    const el  = document.getElementById(`sstep-${i}`);
-    const dot = document.getElementById(`sdot-${i}`);
-    if (el)  el.classList.remove('active');
-    if (dot) { dot.classList.remove('active','done'); if (i < step) dot.classList.add('done'); }
+  for(let i=0;i<3;i++){
+    const el=document.getElementById(`sstep-${i}`), seg=document.getElementById(`sseg-${i}`);
+    if(el)  el.classList.remove('active');
+    if(seg){ seg.classList.remove('active','done'); if(i<step) seg.classList.add('done'); }
   }
-  const active = document.getElementById(`sstep-${step}`);
-  const adot   = document.getElementById(`sdot-${step}`);
-  if (active) active.classList.add('active');
-  if (adot)   adot.classList.add('active');
+  document.getElementById(`sstep-${step}`)?.classList.add('active');
+  document.getElementById(`sseg-${step}`)?.classList.add('active');
 }
 
-function finishSetup() {
-  state.password = setupPassword;
+async function finishSetup(){
+  state.password = _setupPw;
   state.entries  = [];
   state.unlocked = true;
-  saveVault();
-  const overlay = document.getElementById('setup-overlay');
-  if (overlay) overlay.remove();
+  await saveVault();
+  document.getElementById('setup-overlay')?.remove();
   document.getElementById('app-page').classList.add('active');
   resumeStars();
   renderEntries();
-  showToast('Vault created successfully');
+  showToast('Vault created ✓');
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // LOCK / UNLOCK
-// ═══════════════════════════════════════════
-async function unlockVault() {
-  const pw = document.getElementById('unlock-pw').value;
-  if (!pw) return;
+// ════════════════════════════════════════════
+async function unlockVault(){
+  const pw = document.getElementById('unlock-pw').value; if(!pw) return;
+  const btn = document.getElementById('unlock-btn');
+  btn.textContent = 'Unlocking…'; btn.disabled = true;
   try {
     state.password = pw;
     const vault = await loadVault();
     state.entries  = vault.entries || [];
     state.unlocked = true;
     document.getElementById('lock-overlay').classList.remove('active');
-    document.getElementById('unlock-pw').value    = '';
+    document.getElementById('unlock-pw').value = '';
     document.getElementById('unlock-error').textContent = '';
     renderEntries();
   } catch {
     document.getElementById('unlock-error').textContent = 'Incorrect password';
     state.password = '';
+  } finally {
+    btn.textContent = 'Unlock'; btn.disabled = false;
   }
 }
-
-function lockVault() {
-  state.password = ''; state.unlocked = false; state.entries = [];
+function lockVault(){
+  state.password=''; state.unlocked=false; state.entries=[];
   document.getElementById('lock-overlay').classList.add('active');
-  document.getElementById('unlock-pw').value    = '';
-  document.getElementById('unlock-error').textContent = '';
+  document.getElementById('unlock-pw').value='';
+  document.getElementById('unlock-error').textContent='';
 }
 
-// ═══════════════════════════════════════════
-// VAULT CRUD
-// ═══════════════════════════════════════════
-async function saveEntry() {
-  const name    = document.getElementById('f-name').value.trim();
-  const type    = document.getElementById('f-type').value;
-  const rawCodes= document.getElementById('f-codes').value;
-  const notes   = document.getElementById('f-notes').value.trim();
-  const editId  = document.getElementById('edit-id').value;
+// ════════════════════════════════════════════
+// SAVE ENTRY — the bug was initCodeInput() resetting pendingCodes
+// Fix: pendingCodes is set BEFORE modal opens, setupCodeInput() never resets it
+// ════════════════════════════════════════════
+async function saveEntry(){
+  // Flush anything in the text box
+  const inp = document.getElementById('code-entry');
+  if(inp && inp.value.trim()){ addPendingCodes(inp.value.trim()); inp.value=''; }
 
-  if (!name)           { showToast('Enter a service name'); return; }
-  if (!rawCodes.trim()){ showToast('Enter at least one code'); return; }
+  const name   = document.getElementById('f-name').value.trim();
+  const type   = document.getElementById('f-type').value;
+  const notes  = document.getElementById('f-notes').value.trim();
+  const editId = document.getElementById('edit-id').value;
 
-  const codes = rawCodes.split('\n').map(c => c.trim()).filter(Boolean).map(c => ({ code: c, used: false }));
-  const icon  = selectedIcon;
-  const icObj = ICONS.find(i => i.id === icon) || ICONS[ICONS.length - 1];
-  const entry = { name, type, codes, notes, icon, iconSlug: icObj.slug || null };
+  if(!name)            { showToast('Enter a service name'); return; }
+  if(!pendingCodes.length){ showToast('Add at least one code'); return; }
 
-  if (editId) {
-    const idx = state.entries.findIndex(e => e.id === editId);
-    if (idx > -1) {
-      const oldCodes = state.entries[idx].codes || [];
-      entry.codes = codes.map(c => {
-        const old = oldCodes.find(o => o.code === c.code);
-        return old ? { ...c, used: old.used } : c;
-      });
-      entry.pinned = state.entries[idx].pinned || false;
-      state.entries[idx] = { ...state.entries[idx], ...entry, updatedAt: new Date().toISOString() };
+  const btn = document.getElementById('save-btn');
+  btn.textContent='Saving…'; btn.disabled=true;
+
+  try {
+    const codes = pendingCodes.map(c=>({code:c, used:false}));
+    const icObj = ICONS.find(i=>i.id===selectedIcon) || ICONS[ICONS.length-1];
+    const entry = {name, type, codes, notes, icon:selectedIcon, iconSlug:icObj.slug||null};
+
+    if(editId){
+      const idx = state.entries.findIndex(e=>e.id===editId);
+      if(idx>-1){
+        const old = state.entries[idx].codes||[];
+        entry.codes = codes.map(c=>{ const o=old.find(x=>x.code===c.code); return o?{...c,used:o.used}:c; });
+        entry.pinned = state.entries[idx].pinned||false;
+        state.entries[idx] = {...state.entries[idx],...entry,updatedAt:new Date().toISOString()};
+      }
+    } else {
+      state.entries.push({id:crypto.randomUUID(),...entry,pinned:false,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
     }
-  } else {
-    state.entries.push({
-      id: crypto.randomUUID(), ...entry, pinned: false,
-      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-    });
+
+    await saveVault();
+    closeModal();
+    renderEntries();
+    showToast(editId?'Entry updated ✓':'Entry saved ✓');
+  } catch(err){
+    console.error('saveEntry error:',err);
+    showToast('Error saving — check console');
+  } finally {
+    btn.textContent='Save Entry'; btn.disabled=false;
   }
-
-  await saveVault();
-  closeModal();
-  renderEntries();
-  showToast(editId ? 'Entry updated' : 'Entry saved');
 }
 
-function deleteEntry(id) {
-  if (!confirm('Delete this entry permanently?')) return;
-  state.entries = state.entries.filter(e => e.id !== id);
-  saveVault();
-  renderEntries();
-  showToast('Entry deleted');
+function deleteEntry(id){
+  if(!confirm('Delete this entry permanently?')) return;
+  state.entries = state.entries.filter(e=>e.id!==id);
+  saveVault(); renderEntries(); showToast('Deleted');
+}
+function toggleCodeUsed(entryId,idx){
+  const e=state.entries.find(e=>e.id===entryId); if(!e)return;
+  e.codes[idx].used=!e.codes[idx].used;
+  saveVault(); renderEntries();
+}
+function togglePin(id){
+  const e=state.entries.find(e=>e.id===id); if(!e)return;
+  e.pinned=!e.pinned;
+  saveVault(); renderEntries();
+  showToast(e.pinned?'📌 Pinned':'Unpinned');
 }
 
-function toggleCodeUsed(entryId, idx) {
-  const entry = state.entries.find(e => e.id === entryId);
-  if (!entry) return;
-  entry.codes[idx].used = !entry.codes[idx].used;
-  saveVault();
-  renderEntries();
-}
-
-function togglePin(id) {
-  const entry = state.entries.find(e => e.id === id);
-  if (!entry) return;
-  entry.pinned = !entry.pinned;
-  saveVault();
-  renderEntries();
-  showToast(entry.pinned ? 'Pinned' : 'Unpinned');
-}
-
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // RENDER
-// ═══════════════════════════════════════════
-function setFilter(f, el) {
-  state.filter = f;
-  document.querySelectorAll('.filter-row .pill-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderEntries();
+// ════════════════════════════════════════════
+function setFilter(f,el){
+  state.filter=f;
+  document.querySelectorAll('.filter-row .pill-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); renderEntries();
 }
 
-function renderEntries() {
-  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
-  let filtered = state.entries.filter(e => {
-    if (state.filter !== 'all' && e.type !== state.filter) return false;
-    if (q && !e.name.toLowerCase().includes(q) && !(e.notes||'').toLowerCase().includes(q)) return false;
+function renderEntries(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  let filtered=state.entries.filter(e=>{
+    if(state.filter!=='all'&&e.type!==state.filter) return false;
+    if(q&&!e.name.toLowerCase().includes(q)&&!(e.notes||'').toLowerCase().includes(q)) return false;
     return true;
   });
+  filtered=[...filtered.filter(e=>e.pinned),...filtered.filter(e=>!e.pinned)];
 
-  // Pinned entries first
-  filtered = [
-    ...filtered.filter(e => e.pinned),
-    ...filtered.filter(e => !e.pinned)
-  ];
-
-  const grid = document.getElementById('entries-grid');
-  if (!grid) return;
-
-  if (!filtered.length) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">◎</div><div class="empty-title">${q || state.filter!=='all' ? 'No results found' : 'Your vault is empty'}</div><div class="empty-sub">${q || state.filter!=='all' ? 'Try a different search or filter' : 'Add your first recovery codes above'}</div></div>`;
+  const grid=document.getElementById('entries-grid'); if(!grid)return;
+  if(!filtered.length){
+    grid.innerHTML=`<div class="empty-state"><div class="empty-icon">◎</div><div class="empty-title">${q||state.filter!=='all'?'No results found':'Your vault is empty'}</div><div class="empty-sub">${q||state.filter!=='all'?'Try a different search or filter':'Click + Add Entry to get started'}</div></div>`;
     return;
   }
 
-  grid.innerHTML = filtered.map(e => {
-    const used      = e.codes.filter(c => c.used).length;
-    const total     = e.codes.length;
-    const remaining = total - used;
-    const date      = new Date(e.createdAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
-    const icObj     = ICONS.find(i => i.id === e.icon) || null;
-    const iconHtml  = iconImg(icObj, 22);
-
-    const codesHtml = e.codes.map((c,i) => `
-      <div class="code-chip${c.used?' used':''}" onclick="toggleCodeUsed('${e.id}',${i})">
-        <span class="code-chip-text">${esc(c.code)}</span>
-        <span class="code-tick">${c.used?'↩':'✓'}</span>
-      </div>
-    `).join('');
-
-    return `
-      <div class="entry-card${e.pinned?' pinned':''}" data-id="${e.id}">
-        ${e.pinned ? '<span class="pin-indicator">📌</span>' : ''}
-        <div class="card-header">
-          <div style="display:flex;align-items:center;gap:0.8rem">
-            <div class="card-icon">${iconHtml}</div>
-            <div>
-              <div class="card-name">${esc(e.name)}</div>
-              <div class="card-service">${e.notes?esc(e.notes):'<span style="opacity:0.3">No notes</span>'}</div>
-            </div>
-          </div>
-          <div class="card-actions">
-            <div class="card-action-btn${e.pinned?' active':''}" onclick="togglePin('${e.id}')" title="${e.pinned?'Unpin':'Pin'}">📌</div>
-            <div class="card-action-btn" onclick="copyAll('${e.id}')" title="Copy unused codes">⎘</div>
-            <div class="card-action-btn" onclick="editEntry('${e.id}')" title="Edit">✎</div>
-            <div class="card-action-btn del" onclick="deleteEntry('${e.id}')" title="Delete">✕</div>
-          </div>
+  grid.innerHTML=filtered.map((e,i)=>{
+    const used=e.codes.filter(c=>c.used).length, total=e.codes.length, rem=total-used;
+    const date=new Date(e.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    const icObj=ICONS.find(ic=>ic.id===e.icon)||null;
+    const codesHtml=e.codes.map((c,ci)=>`<div class="code-chip${c.used?' used':''}" onclick="toggleCodeUsed('${e.id}',${ci})"><span class="code-chip-text">${esc(c.code)}</span><span class="code-tick">${c.used?'↩':'✓'}</span></div>`).join('');
+    return `<div class="entry-card${e.pinned?' pinned':''}" data-id="${e.id}" style="animation-delay:${i*.04}s">
+      ${e.pinned?'<span class="pin-badge">📌</span>':''}
+      <div class="card-header">
+        <div class="card-icon">${iconImg(icObj,22)}</div>
+        <div class="card-meta">
+          <div class="card-name">${esc(e.name)}</div>
+          <div class="card-note">${e.notes?esc(e.notes):'<span style="opacity:.25">No notes</span>'}</div>
         </div>
-        <div class="codes-list">${codesHtml}</div>
-        <div class="card-footer">
-          <div class="card-remaining">${remaining}/${total} remaining · ${date}</div>
-          <div class="type-badge">${e.type}</div>
+        <div class="card-actions">
+          <div class="card-action-btn${e.pinned?' is-pinned':''}" onclick="togglePin('${e.id}')" title="${e.pinned?'Unpin':'Pin'}">📌</div>
+          <div class="card-action-btn" onclick="copyAll('${e.id}')" title="Copy unused codes">⎘</div>
+          <div class="card-action-btn" onclick="editEntry('${e.id}')" title="Edit">✎</div>
+          <div class="card-action-btn del" onclick="deleteEntry('${e.id}')" title="Delete">✕</div>
         </div>
       </div>
-    `;
+      <div class="codes-list">${codesHtml}</div>
+      <div class="card-footer">
+        <div class="card-remaining">${rem}/${total} remaining · ${date}</div>
+        <div class="type-badge">${e.type}</div>
+      </div>
+    </div>`;
   }).join('');
 
-  // re-attach mouse tracking
-  document.querySelectorAll('.entry-card').forEach(card => {
-    card.addEventListener('mousemove', ev => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty('--mx', ((ev.clientX-r.left)/r.width*100).toFixed(1)+'%');
-      card.style.setProperty('--my', ((ev.clientY-r.top)/r.height*100).toFixed(1)+'%');
+  document.querySelectorAll('.entry-card').forEach(card=>{
+    card.addEventListener('mousemove',ev=>{
+      const r=card.getBoundingClientRect();
+      card.style.setProperty('--mx',((ev.clientX-r.left)/r.width*100).toFixed(1)+'%');
+      card.style.setProperty('--my',((ev.clientY-r.top)/r.height*100).toFixed(1)+'%');
     });
   });
 }
 
-// ═══════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════
-function openAddModal() {
-  selectedIcon = 'other';
+// ════════════════════════════════════════════
+// MODAL OPEN/CLOSE
+// ════════════════════════════════════════════
+function openAddModal(){
+  // Reset everything FIRST
+  selectedIcon  = 'other';
+  pendingCodes  = [];
+  _fileCodes    = null;
+
   document.getElementById('modal-title').textContent = 'Add Entry';
-  document.getElementById('edit-id').value   = '';
-  document.getElementById('f-name').value    = '';
-  document.getElementById('f-type').value    = 'recovery';
-  document.getElementById('f-codes').value   = '';
-  document.getElementById('f-notes').value   = '';
+  document.getElementById('edit-id').value  = '';
+  document.getElementById('f-name').value   = '';
+  document.getElementById('f-type').value   = 'recovery';
+  document.getElementById('f-notes').value  = '';
   document.getElementById('icon-search').value = '';
+  document.getElementById('upload-result').innerHTML = '';
+  document.getElementById('file-input').value = '';
+
   renderIconGrid();
+  renderPendingChips();
+  onTypeChange();
+
   document.getElementById('modal').classList.add('open');
   pauseStars();
+
+  // Set up input AFTER modal is visible, WITHOUT resetting pendingCodes
+  setupCodeInput();
+  setTimeout(()=>document.getElementById('f-name').focus(), 80);
 }
 
-function editEntry(id) {
-  const e = state.entries.find(e => e.id === id);
-  if (!e) return;
-  selectedIcon = e.icon || 'other';
+function editEntry(id){
+  const e = state.entries.find(e=>e.id===id); if(!e) return;
+
+  selectedIcon  = e.icon || 'other';
+  pendingCodes  = e.codes.map(c=>c.code); // load existing codes
+  _fileCodes    = null;
+
   document.getElementById('modal-title').textContent = 'Edit Entry';
-  document.getElementById('edit-id').value   = e.id;
-  document.getElementById('f-name').value    = e.name;
-  document.getElementById('f-type').value    = e.type;
-  document.getElementById('f-codes').value   = e.codes.map(c=>c.code).join('\n');
-  document.getElementById('f-notes').value   = e.notes || '';
+  document.getElementById('edit-id').value  = e.id;
+  document.getElementById('f-name').value   = e.name;
+  document.getElementById('f-type').value   = e.type;
+  document.getElementById('f-notes').value  = e.notes||'';
   document.getElementById('icon-search').value = '';
+  document.getElementById('upload-result').innerHTML = '';
+  document.getElementById('file-input').value = '';
+
   renderIconGrid();
+  renderPendingChips();
+  onTypeChange();
+
   document.getElementById('modal').classList.add('open');
   pauseStars();
+  setupCodeInput(); // sets up listeners WITHOUT touching pendingCodes
 }
 
-function closeModal() {
+function closeModal(){
   document.getElementById('modal').classList.remove('open');
+  pendingCodes = [];
+  _fileCodes   = null;
   resumeStars();
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // UTILS
-// ═══════════════════════════════════════════
-function copyAll(id) {
-  const entry = state.entries.find(e => e.id === id);
-  if (!entry) return;
-  const codes = entry.codes.filter(c => !c.used).map(c => c.code).join('\n');
-  navigator.clipboard.writeText(codes).then(() => showToast(`Copied ${entry.codes.filter(c=>!c.used).length} codes`));
+// ════════════════════════════════════════════
+function copyAll(id){
+  const e=state.entries.find(e=>e.id===id); if(!e)return;
+  const codes=e.codes.filter(c=>!c.used).map(c=>c.code).join('\n');
+  navigator.clipboard.writeText(codes).then(()=>showToast(`Copied ${e.codes.filter(c=>!c.used).length} codes`));
 }
-
-function exportVault() {
-  const data = JSON.stringify({ entries: state.entries, exportedAt: new Date().toISOString() }, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = `andromeda-backup-${Date.now()}.json`;
-  a.click(); URL.revokeObjectURL(url);
+function exportVault(){
+  const data=JSON.stringify({entries:state.entries,exportedAt:new Date().toISOString()},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  Object.assign(document.createElement('a'),{href:url,download:`andromeda-backup-${Date.now()}.json`}).click();
+  URL.revokeObjectURL(url);
   showToast('Vault exported');
 }
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
 }
-
-function togglePw(id, btn) {
-  const inp = document.getElementById(id);
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+function togglePw(id,btn){
+  const inp=document.getElementById(id);
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'👁':'🙈';
 }
-
-function esc(str) {
+function esc(str){
   return String(str||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 </script>
