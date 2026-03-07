@@ -16,6 +16,12 @@ Runs on your machine. AES-256 encrypted. No cloud. No accounts.
 
 ---
 
+> [!WARNING]
+> **🚧 Work in progress — not ready for use.**  
+> This project is under active development. Things may be broken, incomplete, or change without notice. Use at your own risk.
+
+---
+
 ## Run it
 
 ```bash
