@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Andromeda — Recovery Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --off-white: rgba(255,255,255,0.85);
+    --dim: rgba(255,255,255,0.5);
+    --faint: rgba(255,255,255,0.2);
+    --fainter: rgba(255,255,255,0.08);
+    --black: #000000;
+    --glass: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.15);
+    --glass-hover: rgba(255,255,255,0.13);
+  }
+
+  html, body {
+    height: 100%;
+    background: #000;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ═══ CUSTOM CURSOR ═══ */
+  #cursor {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 20px; height: 20px;
+    border: 1.5px solid rgba(255,255,255,0.7);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s, background 0.2s, border-color 0.2s;
+    mix-blend-mode: difference;
+  }
+  #cursor.hover {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.9);
+  }
+
+  /* ═══ STAR CANVAS ═══ */
+  #star-canvas {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ═══ WELCOME PAGE ═══ */
+  #welcome-page {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+  }
+
+  /* NAV */
+  .top-nav {
+    width: 100%;
+    padding: 2rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    animation: fadeDown 1s ease 0.3s both;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-size: 0.9rem; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--dim);
+  }
+  .nav-logo svg { opacity: 0.6; }
+  .nav-links { display: flex; gap: 0.4rem; }
+  .nav-link {
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.82rem; font-weight: 400;
+    color: var(--dim);
+    text-decoration: none;
+    background: var(--fainter);
+    border: 1px solid transparent;
+    transition: all 0.3s;
+    cursor: none;
+  }
+  .nav-link:hover {
+    color: var(--white);
+    background: var(--glass);
+    border-color: var(--glass-border);
+  }
+
+  /* HERO */
+  .hero {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem 2rem;
+    gap: 0;
+  }
+
+  .hero-constellation {
+    width: 80px; height: 80px;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 1s ease 0.5s both;
+    position: relative;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.75rem; font-weight: 400;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 1.2rem;
+    animation: fadeUp 1s ease 0.6s both;
+  }
+
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(4rem, 10vw, 7.5rem);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+    animation: fadeUp 1s ease 0.7s both;
+  }
+
+  .hero-sub {
+    font-size: 1rem; font-weight: 300;
+    color: var(--dim);
+    max-width: 420px;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+    animation: fadeUp 1s ease 0.85s both;
+  }
+
+  .enter-btn {
+    position: relative;
+    padding: 1rem 2.8rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 50px;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: none;
+    text-decoration: none;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: fadeUp 1s ease 1s both;
+    overflow: hidden;
+  }
+  .enter-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.15) 0%, transparent 70%);
+    opacity: 0; transition: opacity 0.3s;
+    border-radius: inherit;
+  }
+  .enter-btn:hover {
+    background: rgba(255,255,255,0.16);
+    border-color: rgba(255,255,255,0.5);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(255,255,255,0.08), 0 0 0 1px rgba(255,255,255,0.1);
+  }
+  .enter-btn:hover::before { opacity: 1; }
+  .enter-btn span { position: relative; z-index: 1; }
+
+  /* ═══ FEATURES SECTION ═══ */
+  .features-section {
+    width: 100%;
+    max-width: 1100px;
+    padding: 4rem 2rem 6rem;
+    animation: fadeUp 1s ease 1.2s both;
+  }
+
+  .section-label {
+    text-align: center;
+    font-size: 0.72rem; font-weight: 400;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 3rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .feature-card {
+    background: rgba(0,0,0,0.8);
+    padding: 2rem 1.75rem;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.05) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .feature-card:hover { background: rgba(255,255,255,0.04); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .feature-name {
+    font-size: 0.9rem; font-weight: 500;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+  .feature-desc {
+    font-size: 0.8rem; font-weight: 300;
+    color: var(--dim);
+    line-height: 1.65;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ═══ APP PAGE (vault) ═══ */
+  #app-page {
+    display: none;
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+  #app-page.active { display: flex; }
+
+  /* ═══ SETUP WIZARD ═══ */
+  #setup-page {
+    display: none;
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    align-items: center; justify-content: center;
+    padding: 2rem;
+  }
+  #setup-page.active { display: flex; }
+
+  .setup-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 28px;
+    padding: 3rem;
+    width: 100%; max-width: 520px;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .setup-step { display: none; }
+  .setup-step.active { display: block; }
+
+  .step-indicator {
+    display: flex; gap: 0.4rem; margin-bottom: 2.5rem;
+  }
+  .step-dot {
+    height: 3px; border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    flex: 1; transition: background 0.4s;
+  }
+  .step-dot.done { background: rgba(255,255,255,0.8); }
+  .step-dot.active { background: rgba(255,255,255,0.5); }
+
+  .setup-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem; font-weight: 400;
+    margin-bottom: 0.5rem;
+  }
+  .setup-subtitle {
+    font-size: 0.85rem; font-weight: 300;
+    color: var(--dim); margin-bottom: 2rem; line-height: 1.6;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 0.5rem;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 0.85rem 1.1rem;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    margin-bottom: 1.2rem;
+    transition: border-color 0.25s, background 0.25s;
+  }
+  .form-input:focus, .form-select:focus {
+    border-color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.09);
+  }
+  .form-input::placeholder { color: rgba(255,255,255,0.25); }
+  .form-select option { background: #111; }
+
+  .pw-wrap { position: relative; }
+  .pw-toggle {
+    position: absolute; right: 1rem; top: 50%; transform: translateY(-55%);
+    background: none; border: none; color: var(--dim); cursor: none;
+    font-size: 1rem; padding: 0; transition: color 0.2s;
+  }
+  .pw-toggle:hover { color: var(--white); }
+
+  .btn-next, .btn-back {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem; font-weight: 500;
+    cursor: none; border-radius: 50px;
+    padding: 0.8rem 2rem;
+    transition: all 0.3s;
+    border: 1px solid;
+  }
+  .btn-next {
+    background: rgba(255,255,255,0.9);
+    border-color: rgba(255,255,255,0.9);
+    color: #000;
+  }
+  .btn-next:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.2); }
+  .btn-back {
+    background: transparent;
+    border-color: rgba(255,255,255,0.15);
+    color: var(--dim);
+    margin-right: 0.75rem;
+  }
+  .btn-back:hover { border-color: rgba(255,255,255,0.35); color: var(--white); }
+
+  /* ═══ MAIN VAULT UI ═══ */
+  .vault-nav {
+    padding: 1.2rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .vault-nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem; color: var(--white);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .vault-nav-right { display: flex; gap: 0.5rem; }
+
+  .pill-btn {
+    padding: 0.45rem 1.1rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 30px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem; font-weight: 400;
+    color: var(--dim); cursor: none;
+    transition: all 0.25s;
+    display: flex; align-items: center; gap: 0.35rem;
+  }
+  .pill-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
+  .pill-btn.active { color: var(--white); background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
+
+  .vault-main { flex: 1; padding: 2rem; max-width: 1200px; width: 100%; margin: 0 auto; }
+
+  .vault-toolbar {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 2rem; flex-wrap: wrap;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 220px; }
+  .search-wrap svg { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); opacity: 0.35; pointer-events: none; }
+  .search-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50px;
+    padding: 0.65rem 1rem 0.65rem 2.8rem;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem; outline: none;
+    transition: all 0.25s;
+  }
+  .search-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); }
+  .search-input::placeholder { color: rgba(255,255,255,0.25); }
+
+  .filter-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+  .add-btn {
+    padding: 0.65rem 1.4rem;
+    background: rgba(255,255,255,0.88);
+    border: none;
+    border-radius: 50px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    color: #000; cursor: none;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.18); }
+
+  /* ═══ ENTRY CARDS ═══ */
+  .entries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .entry-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 1.4rem;
+    transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+    position: relative; overflow: hidden;
+    cursor: none;
+  }
+  .entry-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.06) 0%, transparent 65%);
+    opacity: 0; transition: opacity 0.35s;
+    pointer-events: none; border-radius: inherit;
+  }
+  .entry-card:hover {
+    border-color: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.07);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .entry-card:hover::after { opacity: 1; }
+
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    overflow: hidden;
+  }
+  .card-icon img { width: 28px; height: 28px; object-fit: contain; }
+
+  .card-actions { display: flex; gap: 0.3rem; opacity: 0; transition: opacity 0.2s; }
+  .entry-card:hover .card-actions { opacity: 1; }
+  .card-action-btn {
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: none; transition: all 0.2s;
+    color: var(--dim); font-size: 0.75rem;
+  }
+  .card-action-btn:hover { background: rgba(255,255,255,0.14); color: var(--white); border-color: rgba(255,255,255,0.25); }
+  .card-action-btn.del:hover { color: #ff6b6b; border-color: rgba(255,107,107,0.4); background: rgba(255,107,107,0.08); }
+
+  .card-name { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.15rem; }
+  .card-service { font-size: 0.75rem; color: var(--dim); margin-bottom: 1.1rem; }
+
+  .codes-list { display: flex; flex-direction: column; gap: 0.3rem; }
+  .code-chip {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 0.45rem 0.75rem;
+    font-family: 'Outfit', monospace;
+    font-size: 0.8rem; color: rgba(255,255,255,0.7);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: none; transition: all 0.2s;
+  }
+  .code-chip:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.18); }
+  .code-chip.used { opacity: 0.35; text-decoration: line-through; }
+  .code-chip-text { font-family: 'Outfit', monospace; letter-spacing: 0.06em; }
+  .code-tick { font-size: 0.65rem; opacity: 0; transition: opacity 0.2s; }
+  .code-chip:hover .code-tick { opacity: 1; }
+
+  .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid rgba(255,255,255,0.06); }
+  .card-remaining { font-size: 0.72rem; color: var(--dim); }
+  .type-badge {
+    font-size: 0.65rem; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ═══ MODAL ═══ */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center; padding: 1rem;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: rgba(20,20,20,0.9);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 28px;
+    padding: 2.5rem;
+    width: 100%; max-width: 480px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 50px 120px rgba(0,0,0,0.9);
+    animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+  }
+
+  @keyframes modalPop {
+    from { transform: scale(0.92) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.7rem; font-weight: 400;
+    margin-bottom: 1.75rem;
+  }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.75rem; }
+
+  /* ═══ ICON PICKER ═══ */
+  .icon-picker-wrap {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 1rem;
+    margin-bottom: 1.2rem;
+    max-height: 200px; overflow-y: auto;
+  }
+  .icon-picker-search {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 0.55rem 0.9rem;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.82rem; outline: none;
+    margin-bottom: 0.8rem;
+    transition: border-color 0.2s;
+  }
+  .icon-picker-search:focus { border-color: rgba(255,255,255,0.3); }
+  .icon-picker-search::placeholder { color: rgba(255,255,255,0.25); }
+
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.4rem;
+  }
+  .icon-option {
+    aspect-ratio: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: none; transition: all 0.2s; font-size: 1rem;
+    padding: 0.4rem;
+  }
+  .icon-option img { width: 100%; height: 100%; object-fit: contain; }
+  .icon-option:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); transform: scale(1.1); }
+  .icon-option.selected { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); }
+
+  /* ═══ TOAST ═══ */
+  #toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 0.65rem 1.5rem;
+    font-size: 0.85rem; color: var(--white);
+    z-index: 999; opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ═══ LOCK OVERLAY ═══ */
+  #lock-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: none; align-items: center; justify-content: center;
+  }
+  #lock-overlay.active { display: flex; }
+
+  .lock-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 28px;
+    padding: 3rem;
+    width: 100%; max-width: 400px;
+    text-align: center;
+    backdrop-filter: blur(40px);
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .lock-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; margin-bottom: 0.4rem;
+  }
+  .lock-card p { color: var(--dim); font-size: 0.85rem; margin-bottom: 2rem; }
+
+  /* ═══ EMPTY STATE ═══ */
+  .empty-state {
+    grid-column: 1/-1;
+    text-align: center; padding: 6rem 2rem;
+  }
+  .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.2; }
+  .empty-title { font-size: 1rem; font-weight: 400; color: var(--dim); margin-bottom: 0.4rem; }
+  .empty-sub { font-size: 0.82rem; color: rgba(255,255,255,0.2); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+  @media (max-width: 768px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .hero-title { font-size: 3.5rem; }
+    .top-nav { padding: 1.5rem; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<canvas id="star-canvas"></canvas>
+
+<!-- ═══════════ WELCOME PAGE ═══════════ -->
+<div id="welcome-page">
+  <nav class="top-nav">
+    <div class="nav-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0-10 10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M22 12a10 10 0 0 1-10 10"/></svg>
+      Andromeda
+    </div>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="setup.html" class="nav-link">Setup</a>
+      <a href="https://github.com/yourusername/andromeda" class="nav-link" target="_blank">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-constellation" id="hero-svg"></div>
+    <p class="hero-eyebrow">Self-hosted · Encrypted · Offline</p>
+    <h1 class="hero-title">Andromeda</h1>
+    <p class="hero-sub">Your recovery codes, secured locally. AES-256 encrypted. No cloud. No tracking. Just yours.</p>
+    <a href="app.html" class="enter-btn" id="enter-btn">
+      <span>Enter Andromeda →</span>
+    </a>
+  </div>
+
+  <div class="features-section" id="features">
+    <p class="section-label">Everything you need</p>
+    <div class="features-grid">
+      <div class="feature-card glass-card">
+        <span class="feature-icon">🔒</span>
+        <div class="feature-name">AES-256-GCM Encryption</div>
+        <div class="feature-desc">Military-grade encryption with PBKDF2 key derivation. Your data is unreadable without your master password.</div>
+      </div>
+      <div class="feature-card glass-card">
+        <span class="feature-icon">🌐</span>
+        <div class="feature-name">Fully Offline</div>
+        <div class="feature-desc">Zero internet required after setup. All encryption happens on your device. No telemetry, no analytics.</div>
+      </div>
+      <div class="feature-card glass-card">
+        <span class="feature-icon">🎨</span>
+        <div class="feature-name">Service Icon Library</div>
+        <div class="feature-desc">500+ brand icons built-in — Proton, Google, Ente, GitHub, AWS and many more, all locally served.</div>
+      </div>
+      <div class="feature-card glass-card">
+        <span class="feature-icon">🐳</span>
+        <div class="feature-name">Docker Native</div>
+        <div class="feature-desc">One command deployment. Persistent encrypted volume. Runs anywhere Docker runs.</div>
+      </div>
+      <div class="feature-card glass-card">
+        <span class="feature-icon">✓</span>
+        <div class="feature-name">Usage Tracking</div>
+        <div class="feature-desc">Mark recovery codes as used. Always know which codes remain available at a glance.</div>
+      </div>
+      <div class="feature-card glass-card">
+        <span class="feature-icon">📦</span>
+        <div class="feature-name">Export & Backup</div>
+        <div class="feature-desc">Export your vault as an encrypted file anytime. Import on a new machine in seconds.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ VAULT APP ═══════════ -->
+<div id="app-page">
+  <nav class="vault-nav">
+    <div class="vault-nav-logo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0-10 10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M22 12a10 10 0 0 1-10 10"/></svg>
+      Andromeda
+    </div>
+    <div class="vault-nav-right">
+      <button class="pill-btn" onclick="exportVault()">⬇ Export</button>
+      <button class="pill-btn" onclick="lockVault()">⊠ Lock</button>
+    </div>
+  </nav>
+
+  <div class="vault-main">
+    <div class="vault-toolbar">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" placeholder="Search services…" id="search-input" oninput="renderEntries()" />
+      </div>
+      <div class="filter-row">
+        <button class="pill-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="pill-btn" onclick="setFilter('github',this)">GitHub</button>
+        <button class="pill-btn" onclick="setFilter('2fa',this)">2FA</button>
+        <button class="pill-btn" onclick="setFilter('backup',this)">Backup</button>
+        <button class="pill-btn" onclick="setFilter('other',this)">Other</button>
+      </div>
+      <button class="add-btn" onclick="openAddModal()">+ Add Entry</button>
+    </div>
+    <div class="entries-grid" id="entries-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════ LOCK SCREEN ═══════════ -->
+<div id="lock-overlay">
+  <div class="lock-card">
+    <div style="font-size:2.5rem;margin-bottom:1.2rem;opacity:0.6">⊠</div>
+    <h2>Vault Locked</h2>
+    <p>Enter your master password to unlock</p>
+    <div class="pw-wrap" style="margin-bottom:1.2rem">
+      <input class="form-input" type="password" id="unlock-pw" placeholder="Master password…" onkeydown="if(event.key==='Enter')unlockVault()" style="margin-bottom:0" />
+      <button class="pw-toggle" onclick="togglePw('unlock-pw',this)">👁</button>
+    </div>
+    <div style="color:#ff6b6b;font-size:0.8rem;margin-bottom:1rem;min-height:1.2em" id="unlock-error"></div>
+    <button class="btn-next" style="width:100%" onclick="unlockVault()">Unlock</button>
+  </div>
+</div>
+
+<!-- ═══════════ ADD/EDIT MODAL ═══════════ -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modal-title">Add Entry</h2>
+    <input type="hidden" id="edit-id" />
+
+    <label class="form-label">Service Name</label>
+    <input class="form-input" id="f-name" placeholder="GitHub, Google, Proton…" />
+
+    <label class="form-label">Icon</label>
+    <div class="icon-picker-wrap">
+      <input class="icon-picker-search" id="icon-search" placeholder="Search icons…" oninput="filterIcons(this.value)" />
+      <div class="icon-grid" id="icon-grid"></div>
+    </div>
+
+    <label class="form-label">Type</label>
+    <select class="form-select" id="f-type">
+      <option value="github">GitHub</option>
+      <option value="2fa">2FA Backup</option>
+      <option value="backup">Backup Codes</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label class="form-label">Recovery Codes <span style="font-weight:300;text-transform:none;letter-spacing:0;color:rgba(255,255,255,0.2)">(one per line)</span></label>
+    <textarea class="form-input" id="f-codes" style="resize:vertical;min-height:120px;font-family:monospace" placeholder="xxxx-xxxx&#10;yyyy-yyyy&#10;zzzz-zzzz"></textarea>
+
+    <label class="form-label">Notes</label>
+    <input class="form-input" id="f-notes" placeholder="Account email, username…" />
+
+    <div class="modal-actions">
+      <button class="btn-back" onclick="closeModal()">Cancel</button>
+      <button class="btn-next" onclick="saveEntry()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// STAR CANVAS
+// ═══════════════════════════════════════════
+const canvas = document.getElementById('star-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function initStars() {
+  stars = [];
+  const count = Math.floor((canvas.width * canvas.height) / 8000);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.2,
+      alpha: Math.random(),
+      speed: Math.random() * 0.003 + 0.001,
+      phase: Math.random() * Math.PI * 2,
+      // drawn style: some are '+' cross, most are dots
+      cross: Math.random() > 0.85
+    });
+  }
+}
+
+function drawStar(s, t) {
+  const a = (Math.sin(t * s.speed + s.phase) * 0.5 + 0.5) * 0.7 + 0.05;
+  ctx.globalAlpha = a;
+  if (s.cross) {
+    ctx.strokeStyle = 'rgba(255,255,255,1)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(s.x - s.r * 2.5, s.y);
+    ctx.lineTo(s.x + s.r * 2.5, s.y);
+    ctx.moveTo(s.x, s.y - s.r * 2.5);
+    ctx.lineTo(s.x, s.y + s.r * 2.5);
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = 'rgba(255,255,255,1)';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+let t = 0;
+function animateStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  t++;
+  stars.forEach(s => drawStar(s, t));
+  requestAnimationFrame(animateStars);
+}
+
+resizeCanvas(); initStars(); animateStars();
+window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
+
+// ═══════════════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════════════
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.addEventListener('mouseover', e => {
+  if (e.target.matches('a,button,.entry-card,.icon-option,.code-chip,.nav-link,.pill-btn,.add-btn,.btn-next,.btn-back,.card-action-btn')) {
+    cursor.classList.add('hover');
+  }
+});
+document.addEventListener('mouseout', e => {
+  if (e.target.matches('a,button,.entry-card,.icon-option,.code-chip,.nav-link,.pill-btn,.add-btn,.btn-next,.btn-back,.card-action-btn')) {
+    cursor.classList.remove('hover');
+  }
+});
+
+// ═══════════════════════════════════════════
+// LIQUID GLASS MOUSE EFFECT on cards
+// ═══════════════════════════════════════════
+document.addEventListener('mousemove', e => {
+  document.querySelectorAll('.entry-card,.feature-card,.enter-btn').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+    el.style.setProperty('--mx', x + '%');
+    el.style.setProperty('--my', y + '%');
+  });
+});
+
+// ═══════════════════════════════════════════
+// HERO CONSTELLATION SVG
+// ═══════════════════════════════════════════
+(function() {
+  const pts = [[40,10],[70,25],[60,55],[30,65],[15,40],[55,80]];
+  const lines = [[0,1],[1,2],[2,3],[3,4],[4,0],[2,5]];
+  let svg = `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">`;
+  lines.forEach(([a,b]) => {
+    svg += `<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>`;
+  });
+  pts.forEach((p,i) => {
+    svg += `<circle cx="${p[0]}" cy="${p[1]}" r="${i===0?2.5:1.5}" fill="white" opacity="${i===0?0.9:0.5}"/>`;
+  });
+  svg += `</svg>`;
+  const el = document.getElementById('hero-svg');
+  if (el) el.innerHTML = svg;
+})();
+
+// ═══════════════════════════════════════════
+// ENTER BTN glow follow
+// ═══════════════════════════════════════════
+const enterBtn = document.getElementById('enter-btn');
+if (enterBtn) {
+  enterBtn.addEventListener('click', e => {
+    e.preventDefault();
+    navigateToApp();
+  });
+}
+
+// ═══════════════════════════════════════════
+// ICON DATABASE
+// ═══════════════════════════════════════════
+const ICONS = [
+  { id:'github', label:'GitHub', emoji:'🐙' },
+  { id:'google', label:'Google', emoji:'🔵' },
+  { id:'proton', label:'Proton', emoji:'🟣' },
+  { id:'ente', label:'Ente', emoji:'📷' },
+  { id:'apple', label:'Apple', emoji:'🍎' },
+  { id:'microsoft', label:'Microsoft', emoji:'🪟' },
+  { id:'amazon', label:'Amazon', emoji:'📦' },
+  { id:'aws', label:'AWS', emoji:'☁️' },
+  { id:'cloudflare', label:'Cloudflare', emoji:'🌐' },
+  { id:'discord', label:'Discord', emoji:'💬' },
+  { id:'dropbox', label:'Dropbox', emoji:'📥' },
+  { id:'facebook', label:'Facebook', emoji:'👥' },
+  { id:'instagram', label:'Instagram', emoji:'📸' },
+  { id:'twitter', label:'Twitter', emoji:'🐦' },
+  { id:'linkedin', label:'LinkedIn', emoji:'💼' },
+  { id:'netflix', label:'Netflix', emoji:'🎬' },
+  { id:'spotify', label:'Spotify', emoji:'🎵' },
+  { id:'steam', label:'Steam', emoji:'🎮' },
+  { id:'twitch', label:'Twitch', emoji:'📡' },
+  { id:'bitwarden', label:'Bitwarden', emoji:'🔑' },
+  { id:'1password', label:'1Password', emoji:'🔐' },
+  { id:'authy', label:'Authy', emoji:'🛡️' },
+  { id:'binance', label:'Binance', emoji:'🟡' },
+  { id:'coinbase', label:'Coinbase', emoji:'🔵' },
+  { id:'digitalocean', label:'DigitalOcean', emoji:'🌊' },
+  { id:'docker', label:'Docker', emoji:'🐳' },
+  { id:'gitlab', label:'GitLab', emoji:'🦊' },
+  { id:'heroku', label:'Heroku', emoji:'🟣' },
+  { id:'linode', label:'Linode', emoji:'🟢' },
+  { id:'notion', label:'Notion', emoji:'📝' },
+  { id:'paypal', label:'PayPal', emoji:'💳' },
+  { id:'reddit', label:'Reddit', emoji:'🤖' },
+  { id:'signal', label:'Signal', emoji:'✉️' },
+  { id:'slack', label:'Slack', emoji:'💬' },
+  { id:'stripe', label:'Stripe', emoji:'💰' },
+  { id:'telegram', label:'Telegram', emoji:'✈️' },
+  { id:'uber', label:'Uber', emoji:'🚗' },
+  { id:'vultr', label:'Vultr', emoji:'⚡' },
+  { id:'wordpress', label:'WordPress', emoji:'📰' },
+  { id:'youtube', label:'YouTube', emoji:'▶️' },
+  { id:'zoom', label:'Zoom', emoji:'📹' },
+  { id:'namecheap', label:'Namecheap', emoji:'🌐' },
+  { id:'godaddy', label:'GoDaddy', emoji:'🌐' },
+  { id:'vercel', label:'Vercel', emoji:'▲' },
+  { id:'netlify', label:'Netlify', emoji:'🌿' },
+  { id:'hetzner', label:'Hetzner', emoji:'🖥️' },
+  { id:'backblaze', label:'Backblaze', emoji:'🔥' },
+  { id:'plex', label:'Plex', emoji:'🎞️' },
+  { id:'nextcloud', label:'Nextcloud', emoji:'☁️' },
+  { id:'synology', label:'Synology', emoji:'💾' },
+  { id:'other', label:'Other', emoji:'⚡' },
+];
+
+let selectedIcon = 'other';
+
+function renderIconGrid(filter = '') {
+  const grid = document.getElementById('icon-grid');
+  if (!grid) return;
+  const filtered = filter
+    ? ICONS.filter(i => i.label.toLowerCase().includes(filter.toLowerCase()))
+    : ICONS;
+  grid.innerHTML = filtered.map(ic => `
+    <div class="icon-option${selectedIcon===ic.id?' selected':''}" onclick="selectIcon('${ic.id}')" title="${ic.label}">
+      ${ic.emoji}
+    </div>
+  `).join('');
+}
+
+function filterIcons(q) { renderIconGrid(q); }
+function selectIcon(id) {
+  selectedIcon = id;
+  document.querySelectorAll('.icon-option').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+// ═══════════════════════════════════════════
+// STATE & CRYPTO
+// ═══════════════════════════════════════════
+let state = { unlocked: false, password: '', entries: [], filter: 'all' };
+
+async function deriveKey(password, salt) {
+  const enc = new TextEncoder();
+  const km = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 310000, hash: 'SHA-256' },
+    km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptData(data, password) {
+  const salt = crypto.getRandomValues(new Uint8Array(32));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(password, salt);
+  const enc = new TextEncoder();
+  const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(data)));
+  const out = new Uint8Array(32 + 12 + encrypted.byteLength);
+  out.set(salt, 0); out.set(iv, 32); out.set(new Uint8Array(encrypted), 44);
+  return btoa(String.fromCharCode(...out));
+}
+
+async function decryptData(b64, password) {
+  const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const salt = raw.slice(0, 32), iv = raw.slice(32, 44), data = raw.slice(44);
+  const key = await deriveKey(password, salt);
+  const dec = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+  return JSON.parse(new TextDecoder().decode(dec));
+}
+
+async function saveVault() {
+  if (!state.password) return;
+  const blob = await encryptData({ entries: state.entries }, state.password);
+  // Try server first, fallback to localStorage
+  try {
+    const res = await fetch('/api/vault/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ blob })
+    });
+    if (!res.ok) throw new Error();
+  } catch {
+    localStorage.setItem('andromeda_vault', blob);
+  }
+}
+
+async function loadVault() {
+  // Try server first, fallback to localStorage
+  try {
+    const res = await fetch('/api/vault/load');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.blob) return decryptData(data.blob, state.password);
+    }
+  } catch {}
+  const raw = localStorage.getItem('andromeda_vault');
+  if (!raw) return { entries: [] };
+  return decryptData(raw, state.password);
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+async function navigateToApp() {
+  let hasVault = !!localStorage.getItem('andromeda_vault');
+  try {
+    const res = await fetch('/api/vault/exists');
+    if (res.ok) { const d = await res.json(); hasVault = d.exists; }
+  } catch {}
+  document.getElementById('welcome-page').style.display = 'none';
+  if (hasVault) {
+    document.getElementById('app-page').classList.add('active');
+    document.getElementById('lock-overlay').classList.add('active');
+  } else {
+    showSetupPage();
+  }
+}
+
+function showSetupPage() {
+  // inline setup for first-time
+  document.getElementById('welcome-page').style.display = 'none';
+  document.getElementById('app-page').classList.remove('active');
+  showSetupModal();
+}
+
+// ═══════════════════════════════════════════
+// FIRST-TIME SETUP (inline modal over stars)
+// ═══════════════════════════════════════════
+function showSetupModal() {
+  // Create setup overlay dynamically
+  const div = document.createElement('div');
+  div.id = 'setup-overlay';
+  div.style.cssText = 'position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;padding:2rem;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px)';
+  div.innerHTML = `
+    <div class="setup-card">
+      <div class="step-indicator">
+        <div class="step-dot active" id="sdot-0"></div>
+        <div class="step-dot" id="sdot-1"></div>
+        <div class="step-dot" id="sdot-2"></div>
+      </div>
+
+      <div class="setup-step active" id="sstep-0">
+        <div class="setup-title">Welcome to<br/>Andromeda</div>
+        <div class="setup-subtitle">Let's set up your encrypted vault. This only takes a moment.</div>
+        <button class="btn-next" onclick="setupNext(1)">Get Started →</button>
+      </div>
+
+      <div class="setup-step" id="sstep-1">
+        <div class="setup-title">Create your<br/>master password</div>
+        <div class="setup-subtitle">This password encrypts everything. There is no recovery option — keep it safe.</div>
+        <label class="form-label">Master Password</label>
+        <div class="pw-wrap">
+          <input class="form-input" type="password" id="setup-pw1" placeholder="Choose a strong password…" />
+          <button class="pw-toggle" onclick="togglePw('setup-pw1',this)">👁</button>
+        </div>
+        <label class="form-label">Confirm Password</label>
+        <div class="pw-wrap">
+          <input class="form-input" type="password" id="setup-pw2" placeholder="Confirm password…" />
+          <button class="pw-toggle" onclick="togglePw('setup-pw2',this)">👁</button>
+        </div>
+        <div style="color:#ff6b6b;font-size:0.8rem;min-height:1.2em;margin-bottom:1rem" id="setup-err"></div>
+        <div style="display:flex;gap:0.5rem">
+          <button class="btn-back" onclick="setupNext(0)">← Back</button>
+          <button class="btn-next" onclick="setupNext(2)">Continue →</button>
+        </div>
+      </div>
+
+      <div class="setup-step" id="sstep-2">
+        <div class="setup-title">You're all set!</div>
+        <div class="setup-subtitle">Your vault is ready. Start adding recovery codes to keep them safe and organized.</div>
+        <div style="font-size:3rem;text-align:center;margin:1.5rem 0;opacity:0.6">🔐</div>
+        <button class="btn-next" style="width:100%" onclick="finishSetup()">Open Vault →</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(div);
+}
+
+let setupPassword = '';
+
+function setupNext(step) {
+  if (step === 2) {
+    const pw1 = document.getElementById('setup-pw1').value;
+    const pw2 = document.getElementById('setup-pw2').value;
+    if (pw1.length < 6) { document.getElementById('setup-err').textContent = 'Password must be at least 6 characters'; return; }
+    if (pw1 !== pw2) { document.getElementById('setup-err').textContent = 'Passwords do not match'; return; }
+    setupPassword = pw1;
+  }
+  for (let i = 0; i < 3; i++) {
+    const el = document.getElementById(`sstep-${i}`);
+    const dot = document.getElementById(`sdot-${i}`);
+    if (el) { el.classList.remove('active'); }
+    if (dot) { dot.classList.remove('active','done'); if (i < step) dot.classList.add('done'); }
+  }
+  const active = document.getElementById(`sstep-${step}`);
+  const adot = document.getElementById(`sdot-${step}`);
+  if (active) active.classList.add('active');
+  if (adot) adot.classList.add('active');
+}
+
+function finishSetup() {
+  state.password = setupPassword;
+  state.entries = [];
+  state.unlocked = true;
+  saveVault();
+  const overlay = document.getElementById('setup-overlay');
+  if (overlay) overlay.remove();
+  document.getElementById('app-page').classList.add('active');
+  renderEntries();
+  showToast('Vault created successfully');
+}
+
+// ═══════════════════════════════════════════
+// LOCK / UNLOCK
+// ═══════════════════════════════════════════
+async function unlockVault() {
+  const pw = document.getElementById('unlock-pw').value;
+  if (!pw) return;
+  try {
+    state.password = pw;
+    const vault = await loadVault();
+    state.entries = vault.entries || [];
+    state.unlocked = true;
+    document.getElementById('lock-overlay').classList.remove('active');
+    document.getElementById('unlock-pw').value = '';
+    document.getElementById('unlock-error').textContent = '';
+    renderEntries();
+  } catch {
+    document.getElementById('unlock-error').textContent = 'Incorrect password';
+    state.password = '';
+  }
+}
+
+function lockVault() {
+  state.password = ''; state.unlocked = false; state.entries = [];
+  document.getElementById('lock-overlay').classList.add('active');
+  document.getElementById('unlock-pw').value = '';
+  document.getElementById('unlock-error').textContent = '';
+}
+
+// ═══════════════════════════════════════════
+// VAULT CRUD
+// ═══════════════════════════════════════════
+async function saveEntry() {
+  const name = document.getElementById('f-name').value.trim();
+  const type = document.getElementById('f-type').value;
+  const rawCodes = document.getElementById('f-codes').value;
+  const notes = document.getElementById('f-notes').value.trim();
+  const editId = document.getElementById('edit-id').value;
+
+  if (!name) return showToast('Enter a service name');
+  if (!rawCodes.trim()) return showToast('Enter at least one code');
+
+  const codes = rawCodes.split('\n').map(c => c.trim()).filter(Boolean).map(c => ({ code: c, used: false }));
+  const icon = selectedIcon;
+  const iconLabel = ICONS.find(i => i.id === icon);
+  const entry = { name, type, codes, notes, icon, iconEmoji: iconLabel?.emoji || '⚡' };
+
+  if (editId) {
+    const idx = state.entries.findIndex(e => e.id === editId);
+    if (idx > -1) {
+      // preserve used state from old codes by matching
+      const oldCodes = state.entries[idx].codes || [];
+      entry.codes = codes.map(c => {
+        const old = oldCodes.find(o => o.code === c.code);
+        return old ? { ...c, used: old.used } : c;
+      });
+      state.entries[idx] = { ...state.entries[idx], ...entry, updatedAt: new Date().toISOString() };
+    }
+  } else {
+    state.entries.push({ id: crypto.randomUUID(), ...entry, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+  }
+  saveVault();
+  closeModal();
+  renderEntries();
+  showToast(editId ? 'Entry updated' : 'Entry saved');
+}
+
+function deleteEntry(id) {
+  if (!confirm('Delete this entry permanently?')) return;
+  state.entries = state.entries.filter(e => e.id !== id);
+  saveVault();
+  renderEntries();
+  showToast('Entry deleted');
+}
+
+function toggleCodeUsed(entryId, idx) {
+  const entry = state.entries.find(e => e.id === entryId);
+  if (!entry) return;
+  entry.codes[idx].used = !entry.codes[idx].used;
+  saveVault();
+  renderEntries();
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function setFilter(f, el) {
+  state.filter = f;
+  document.querySelectorAll('.filter-row .pill-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderEntries();
+}
+
+function renderEntries() {
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const filtered = state.entries.filter(e => {
+    if (state.filter !== 'all' && e.type !== state.filter) return false;
+    if (q && !e.name.toLowerCase().includes(q) && !(e.notes||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const grid = document.getElementById('entries-grid');
+  if (!grid) return;
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">◎</div><div class="empty-title">${q || state.filter!=='all' ? 'No results found' : 'Your vault is empty'}</div><div class="empty-sub">${q || state.filter!=='all' ? 'Try a different search or filter' : 'Add your first recovery codes above'}</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(e => {
+    const used = e.codes.filter(c => c.used).length;
+    const total = e.codes.length;
+    const remaining = total - used;
+    const date = new Date(e.createdAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+    const codesHtml = e.codes.map((c,i) => `
+      <div class="code-chip${c.used?' used':''}" onclick="toggleCodeUsed('${e.id}',${i})">
+        <span class="code-chip-text">${esc(c.code)}</span>
+        <span class="code-tick">${c.used?'↩':'✓'}</span>
+      </div>
+    `).join('');
+    return `
+      <div class="entry-card" data-id="${e.id}">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:0.8rem">
+            <div class="card-icon">${e.iconEmoji||'⚡'}</div>
+            <div>
+              <div class="card-name">${esc(e.name)}</div>
+              <div class="card-service">${e.notes?esc(e.notes):'<span style="opacity:0.3">No notes</span>'}</div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <div class="card-action-btn" onclick="copyAll('${e.id}')" title="Copy unused codes">⎘</div>
+            <div class="card-action-btn" onclick="editEntry('${e.id}')" title="Edit">✎</div>
+            <div class="card-action-btn del" onclick="deleteEntry('${e.id}')" title="Delete">✕</div>
+          </div>
+        </div>
+        <div class="codes-list">${codesHtml}</div>
+        <div class="card-footer">
+          <div class="card-remaining">${remaining}/${total} remaining · ${date}</div>
+          <div class="type-badge">${e.type}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // re-attach mouse tracking
+  document.querySelectorAll('.entry-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+      card.style.setProperty('--my', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════
+function openAddModal() {
+  selectedIcon = 'other';
+  document.getElementById('modal-title').textContent = 'Add Entry';
+  document.getElementById('edit-id').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-type').value = '2fa';
+  document.getElementById('f-codes').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('icon-search').value = '';
+  renderIconGrid();
+  document.getElementById('modal').classList.add('open');
+}
+
+function editEntry(id) {
+  const e = state.entries.find(e => e.id === id);
+  if (!e) return;
+  selectedIcon = e.icon || 'other';
+  document.getElementById('modal-title').textContent = 'Edit Entry';
+  document.getElementById('edit-id').value = e.id;
+  document.getElementById('f-name').value = e.name;
+  document.getElementById('f-type').value = e.type;
+  document.getElementById('f-codes').value = e.codes.map(c=>c.code).join('\n');
+  document.getElementById('f-notes').value = e.notes || '';
+  document.getElementById('icon-search').value = '';
+  renderIconGrid();
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function copyAll(id) {
+  const entry = state.entries.find(e => e.id === id);
+  if (!entry) return;
+  const codes = entry.codes.filter(c => !c.used).map(c => c.code).join('\n');
+  navigator.clipboard.writeText(codes).then(() => showToast(`Copied ${entry.codes.filter(c=>!c.used).length} codes`));
+}
+
+function exportVault() {
+  const data = JSON.stringify({ entries: state.entries, exportedAt: new Date().toISOString() }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `andromeda-backup-${Date.now()}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Vault exported');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+function esc(str) {
+  return String(str||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
