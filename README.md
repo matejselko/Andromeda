@@ -38,8 +38,20 @@ Open **http://localhost:3456**
 ## Or with Docker Compose
 
 ```bash
-curl -O https://raw.githubusercontent.com/matejselko/andromeda/main/docker-compose.yml
-docker compose up -d
+services:
+  andromeda:
+    image: ghcr.io/matejselko/andromeda:latest
+    container_name: andromeda
+    restart: unless-stopped
+    ports:
+      - "3456:3000"
+    volumes:
+      - andromeda-data:/data
+    environment:
+      - DATA_FILE=/data/vault.enc
+
+volumes:
+  andromeda-data:
 ```
 
 ---
