@@ -4,15 +4,12 @@ RUN addgroup -S andromeda && adduser -S andromeda -G andromeda
 
 WORKDIR /app
 
-# Install deps
 COPY backend/package*.json ./backend/
-RUN cd backend && npm ci --omit=dev
+RUN cd backend && npm install --omit=dev
 
-# Copy app
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
 
-# Vault storage
 RUN mkdir -p /data && chown andromeda:andromeda /data
 
 USER andromeda
