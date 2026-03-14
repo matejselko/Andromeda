@@ -59,7 +59,7 @@ docker volume rm andromeda-data
 
 - 🔒 AES-256-GCM encryption — happens in your browser, server never sees plaintext
 - 🌐 Fully offline after first pull
-- 🎨 500+ service icons — GitHub, Proton, Ente, Google, AWS and more
+- 🎨 Service icons — GitHub, Proton, Ente, Google, AWS and more
 - ✓ Mark codes as used
 - 📦 Export encrypted backup anytime
 - 🐳 amd64 + arm64 (works on Raspberry Pi and Apple Silicon)
