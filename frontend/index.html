@@ -20,7 +20,10 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 /* ── CURSOR ── */
 #cursor{position:fixed;pointer-events:none;z-index:9999;width:18px;height:18px;border:1.5px solid rgba(255,255,255,.6);border-radius:50%;transform:translate(-50%,-50%);transition:width .18s,height .18s,background .18s;mix-blend-mode:difference}
 #cursor.hover{width:34px;height:34px;background:rgba(255,255,255,.08)}
-#star-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;will-change:transform;transform:translateZ(0);image-rendering:pixelated}
+#star-field{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  @keyframes twinkle{0%,100%{opacity:.08}50%{opacity:.7}}
+  .star{position:absolute;border-radius:50%;background:#fff;will-change:opacity;animation:twinkle var(--dur,4s) ease-in-out infinite;animation-delay:var(--del,0s)}
+  .star.cross{border-radius:0;width:1px!important;background:transparent;box-shadow:0 -4px 0 .5px #fff, 0 4px 0 .5px #fff, -4px 0 0 .5px #fff, 4px 0 0 .5px #fff}
 
 /* ── ANIMATIONS ── */
 @keyframes fadeUp  {from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
@@ -64,13 +67,13 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 .topbar-logo{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:.45rem}
 .topbar-search{position:relative}
 .topbar-search svg{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);opacity:.3;pointer-events:none}
-.topbar-search input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.38rem .85rem .38rem 2.2rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.8rem;outline:none;width:220px;transition:all .22s}
+.topbar-search input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.38rem .85rem .38rem 2.2rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.87rem;outline:none;width:230px;transition:all .22s}
 .topbar-search input:focus{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.09);width:260px}
 .topbar-search input::placeholder{color:rgba(255,255,255,.22)}
 .topbar-right{display:flex;align-items:center;gap:.5rem}
 .icon-btn{width:30px;height:30px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:none;transition:all .2s;color:var(--dim)}
 .icon-btn:hover{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25)}
-.add-btn-top{padding:.38rem 1rem;background:rgba(255,255,255,.88);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;color:#000;cursor:none;transition:all .25s;white-space:nowrap}
+.add-btn-top{padding:.38rem 1rem;background:rgba(255,255,255,.88);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.87rem;font-weight:600;color:#000;cursor:none;transition:all .25s;white-space:nowrap}
 .add-btn-top:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,255,255,.14)}
 
 /* Main area */
@@ -80,7 +83,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 .sidebar{width:210px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(0,0,0,.55);border-right:1px solid rgba(255,255,255,.06);overflow-y:auto;overflow-x:hidden;transition:width .28s cubic-bezier(.4,0,.2,1)}
 .sidebar.collapsed{width:0}
 .sidebar-inner{width:210px;padding:1rem .75rem;display:flex;flex-direction:column;height:100%}
-.sb-section{font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:.6rem .5rem .3rem;white-space:nowrap}
+.sb-section{font-size:.67rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:.6rem .5rem .3rem;white-space:nowrap}
 .sb-item{display:flex;align-items:center;gap:.6rem;padding:.52rem .65rem;border-radius:9px;cursor:none;transition:all .18s;color:rgba(255,255,255,.42);font-size:.8rem;border:1px solid transparent;white-space:nowrap;overflow:hidden}
 .sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
 .sb-item.active{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.1)}
@@ -99,8 +102,8 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 /* ── CONTENT ── */
 .vault-content{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .content-header{padding:.9rem 1.6rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0}
-.content-title{font-family:'DM Serif Display',serif;font-size:1.3rem;font-weight:400}
-.content-meta{font-size:.72rem;color:rgba(255,255,255,.28);margin-top:.1rem}
+.content-title{font-family:'DM Serif Display',serif;font-size:1.5rem;font-weight:400}
+.content-meta{font-size:.82rem;color:rgba(255,255,255,.28);margin-top:.1rem}
 .filter-chips{display:flex;gap:.35rem;flex-wrap:wrap}
 .fc{padding:.28rem .75rem;border-radius:6px;font-size:.72rem;font-weight:500;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:var(--dim);cursor:none;transition:all .18s}
 .fc:hover{color:#fff;border-color:rgba(255,255,255,.25)}
@@ -118,8 +121,8 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 .card-header{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.9rem}
 .card-icon{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
 .card-meta{flex:1;min-width:0;padding-top:.1rem}
-.card-name{font-size:.9rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.1rem}
-.card-note{font-size:.72rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-name{font-size:1rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.1rem}
+.card-note{font-size:.82rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-actions{display:flex;gap:.25rem;opacity:0;transition:opacity .15s;flex-shrink:0}
 .entry-card:hover .card-actions{opacity:1}
 .ca{width:26px;height:26px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:none;transition:all .15s;color:var(--dim);font-size:.7rem}
@@ -127,22 +130,25 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 .ca.del:hover{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.07)}
 .ca.pinned-on{color:rgba(251,191,36,.8)}
 .codes-list{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.85rem}
-.code-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:.36rem .65rem;font-family:monospace;font-size:.77rem;color:rgba(255,255,255,.62);display:flex;align-items:center;justify-content:space-between;gap:.4rem;cursor:none;transition:all .15s}
+.code-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:.36rem .65rem;font-family:monospace;font-size:.85rem;color:rgba(255,255,255,.62);display:flex;align-items:center;justify-content:space-between;gap:.4rem;cursor:none;transition:all .15s}
 .code-chip:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15)}
 .code-chip.used{opacity:.28;text-decoration:line-through}
-.code-chip.no-toggle{cursor:default}
+.code-chip.no-toggle{cursor:none}
 .code-chip.no-toggle:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)}
 .code-chip-text{font-family:monospace;letter-spacing:.07em;flex:1}
 .code-tick{font-size:.58rem;opacity:0;transition:opacity .15s;flex-shrink:0}
 .code-chip:not(.no-toggle):hover .code-tick{opacity:1}
+  .code-chip.no-toggle:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18);cursor:none}
+  .code-chip.no-toggle .copy-hint{font-size:.55rem;opacity:0;transition:opacity .14s;flex-shrink:0;color:rgba(255,255,255,.5)}
+  .code-chip.no-toggle:hover .copy-hint{opacity:1}
 .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.05)}
-.card-rem{font-size:.68rem;color:var(--dim)}
-.type-badge{font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .55rem;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.38)}
+.card-rem{font-size:.77rem;color:var(--dim)}
+.type-badge{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .55rem;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.38)}
 
 /* ── FORMS ── */
-.form-label{display:block;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:.42rem}
+.form-label{display:block;font-size:.76rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:.42rem}
 .form-label small{font-size:.63rem;font-weight:300;text-transform:none;letter-spacing:0;color:rgba(255,255,255,.2);margin-left:.4rem}
-.form-input,.form-select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:12px;padding:.78rem 1rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.87rem;outline:none;margin-bottom:1.1rem;transition:border-color .2s,background .2s}
+.form-input,.form-select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:12px;padding:.78rem 1rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.95rem;outline:none;margin-bottom:1.1rem;transition:border-color .2s,background .2s}
 .form-input:focus,.form-select:focus{border-color:rgba(255,255,255,.36);background:rgba(255,255,255,.09)}
 .form-input::placeholder{color:rgba(255,255,255,.2)}
 .form-select option{background:#0d0d0d;color:#fff}
@@ -183,11 +189,11 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 
 /* Code chip input */
 .codes-chips-list{display:flex;flex-direction:column;gap:.24rem;margin-bottom:.42rem}
-.code-input-chip{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:.36rem .68rem;font-family:monospace;font-size:.82rem;color:rgba(255,255,255,.78);display:flex;align-items:center;justify-content:space-between;gap:.5rem;animation:chipIn .16s ease both}
+.code-input-chip{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:.36rem .68rem;font-family:monospace;font-size:.85rem;color:rgba(255,255,255,.78);display:flex;align-items:center;justify-content:space-between;gap:.5rem;animation:chipIn .16s ease both}
 .chip-text{flex:1;letter-spacing:.05em}
 .chip-remove{opacity:.32;cursor:none;font-size:.68rem;transition:opacity .14s;flex-shrink:0;padding:.1rem .2rem}
 .chip-remove:hover{opacity:.9}
-.code-entry-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:9px;padding:.65rem .95rem;color:#fff;font-family:monospace;font-size:.83rem;outline:none;transition:border-color .2s}
+.code-entry-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:9px;padding:.65rem .95rem;color:#fff;font-family:monospace;font-size:.85rem;outline:none;transition:border-color .2s}
 .code-entry-input:focus{border-color:rgba(255,255,255,.36)}
 .code-entry-input::placeholder{color:rgba(255,255,255,.17);font-family:'Outfit',sans-serif;font-size:.8rem}
 .code-hint{font-size:.68rem;color:rgba(255,255,255,.17);margin-top:.28rem}
@@ -209,12 +215,12 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 .fpp-body{flex:1;overflow-y:auto;padding:1.6rem 2rem;max-width:700px;width:100%;margin:0 auto}
 .fpp-code-list{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.5rem}
 .fpp-code-row{display:flex;align-items:center;gap:.6rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:.5rem .75rem;animation:cardIn .25s ease both}
-.fpp-code-row input{flex:1;background:transparent;border:none;color:#fff;font-family:monospace;font-size:.83rem;outline:none;padding:0}
+.fpp-code-row input{flex:1;background:transparent;border:none;color:#fff;font-family:monospace;font-size:.85rem;outline:none;padding:0}
 .fpp-code-row input::placeholder{color:rgba(255,255,255,.2)}
 .fpp-code-row .fpp-del{opacity:.3;cursor:none;font-size:.7rem;transition:opacity .15s;flex-shrink:0}
 .fpp-code-row .fpp-del:hover{opacity:.9}
 .fpp-add-row{display:flex;gap:.5rem}
-.fpp-add-row input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:9px;padding:.6rem .9rem;color:#fff;font-family:monospace;font-size:.83rem;outline:none;transition:border-color .2s}
+.fpp-add-row input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:9px;padding:.6rem .9rem;color:#fff;font-family:monospace;font-size:.85rem;outline:none;transition:border-color .2s}
 .fpp-add-row input:focus{border-color:rgba(255,255,255,.35)}
 .fpp-add-row button{padding:.6rem 1.1rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#fff;font-family:'Outfit',sans-serif;font-size:.8rem;cursor:none;transition:all .18s}
 .fpp-add-row button:hover{background:rgba(255,255,255,.16)}
@@ -273,7 +279,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 </head>
 <body>
 <div id="cursor"></div>
-<canvas id="star-canvas"></canvas>
+<div id="star-field"></div>
 
 <!-- ══════════ WELCOME ══════════ -->
 <div id="welcome-page">
@@ -358,14 +364,6 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
         </div>
         <div class="sb-spacer"></div>
         <div class="sb-divider"></div>
-        <div class="sb-item" onclick="exportVault()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export vault
-        </div>
-        <div class="sb-item" onclick="triggerImport()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10" transform="scale(1,-1) translate(0,-24)"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Import vault
-        </div>
         <div class="sb-item" onclick="openSettings()">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           Settings
@@ -382,7 +380,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
     <div class="vault-content">
       <div class="content-header">
         <div>
-          <div style="font-size:.66rem;color:rgba(255,255,255,.25);margin-bottom:.15rem;letter-spacing:.04em">Welcome home, <span id="welcome-name">User</span></div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.28);margin-bottom:.2rem;letter-spacing:.03em">Welcome home, <span id="welcome-name">User</span></div>
           <div class="content-title" id="content-title">All entries</div>
           <div class="content-meta" id="content-meta"></div>
         </div>
@@ -508,33 +506,55 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 <script>
 'use strict';
 
-// ── STARS ──────────────────────────────────
-const canvas=document.getElementById('star-canvas'),ctx=canvas.getContext('2d');
-let stars=[],sT=0,sPaused=false,sFrame=null;
-function resizeCanvas(){canvas.width=innerWidth;canvas.height=innerHeight}
-function initStars(){
-  stars=[];
-  const n=Math.min(Math.floor(canvas.width*canvas.height/9000),160);
-  for(let i=0;i<n;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.1+.2,spd:Math.random()*.003+.001,ph:Math.random()*Math.PI*2,cross:Math.random()>.87});
+// ── STARS — pure CSS, zero flicker ──────────────────────────────────
+// No canvas, no clearRect, no JS animation loop.
+// Each star is a div with a CSS opacity keyframe — compositor-only, never flickers.
+(function buildStars(){
+  const field = document.getElementById('star-field');
+  if(!field) return;
+  const W = innerWidth, H = innerHeight;
+  const n = Math.min(Math.floor(W * H / 8000), 180);
+  const frag = document.createDocumentFragment();
+  for(let i = 0; i < n; i++){
+    const d = document.createElement('div');
+    const size = Math.random() * 1.5 + 0.4;
+    const isCross = Math.random() > 0.88;
+    const dur  = (Math.random() * 6 + 3).toFixed(2);   // 3–9s cycle
+    const del  = (Math.random() * 8).toFixed(2);        // stagger
+    d.className = 'star' + (isCross ? ' cross' : '');
+    d.style.cssText = `left:${(Math.random()*100).toFixed(2)}%;top:${(Math.random()*100).toFixed(2)}%;` +
+      `width:${size.toFixed(1)}px;height:${size.toFixed(1)}px;` +
+      `--dur:${dur}s;--del:-${del}s`;
+    frag.appendChild(d);
+  }
+  field.appendChild(frag);
+})();
+// pauseStars / resumeStars: pause/play CSS animations on the field
+function pauseStars(){
+  const f = document.getElementById('star-field');
+  if(f) f.style.animationPlayState = 'paused';
+  document.querySelectorAll('.star').forEach(s=>s.style.animationPlayState='paused');
 }
-function drawStar(s){
-  const a=(Math.sin(sT*s.spd*6.28+s.ph)*.5+.5)*.62+.05;
-  ctx.globalAlpha=a;
-  if(s.cross){ctx.strokeStyle='#fff';ctx.lineWidth=.45;ctx.beginPath();ctx.moveTo(s.x-s.r*2.4,s.y);ctx.lineTo(s.x+s.r*2.4,s.y);ctx.moveTo(s.x,s.y-s.r*2.4);ctx.lineTo(s.x,s.y+s.r*2.4);ctx.stroke();}
-  else{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();}
-  ctx.globalAlpha=1;
+function resumeStars(){
+  const f = document.getElementById('star-field');
+  if(f) f.style.animationPlayState = '';
+  document.querySelectorAll('.star').forEach(s=>s.style.animationPlayState='');
 }
-// Use real timestamp (ms) not frame count — eliminates speed-based flicker
-function animStars(ts){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  sT = ts * 0.001; // seconds, smooth
-  stars.forEach(drawStar);
-  sFrame=requestAnimationFrame(animStars);
-}
-function pauseStars(){sPaused=true;if(sFrame){cancelAnimationFrame(sFrame);sFrame=null}}
-function resumeStars(){if(sPaused){sPaused=false;sFrame=requestAnimationFrame(animStars)}}
-resizeCanvas();initStars();sFrame=requestAnimationFrame(animStars);
-window.addEventListener('resize',()=>{resizeCanvas();initStars()});
+window.addEventListener('resize',()=>{
+  // Rebuild on resize so stars fill new dimensions
+  const field = document.getElementById('star-field');
+  if(field){ field.innerHTML=''; }
+  const W=innerWidth,H=innerHeight,n=Math.min(Math.floor(W*H/8000),180);
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div'),size=Math.random()*1.5+0.4,isCross=Math.random()>.88;
+    const dur=(Math.random()*6+3).toFixed(2),del=(Math.random()*8).toFixed(2);
+    d.className='star'+(isCross?' cross':'');
+    d.style.cssText=`left:${(Math.random()*100).toFixed(2)}%;top:${(Math.random()*100).toFixed(2)}%;width:${size.toFixed(1)}px;height:${size.toFixed(1)}px;--dur:${dur}s;--del:-${del}s`;
+    frag.appendChild(d);
+  }
+  if(field) field.appendChild(frag);
+});
 
 // ── CURSOR ──────────────────────────────────
 const cursor=document.getElementById('cursor');
@@ -616,6 +636,9 @@ const SVG = {
   dropbox:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 6.453L6.001 10.12 12 13.786l-6 3.667L0 13.786l6.001-3.667L0 6.453 6.001 2.787zm-12 10.667l6.001 3.667L12 17.12l6 3.667 6.001-3.667L18 13.453l6.001-3.667-6.001-3.667L12 9.786 6.001 6.12 0 9.787l6.001 3.666zm12-14.333L18 6.453l-5.999 3.667L18 13.786l6-3.667-6-3.666z"/></svg>`,
   nextcloud: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.8a7.2 7.2 0 1 1 0 14.4A7.2 7.2 0 0 1 12 4.8zm0 1.8a5.4 5.4 0 1 0 0 10.8A5.4 5.4 0 0 0 12 6.6z"/></svg>`,
   wordpress: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.11m-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.649-.03 1.234-.1 1.234-.1.585-.075.516-.93-.065-.896 0 0-1.746.138-2.874.138-.2 0-.438-.008-.69-.015C4.911 3.15 8.235 1.215 12 1.215c2.809 0 5.365 1.072 7.286 2.833-.046-.003-.091-.009-.141-.009-1.06 0-1.812.923-1.812 1.914 0 .89.513 1.643 1.06 2.531.411.72.89 1.643.89 2.977 0 .915-.354 1.994-.843 3.479l-1.105 3.699-4.04-11.99zm-9.608 13.042C2.446 18.319 1.2 15.298 1.2 12c0-1.312.212-2.577.6-3.762L7.2 23.982c-1.326-.6-2.52-1.44-3.32-4.01zM12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12z"/></svg>`,
+  proton:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-1.296 1.519-1.972 2.49-1.102L12 13.093l9.51-8.738C22.48 3.485 24 4.161 24 5.457z"/></svg>`,
+  ente:      `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`,
+  homeassistant:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.8 13H20v7h-4v-4h-4v4H8v-7H6.2c-.5 0-.7-.6-.4-.9l7.4-7.4c.4-.4 1-.4 1.4 0l3.4 3.4V6h2v3.1l1.6 1.6c.4.3.2.9-.4.9zM4 21v-7.2L12 6l8 7.8V21H4z"/></svg>`,
 };
 
 // Icon definitions — svg key = uses SVG above, else letter avatar
@@ -706,7 +729,7 @@ const ICONS = [
   {id:'mullvad',      label:'Mullvad',        svg:null,letter:'M', bg:'#44AD4D'},
   {id:'protonvpn',    label:'Proton VPN',     svg:null,letter:'VPN',bg:'#6D4AFF'},
   {id:'nordvpn',      label:'NordVPN',        svg:null,letter:'N', bg:'#4687FF'},
-  {id:'ente',         label:'Ente',           svg:null,letter:'En',bg:'#2C9B57'},
+  {id:'ente',         label:'Ente',           svg:'ente'},
   {id:'simplelogin',  label:'SimpleLogin',    svg:null,letter:'SL',bg:'#E85D04'},
   // ── Domains / hosting ─────────────────────────────────────────────────
   {id:'namecheap',    label:'Namecheap',      svg:null,letter:'NC',bg:'#DE3723'},
@@ -717,7 +740,7 @@ const ICONS = [
   // ── Self-hosted / homelab ─────────────────────────────────────────────
   {id:'proxmox',      label:'Proxmox',        svg:null,letter:'Px',bg:'#E57000'},
   {id:'truenas',      label:'TrueNAS',        svg:null,letter:'TN',bg:'#0095D5'},
-  {id:'homeassistant',label:'Home Assistant', svg:null,letter:'HA',bg:'#41BDF5'},
+  {id:'homeassistant',label:'Home Assistant', svg:'homeassistant'},
   {id:'portainer',    label:'Portainer',      svg:null,letter:'Po',bg:'#13BEF9'},
   {id:'pihole',       label:'Pi-hole',        svg:null,letter:'π', bg:'#CC0000'},
   {id:'zoom',         label:'Zoom',           svg:null,letter:'Z', bg:'#2D8CFF'},
@@ -1178,8 +1201,8 @@ function renderEntries(){
     const used=e.codes.filter(c=>c.used).length,total=e.codes.length,rem=total-used;
     const date=new Date(e.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
     const noToggle=e.type==='passphrase'||e.type==='bitlocker';
-    const codes=e.codes.map((c,ci)=>`<div class="code-chip${c.used&&!noToggle?' used':''} ${noToggle?'no-toggle':''}" ${noToggle?'':(`onclick="toggleCodeUsed('${e.id}',${ci})"`)}>
-      <span class="code-chip-text">${esc(c.code)}</span>${noToggle?'':`<span class="code-tick">${c.used?'↩':'✓'}</span>`}
+    const codes=e.codes.map((c,ci)=>`<div class="code-chip${c.used&&!noToggle?' used':''} ${noToggle?'no-toggle':''}" onclick="${noToggle?`copyChipText(this,'${e.id}',${ci})`:`toggleCodeUsed('${e.id}',${ci})`}">
+      <span class="code-chip-text">${esc(c.code)}</span>${noToggle?'<span class="copy-hint">copy</span>':`<span class="code-tick">${c.used?'↩':'✓'}</span>`}
     </div>`).join('');
     const cbcls=e.color&&e.color!=='white'?` cb-${e.color}`:'';
     return`<div class="entry-card${e.pinned?' pinned':''}${cbcls}" data-id="${e.id}" style="animation-delay:${i*.035}s">
@@ -1251,6 +1274,18 @@ function copyAll(id){
   const e=state.entries.find(e=>e.id===id);if(!e)return;
   const codes=e.codes.filter(c=>!c.used).map(c=>c.code).join('\n');
   navigator.clipboard.writeText(codes).then(()=>showToast(`Copied ${e.codes.filter(c=>!c.used).length} codes`));
+}
+function copyChipText(el,entryId,idx){
+  const e=state.entries.find(e=>e.id===entryId);if(!e)return;
+  const text=e.codes[idx]?.code;if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>{
+    // Flash the chip green briefly
+    el.style.transition='background .15s,border-color .15s';
+    el.style.background='rgba(52,211,153,.18)';
+    el.style.borderColor='rgba(52,211,153,.5)';
+    setTimeout(()=>{el.style.background='';el.style.borderColor='';},700);
+    showToast('Copied to clipboard ✓');
+  }).catch(()=>showToast('Copy failed'));
 }
 // ── SETTINGS PANEL ──────────────────────────────────────────────────────────
 function openSettings(){
