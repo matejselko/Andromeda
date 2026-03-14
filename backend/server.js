@@ -4,31 +4,29 @@ const fs       = require('fs');
 const path     = require('path');
 const https    = require('https');
 const http     = require('http');
-const crypto   = require('crypto');
 const { rateLimit } = require('express-rate-limit');
+
+// ── Config ────────────────────────────────────────────
+const FRONTEND   = path.join(__dirname, '../frontend');
+const DATA_FILE  = process.env.DATA_FILE  || '/data/vault.enc';
+const DATA_DIR   = path.dirname(DATA_FILE);
+const CERT_DIR   = process.env.CERT_DIR   || '/data/certs';
+const PORT       = parseInt(process.env.PORT       || '3000', 10); // HTTPS (main)
+const HEALTH_PORT= parseInt(process.env.HEALTH_PORT|| '3002', 10); // HTTP  (healthcheck only)
+
+// Ensure directories exist
+try { fs.mkdirSync(DATA_DIR,  { recursive: true }); } catch {}
+try { fs.mkdirSync(CERT_DIR,  { recursive: true }); } catch {}
 
 // ── Express app ───────────────────────────────────────
 const app = express();
 app.use(express.json({ limit: '10mb' }));
-
-const FRONTEND  = path.join(__dirname, '../frontend');
-const DATA_FILE = process.env.DATA_FILE || '/data/vault.enc';
-const DATA_DIR  = path.dirname(DATA_FILE);
-const CERT_DIR  = process.env.CERT_DIR  || '/data/certs';
-const PORT      = parseInt(process.env.PORT || '3000', 10);
-const HTTP_PORT = parseInt(process.env.HTTP_PORT || String(PORT + 1), 10);
-
-try { fs.mkdirSync(DATA_DIR,  { recursive: true }); } catch {}
-try { fs.mkdirSync(CERT_DIR,  { recursive: true }); } catch {}
-
 app.use(express.static(FRONTEND));
 
-// ── Security headers ──────────────────────────────────
-// These mark the page as a "secure context" so crypto.subtle works
-// even when accessed via plain HTTP on a LAN IP
+// Headers that allow crypto.subtle on any origin (secure context hint)
 app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy',   'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy',  'require-corp');
+  res.setHeader('Cross-Origin-Opener-Policy',  'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   next();
 });
 
@@ -39,9 +37,9 @@ const vaultLimiter = rateLimit({
   message: { error: 'Too many requests, try again later.' }
 });
 
-// ── API ───────────────────────────────────────────────
+// ── Routes ────────────────────────────────────────────
 app.get('/api/health', (_, res) => {
-  res.json({ status: 'ok', writable: canWrite(), https: true });
+  res.json({ status: 'ok', writable: canWrite() });
 });
 
 app.get('/api/vault/exists', vaultLimiter, (_, res) => {
@@ -79,64 +77,62 @@ function canWrite() {
   catch { return false; }
 }
 
-// ── Self-signed certificate (generated once, persisted in /data/certs) ───────
-// Browser will show "Not secure" once — user clicks Advanced → Proceed.
-// After that crypto.subtle works on every visit.
+// ── TLS cert (generated once, stored in volume) ───────
 const CERT_FILE = path.join(CERT_DIR, 'cert.pem');
-const KEY_FILE  = path.join(CERT_DIR, 'key.pem');
+const KEY_FILE  = path.join(CERT_DIR,  'key.pem');
 
-function genSelfSigned() {
-  // Use openssl if available (alpine has it), otherwise fall back to pure-node
+function genCert() {
   try {
     const { execSync } = require('child_process');
     execSync(
       `openssl req -x509 -newkey rsa:2048 -keyout "${KEY_FILE}" -out "${CERT_FILE}" ` +
-      `-days 3650 -nodes -subj "/CN=andromeda-vault" ` +
-      `-addext "subjectAltName=IP:0.0.0.0,DNS:localhost" 2>/dev/null`,
-      { timeout: 15000 }
+      `-days 3650 -nodes -subj "/CN=andromeda-vault" 2>/dev/null`,
+      { timeout: 20000 }
     );
-    console.log('  ✦  Generated self-signed TLS certificate');
     return true;
   } catch (e) {
-    console.error('  ✗  openssl not available, falling back to HTTP only:', e.message);
+    console.error('  ✗  openssl failed:', e.message);
     return false;
   }
 }
 
-function loadOrCreateCert() {
-  if (fs.existsSync(CERT_FILE) && fs.existsSync(KEY_FILE)) {
+function loadCert() {
+  if (fs.existsSync(CERT_FILE) && fs.existsSync(KEY_FILE))
     return { cert: fs.readFileSync(CERT_FILE), key: fs.readFileSync(KEY_FILE) };
-  }
-  if (genSelfSigned()) {
+  console.log('  ✦  Generating self-signed TLS certificate…');
+  if (genCert())
     return { cert: fs.readFileSync(CERT_FILE), key: fs.readFileSync(KEY_FILE) };
-  }
   return null;
 }
 
 // ── Start ─────────────────────────────────────────────
-const creds = loadOrCreateCert();
 
+// 1. Plain HTTP health-check server — always starts immediately on HEALTH_PORT.
+//    Only used by Docker HEALTHCHECK (internal only, not exposed in compose).
+http.createServer((req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok' }));
+  } else {
+    res.writeHead(404); res.end();
+  }
+}).listen(HEALTH_PORT, '127.0.0.1', () => {
+  console.log(`  ✦  Health endpoint →  http://127.0.0.1:${HEALTH_PORT}/health`);
+});
+
+// 2. Main app server — HTTPS if cert available, plain HTTP otherwise.
+const creds = loadCert();
 if (creds) {
-  // HTTPS — crypto.subtle works on all browsers
   https.createServer(creds, app).listen(PORT, '0.0.0.0', () => {
-    console.log(`\n  ✦  Andromeda  →  https://localhost:${PORT}  (HTTPS)`);
+    console.log(`\n  ✦  Andromeda  →  https://localhost:${PORT}`);
     console.log(`  ✦  Data file  →  ${DATA_FILE}`);
     console.log(`  ✦  Writable   →  ${canWrite()}`);
     console.log(`\n  ⚠  First visit: click "Advanced → Proceed" to accept the self-signed cert.\n`);
   });
-  // HTTP redirect on PORT+1 (optional)
-  http.createServer((req, res) => {
-    const host = req.headers.host?.replace(/:.*/, '') || 'localhost';
-    res.writeHead(301, { Location: `https://${host}:${PORT}${req.url}` });
-    res.end();
-  }).listen(HTTP_PORT, '0.0.0.0', () => {
-    console.log(`  ✦  HTTP redirect →  :${HTTP_PORT}  →  https://:${PORT}`);
-  });
 } else {
-  // HTTP fallback — crypto.subtle only works from localhost in this mode
+  // Fallback: plain HTTP (crypto.subtle only works from localhost)
   http.createServer(app).listen(PORT, '0.0.0.0', () => {
-    console.log(`\n  ✦  Andromeda  →  http://localhost:${PORT}  (HTTP only)`);
-    console.log(`  ⚠  WARNING: crypto.subtle unavailable on non-localhost HTTP.`);
-    console.log(`  ⚠  Access via http://localhost:${PORT} or set up HTTPS.\n`);
+    console.log(`\n  ✦  Andromeda  →  http://localhost:${PORT}  (HTTP — HTTPS cert failed)`);
+    console.log(`  ⚠  Access via http://localhost:${PORT} only — LAN access requires HTTPS.\n`);
   });
 }
