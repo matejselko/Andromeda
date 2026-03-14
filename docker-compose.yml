@@ -4,11 +4,13 @@ services:
     container_name: andromeda
     restart: unless-stopped
     ports:
-      - "3456:3000"
+      - "3456:3000"   # HTTPS — access via https://your-server-ip:3456
+      - "3457:3001"   # HTTP redirect (optional, redirects to 3456)
     volumes:
       - andromeda-data:/data
     environment:
       - DATA_FILE=/data/vault.enc
+      - CERT_DIR=/data/certs
 
 volumes:
   andromeda-data:
