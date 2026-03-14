@@ -545,6 +545,16 @@ document.addEventListener('mousemove',e=>{
   s+=`</svg>`;
   const el=document.getElementById('hero-svg');if(el)el.innerHTML=s;
 })();
+// Check secure context — crypto.subtle needs HTTPS or localhost
+(function checkSecureContext(){
+  if(typeof crypto === 'undefined' || !crypto.subtle){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4444;color:#fff;text-align:center;padding:.75rem 1rem;font-size:.85rem;font-family:Outfit,sans-serif;line-height:1.5';
+    banner.innerHTML = '<strong>⚠ Encryption unavailable</strong> — You are accessing over plain HTTP.<br>Open <strong>https://</strong>' + location.host + ' instead (accept the self-signed certificate warning).';
+    document.body.prepend(banner);
+  }
+})();
+
 document.getElementById('enter-btn').addEventListener('click',e=>{e.preventDefault();navigateToApp()});
 
 // ── ICONS ──────────────────────────────────
@@ -871,6 +881,7 @@ function showSetupModal(){
       <div class="setup-title">All set!</div>
       <div class="setup-sub">Your encrypted vault is ready.</div>
       <div style="font-size:2.8rem;text-align:center;margin:1.5rem 0;opacity:.5">🔐</div>
+      <div id="setup-err" style="color:#ff6b6b;font-size:.76rem;min-height:1em;margin-bottom:.85rem;line-height:1.45"></div>
       <button class="btn-next" style="width:100%" onclick="finishSetup()">Open Vault →</button>
     </div>
   </div>`;
@@ -892,14 +903,30 @@ function setupGo(step){
   document.getElementById('ss'+step)?.classList.add('active');
 }
 async function finishSetup(){
-  state.password=_setupPw;state.entries=[];state.unlocked=true;
-  await saveVault();
-  document.getElementById('setup-overlay')?.remove();
-  document.getElementById('app-page').classList.add('active');
-  document.getElementById('lock-overlay').classList.remove('active'); // CRITICAL fix
-  resumeStars();
-  renderEntries();
-  showToast('Vault created ✓');
+  // Check crypto.subtle before trying to encrypt
+  if(typeof crypto==='undefined'||!crypto.subtle){
+    const err=document.getElementById('setup-err');
+    if(err)err.innerHTML='<strong>⚠ Encryption not available.</strong><br>Open this page via <strong>https://</strong> — accept the certificate warning once.';
+    return;
+  }
+  const btn=document.querySelector('#setup-overlay .btn-next[onclick*=finishSetup]');
+  if(btn){btn.textContent='Creating vault…';btn.disabled=true;}
+  try{
+    state.password=_setupPw;state.entries=[];state.unlocked=true;
+    await saveVault();
+    document.getElementById('setup-overlay')?.remove();
+    document.getElementById('app-page').classList.add('active');
+    document.getElementById('lock-overlay').classList.remove('active');
+    resumeStars();
+    renderEntries();
+    showToast('Vault created ✓');
+  }catch(err){
+    console.error('finishSetup error:',err);
+    const errEl=document.getElementById('setup-err');
+    if(errEl)errEl.textContent='Error: '+(err.message||'encryption failed. Use HTTPS.');
+    if(btn){btn.textContent='Open Vault →';btn.disabled=false;}
+    state.password='';state.unlocked=false;
+  }
 }
 
 // ── LOCK / UNLOCK ──────────────────────────────────
@@ -915,8 +942,12 @@ async function unlockVault(){
     document.getElementById('unlock-pw').value='';
     document.getElementById('unlock-error').textContent='';
     renderEntries();
-  }catch{
-    document.getElementById('unlock-error').textContent='Incorrect password';
+  }catch(e){
+    if(!crypto?.subtle){
+      document.getElementById('unlock-error').innerHTML='Use <strong>https://</strong>'+location.host+' — plain HTTP blocks encryption.';
+    } else {
+      document.getElementById('unlock-error').textContent='Incorrect password';
+    }
     state.password='';
   }finally{btn.textContent='Unlock';btn.disabled=false}
 }
