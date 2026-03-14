@@ -23,32 +23,19 @@ Runs on your machine. AES-256 encrypted. No cloud. No accounts.
 ## Run it
 
 ```bash
-docker run -d \
-  --name andromeda \
-  --restart unless-stopped \
-  -p 3456:3000 \
-  -v andromeda-data:/data \
-  ghcr.io/matejselko/andromeda:latest
-```
-
-Open **http://localhost:3456**
-
----
-
-## Or with Docker Compose
-
-```bash
 services:
   andromeda:
     image: ghcr.io/matejselko/andromeda:latest
     container_name: andromeda
     restart: unless-stopped
     ports:
-      - "3456:3000"
+      - "3456:3000"   # HTTPS — access via https://your-server-ip:3456
+      - "3457:3001"   # HTTP redirect (optional, redirects to 3456)
     volumes:
       - andromeda-data:/data
     environment:
       - DATA_FILE=/data/vault.enc
+      - CERT_DIR=/data/certs
 
 volumes:
   andromeda-data:
