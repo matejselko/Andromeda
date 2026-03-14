@@ -198,7 +198,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 .upload-result-box strong{color:#fff;display:block;margin-bottom:.2rem}
 
 /* File preview/edit page */
-.file-preview-page{position:fixed;inset:0;z-index:190;background:rgba(0,0,0,.9);backdrop-filter:blur(12px);display:none;flex-direction:column;animation:fadeIn .2s ease}
+.file-preview-page{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.9);backdrop-filter:blur(12px);display:none;flex-direction:column;animation:fadeIn .2s ease}
 .file-preview-page.open{display:flex}
 .fpp-header{padding:1.4rem 2rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .fpp-title{font-family:'DM Serif Display',serif;font-size:1.4rem}
@@ -258,6 +258,14 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
   .sidebar{display:none}
   .topbar-search input{width:160px}
 }
+/* ── colour border classes for cards ── */
+.cb-red   {border-color:rgba(255,107,107,.55)!important}
+.cb-amber {border-color:rgba(251,191,36,.55)!important}
+.cb-blue  {border-color:rgba(96,165,250,.55)!important}
+.cb-purple{border-color:rgba(167,139,250,.55)!important}
+.cb-green {border-color:rgba(52,211,153,.55)!important}
+/* pin active */
+.ca.pin-on{color:rgba(251,191,36,.75)}
 </style>
 </head>
 <body>
@@ -307,7 +315,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div class="topbar-logo">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0-10 10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M22 12a10 10 0 0 1-10 10"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Andromeda
       </div>
       <div class="topbar-search">
@@ -316,12 +324,6 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
       </div>
     </div>
     <div class="topbar-right">
-      <button class="icon-btn" onclick="exportVault()" title="Export vault">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </button>
-      <button class="icon-btn" onclick="lockVault()" title="Lock vault">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      </button>
       <button class="add-btn-top" onclick="openAddModal()">+ Add Entry</button>
     </div>
   </div>
@@ -371,13 +373,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
           <div class="content-title" id="content-title">All entries</div>
           <div class="content-meta" id="content-meta"></div>
         </div>
-        <div class="filter-chips">
-          <button class="fc active" onclick="setSidebarFilter('all',document.getElementById('sbi-all'))">All</button>
-          <button class="fc" onclick="setSidebarFilter('recovery',document.getElementById('sbi-recovery'))">Recovery</button>
-          <button class="fc" onclick="setSidebarFilter('passphrase',document.getElementById('sbi-passphrase'))">Passphrases</button>
-          <button class="fc" onclick="setSidebarFilter('bitlocker',document.getElementById('sbi-bitlocker'))">BitLocker</button>
-          <button class="fc" onclick="setSidebarFilter('other',document.getElementById('sbi-other'))">Other</button>
-        </div>
+
       </div>
       <div class="cards-area">
         <div class="entries-grid" id="entries-grid"></div>
@@ -493,26 +489,36 @@ let stars=[],sT=0,sPaused=false,sFrame=null;
 function resizeCanvas(){canvas.width=innerWidth;canvas.height=innerHeight}
 function initStars(){
   stars=[];
-  const n=Math.floor(canvas.width*canvas.height/8500);
+  const n=Math.min(Math.floor(canvas.width*canvas.height/9000),160);
   for(let i=0;i<n;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.1+.2,spd:Math.random()*.003+.001,ph:Math.random()*Math.PI*2,cross:Math.random()>.87});
 }
 function drawStar(s){
-  const a=(Math.sin(sT*s.spd+s.ph)*.5+.5)*.68+.04;
+  const a=(Math.sin(sT*s.spd*6.28+s.ph)*.5+.5)*.62+.05;
   ctx.globalAlpha=a;
   if(s.cross){ctx.strokeStyle='#fff';ctx.lineWidth=.45;ctx.beginPath();ctx.moveTo(s.x-s.r*2.4,s.y);ctx.lineTo(s.x+s.r*2.4,s.y);ctx.moveTo(s.x,s.y-s.r*2.4);ctx.lineTo(s.x,s.y+s.r*2.4);ctx.stroke();}
   else{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();}
   ctx.globalAlpha=1;
 }
-function animStars(){ctx.clearRect(0,0,canvas.width,canvas.height);sT++;stars.forEach(drawStar);sFrame=requestAnimationFrame(animStars)}
+// Use real timestamp (ms) not frame count — eliminates speed-based flicker
+function animStars(ts){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  sT = ts * 0.001; // seconds, smooth
+  stars.forEach(drawStar);
+  sFrame=requestAnimationFrame(animStars);
+}
 function pauseStars(){sPaused=true;if(sFrame){cancelAnimationFrame(sFrame);sFrame=null}}
-function resumeStars(){if(sPaused){sPaused=false;animStars()}}
-resizeCanvas();initStars();animStars();
+function resumeStars(){if(sPaused){sPaused=false;sFrame=requestAnimationFrame(animStars)}}
+resizeCanvas();initStars();sFrame=requestAnimationFrame(animStars);
 window.addEventListener('resize',()=>{resizeCanvas();initStars()});
 
 // ── CURSOR ──────────────────────────────────
 const cursor=document.getElementById('cursor');
 const HSEL='a,button,.entry-card,.icon-option,.code-chip,.ca,.upload-zone,.csw,.chip-remove,.fpp-del,.sb-item,.fc';
-document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+let _cx=0,_cy=0,_craf=false;
+document.addEventListener('mousemove',e=>{
+  _cx=e.clientX;_cy=e.clientY;
+  if(!_craf){_craf=true;requestAnimationFrame(()=>{cursor.style.left=_cx+'px';cursor.style.top=_cy+'px';_craf=false;})}
+});
 document.addEventListener('mouseover',e=>{if(e.target.closest(HSEL))cursor.classList.add('hover')});
 document.addEventListener('mouseout', e=>{if(e.target.closest(HSEL))cursor.classList.remove('hover')});
 
@@ -542,49 +548,92 @@ document.addEventListener('mousemove',e=>{
 document.getElementById('enter-btn').addEventListener('click',e=>{e.preventDefault();navigateToApp()});
 
 // ── ICONS ──────────────────────────────────
-const ICONS=[
-  {id:'github',label:'GitHub',slug:'github'},{id:'google',label:'Google',slug:'google'},
-  {id:'proton',label:'Proton',slug:'proton'},{id:'apple',label:'Apple',slug:'apple'},
-  {id:'microsoft',label:'Microsoft',slug:'microsoft'},{id:'amazon',label:'Amazon',slug:'amazon'},
-  {id:'aws',label:'AWS',slug:'amazonaws'},{id:'cloudflare',label:'Cloudflare',slug:'cloudflare'},
-  {id:'discord',label:'Discord',slug:'discord'},{id:'dropbox',label:'Dropbox',slug:'dropbox'},
-  {id:'facebook',label:'Facebook',slug:'facebook'},{id:'instagram',label:'Instagram',slug:'instagram'},
-  {id:'twitter',label:'X/Twitter',slug:'x'},{id:'linkedin',label:'LinkedIn',slug:'linkedin'},
-  {id:'netflix',label:'Netflix',slug:'netflix'},{id:'spotify',label:'Spotify',slug:'spotify'},
-  {id:'steam',label:'Steam',slug:'steam'},{id:'twitch',label:'Twitch',slug:'twitch'},
-  {id:'bitwarden',label:'Bitwarden',slug:'bitwarden'},{id:'1password',label:'1Password',slug:'1password'},
-  {id:'binance',label:'Binance',slug:'binance'},{id:'coinbase',label:'Coinbase',slug:'coinbase'},
-  {id:'digitalocean',label:'DigitalOcean',slug:'digitalocean'},{id:'docker',label:'Docker',slug:'docker'},
-  {id:'gitlab',label:'GitLab',slug:'gitlab'},{id:'notion',label:'Notion',slug:'notion'},
-  {id:'paypal',label:'PayPal',slug:'paypal'},{id:'reddit',label:'Reddit',slug:'reddit'},
-  {id:'signal',label:'Signal',slug:'signal'},{id:'slack',label:'Slack',slug:'slack'},
-  {id:'telegram',label:'Telegram',slug:'telegram'},{id:'vercel',label:'Vercel',slug:'vercel'},
-  {id:'netlify',label:'Netlify',slug:'netlify'},{id:'hetzner',label:'Hetzner',slug:'hetzner'},
-  {id:'nextcloud',label:'Nextcloud',slug:'nextcloud'},{id:'synology',label:'Synology',slug:'synology'},
-  {id:'youtube',label:'YouTube',slug:'youtube'},{id:'zoom',label:'Zoom',slug:'zoom'},
-  {id:'wordpress',label:'WordPress',slug:'wordpress'},{id:'stripe',label:'Stripe',slug:'stripe'},
-  {id:'namecheap',label:'Namecheap',slug:'namecheap'},
-  {id:'other',label:'Other',slug:null},
+// ══════════════════════════════════════════════
+// ICON LIBRARY — fully offline, inline SVG + letter avatars
+// ══════════════════════════════════════════════
+const SVG = {
+  github:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>`,
+  discord:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>`,
+  telegram:  `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>`,
+  signal:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.003 0a12 12 0 100 24 12 12 0 000-24zm.54 6.17c2.95.35 5.3 2.7 5.64 5.65l-1.29.2a4.5 4.5 0 00-3.65-3.66l-.7-2.19zm-1.08 0l-.7 2.19a4.5 4.5 0 00-3.65 3.66l-2.19-.7c.35-2.95 2.7-5.3 5.64-5.65.3-.04.6-.06.9-.08v.58zm7.33 6.42c-.04 3.26-2.7 5.85-5.97 5.8l-.2-1.29a4.5 4.5 0 003.66-3.65l2.51-.86zm-14.56 0l2.51.86a4.5 4.5 0 003.66 3.65l-.2 1.29c-3.27.05-5.93-2.54-5.97-5.8zm7.83 7.5c-3.26 0-5.95-2.6-5.95-5.85h1.49a4.5 4.5 0 004.46 4.35v1.5zm.59 0v-1.5a4.5 4.5 0 004.46-4.35h1.49c0 3.25-2.69 5.85-5.95 5.85z"/></svg>`,
+  slack:     `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 01-2.52 2.523A2.528 2.528 0 010 15.165a2.527 2.527 0 012.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 012.521-2.52 2.527 2.527 0 012.521 2.52v6.313A2.528 2.528 0 018.834 24a2.528 2.528 0 01-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 01-2.521-2.52A2.528 2.528 0 018.834 0a2.527 2.527 0 012.521 2.522v2.52H8.834zm0 1.271a2.527 2.527 0 012.521 2.521 2.527 2.527 0 01-2.521 2.521H2.522A2.528 2.528 0 010 8.834a2.528 2.528 0 012.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 012.522-2.521A2.528 2.528 0 0124 8.834a2.527 2.527 0 01-2.522 2.521h-2.522V8.834zm-1.268 0a2.527 2.527 0 01-2.523 2.521 2.526 2.526 0 01-2.52-2.521V2.522A2.527 2.527 0 0115.165 0a2.528 2.528 0 012.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 012.523 2.522A2.528 2.528 0 0115.165 24a2.527 2.527 0 01-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 01-2.52-2.523 2.526 2.526 0 012.52-2.52h6.313A2.527 2.527 0 0124 15.165a2.528 2.528 0 01-2.522 2.523h-6.313z"/></svg>`,
+  docker:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.184-.186h-2.12a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 00-.75.748 11.376 11.376 0 00.692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 003.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288z"/></svg>`,
+  notion:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>`,
+  cloudflare:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.478 15.126l.367-1.246c.05-.17.073-.263.073-.296a.5.5 0 00-.5-.5h-9.58a.23.23 0 01-.222-.297l.375-1.257c.05-.165.073-.255.073-.287a.5.5 0 00-.5-.5H4.23a.5.5 0 00-.484.373l-.72 2.57A.5.5 0 003.51 14h12.484a.5.5 0 00.484-.374zm1.545-5.126l.733-2.543a.5.5 0 00-.484-.625H5.626a.5.5 0 00-.484.373l-1.479 5.13a.5.5 0 00.484.627h13.246a.5.5 0 00.484-.373l.146-.49z"/></svg>`,
+};
+
+// Icon definitions — svg key = uses SVG above, else letter avatar
+const ICONS = [
+  {id:'github',     label:'GitHub',       svg:'github'},
+  {id:'google',     label:'Google',       svg:null, letter:'G',  bg:'#4285F4'},
+  {id:'discord',    label:'Discord',      svg:'discord'},
+  {id:'telegram',   label:'Telegram',     svg:'telegram'},
+  {id:'signal',     label:'Signal',       svg:'signal'},
+  {id:'slack',      label:'Slack',        svg:'slack'},
+  {id:'docker',     label:'Docker',       svg:'docker'},
+  {id:'notion',     label:'Notion',       svg:'notion'},
+  {id:'cloudflare', label:'Cloudflare',   svg:'cloudflare'},
+  {id:'apple',      label:'Apple',        svg:null, letter:'',  bg:'#555', icon:'apple'},
+  {id:'microsoft',  label:'Microsoft',    svg:null, letter:'⊞', bg:'#0078D4'},
+  {id:'proton',     label:'Proton',       svg:null, letter:'P',  bg:'#6D4AFF'},
+  {id:'amazon',     label:'Amazon',       svg:null, letter:'a',  bg:'#FF9900'},
+  {id:'aws',        label:'AWS',          svg:null, letter:'⛅', bg:'#FF9900'},
+  {id:'facebook',   label:'Facebook',     svg:null, letter:'f',  bg:'#1877F2'},
+  {id:'instagram',  label:'Instagram',    svg:null, letter:'📷', bg:'#C13584'},
+  {id:'twitter',    label:'X',            svg:null, letter:'𝕏',  bg:'#111'},
+  {id:'linkedin',   label:'LinkedIn',     svg:null, letter:'in', bg:'#0A66C2'},
+  {id:'netflix',    label:'Netflix',      svg:null, letter:'N',  bg:'#E50914'},
+  {id:'spotify',    label:'Spotify',      svg:null, letter:'♪',  bg:'#1DB954'},
+  {id:'steam',      label:'Steam',        svg:null, letter:'S',  bg:'#1b2838'},
+  {id:'twitch',     label:'Twitch',       svg:null, letter:'T',  bg:'#9146FF'},
+  {id:'bitwarden',  label:'Bitwarden',    svg:null, letter:'🔑', bg:'#175DDC'},
+  {id:'1password',  label:'1Password',    svg:null, letter:'1',  bg:'#1A8CFF'},
+  {id:'reddit',     label:'Reddit',       svg:null, letter:'r',  bg:'#FF4500'},
+  {id:'youtube',    label:'YouTube',      svg:null, letter:'▶',  bg:'#FF0000'},
+  {id:'gitlab',     label:'GitLab',       svg:null, letter:'GL', bg:'#FC6D26'},
+  {id:'vercel',     label:'Vercel',       svg:null, letter:'▲',  bg:'#111'},
+  {id:'netlify',    label:'Netlify',      svg:null, letter:'◈',  bg:'#00C7B7'},
+  {id:'hetzner',    label:'Hetzner',      svg:null, letter:'H',  bg:'#D50C2D'},
+  {id:'nextcloud',  label:'Nextcloud',    svg:null, letter:'☁',  bg:'#0082C9'},
+  {id:'paypal',     label:'PayPal',       svg:null, letter:'P',  bg:'#003087'},
+  {id:'binance',    label:'Binance',      svg:null, letter:'B',  bg:'#F3BA2F'},
+  {id:'coinbase',   label:'Coinbase',     svg:null, letter:'C',  bg:'#0052FF'},
+  {id:'digitalocean',label:'DigitalOcean',svg:null, letter:'DO', bg:'#0080FF'},
+  {id:'dropbox',    label:'Dropbox',      svg:null, letter:'📦', bg:'#0061FF'},
+  {id:'wordpress',  label:'WordPress',    svg:null, letter:'W',  bg:'#21759B'},
+  {id:'stripe',     label:'Stripe',       svg:null, letter:'S',  bg:'#635BFF'},
+  {id:'zoom',       label:'Zoom',         svg:null, letter:'Z',  bg:'#2D8CFF'},
+  {id:'synology',   label:'Synology',     svg:null, letter:'Sy', bg:'#444'},
+  {id:'other',      label:'Other',        svg:null, letter:'?',  bg:'rgba(255,255,255,.15)'},
 ];
 
-function iconImg(ic,size=22){
-  if(!ic||!ic.slug)return`<span style="font-size:.9rem;opacity:.32">⚡</span>`;
-  // Try Simple Icons first, fallback to Clearbit
-  return`<img src="https://cdn.simpleicons.org/${ic.slug}/ffffff" width="${size}" height="${size}" alt="${ic.label}" style="opacity:.82" onerror="this.src='https://logo.clearbit.com/${ic.slug}.com';this.onerror=function(){this.replaceWith(Object.assign(document.createElement('span'),{textContent:'⚡',style:'font-size:.9rem;opacity:.32'}))}" />`;
+function makeIcon(ic, size=22) {
+  if (!ic) return letterAvatar('?', 'rgba(255,255,255,.15)', size);
+  if (ic.svg && SVG[ic.svg]) {
+    return `<div style="width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;color:#fff">${SVG[ic.svg].replace('<svg ','<svg width="'+size+'" height="'+size+'" ')}</div>`;
+  }
+  return letterAvatar(ic.letter ?? ic.label[0], ic.bg ?? 'rgba(255,255,255,.15)', size);
+}
+function letterAvatar(letter, bg, size=22) {
+  const fs = Math.round(size * (letter.length > 1 ? 0.38 : 0.5));
+  return `<div style="width:${size}px;height:${size}px;border-radius:${Math.round(size*0.3)}px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:700;color:#fff;line-height:1;flex-shrink:0;font-family:system-ui,sans-serif">${letter}</div>`;
+}
+function iconHTMLById(id, size=22) {
+  return makeIcon(ICONS.find(i => i.id === id) || null, size);
 }
 
-let selectedIcon='other',selectedColor='white';
-const COLOR_BORDER={white:'rgba(255,255,255,.2)',red:'rgba(255,107,107,.6)',amber:'rgba(251,191,36,.6)',blue:'rgba(96,165,250,.6)',purple:'rgba(167,139,250,.6)',green:'rgba(52,211,153,.6)'};
+let selectedIcon='other', selectedColor='white';
+const COLOR_BORDER={white:'',red:'rgba(255,107,107,.55)',amber:'rgba(251,191,36,.55)',blue:'rgba(96,165,250,.55)',purple:'rgba(167,139,250,.55)',green:'rgba(52,211,153,.55)'};
 
 function renderIconGrid(filter=''){
   const grid=document.getElementById('icon-grid');if(!grid)return;
   const f=filter?ICONS.filter(i=>i.label.toLowerCase().includes(filter.toLowerCase())):ICONS;
-  grid.innerHTML=f.map(ic=>`<div class="icon-option${selectedIcon===ic.id?' selected':''}" onclick="selectIcon('${ic.id}')" title="${ic.label}">${iconImg(ic,16)}</div>`).join('');
+  grid.innerHTML=f.map(ic=>`<div class="icon-option${selectedIcon===ic.id?' selected':''}" onclick="selectIconOpt('${ic.id}',this)" title="${ic.label}">${makeIcon(ic,15)}</div>`).join('');
 }
-function selectIcon(id){
+function selectIconOpt(id,el){
   selectedIcon=id;
-  document.querySelectorAll('.icon-option').forEach(el=>el.classList.remove('selected'));
-  if(event)event.currentTarget.classList.add('selected');
+  document.querySelectorAll('.icon-option').forEach(e=>e.classList.remove('selected'));
+  if(el)el.classList.add('selected');
 }
 function selectColor(c,el){
   selectedColor=c;
@@ -596,46 +645,18 @@ function resetColorSwatches(c='white'){
   document.querySelectorAll('.csw').forEach(s=>s.classList.toggle('selected',s.dataset.c===c));
 }
 
-// Auto-detect icon — Simple Icons match first, then Clearbit
 let _lastAutoName='';
 function autoDetectIcon(name){
   if(!name||name===_lastAutoName)return;
   _lastAutoName=name;
   const q=name.toLowerCase().trim();
-  let m=ICONS.find(i=>i.id===q||i.label.toLowerCase()===q);
-  if(!m)m=ICONS.find(i=>i.slug&&i.label.toLowerCase().startsWith(q));
-  if(!m)m=ICONS.find(i=>i.slug&&i.label.toLowerCase().includes(q));
-  if(!m)m=ICONS.find(i=>i.slug&&i.slug.toLowerCase().includes(q));
+  let m=ICONS.find(i=>i.label.toLowerCase()===q||i.id===q);
+  if(!m)m=ICONS.find(i=>i.label.toLowerCase().startsWith(q));
+  if(!m)m=ICONS.find(i=>i.label.toLowerCase().includes(q)||i.id.includes(q));
   if(m&&m.id!=='other'){
     selectedIcon=m.id;
     renderIconGrid(document.getElementById('icon-search')?.value||'');
-  } else if(name.length>2){
-    // Unknown service — use Clearbit via a dynamic "clearbit" entry
-    selectedIcon='_clearbit_'+encodeURIComponent(name.toLowerCase().trim());
-    // Update icon picker to show preview
-    const grid=document.getElementById('icon-grid');
-    if(grid){
-      document.querySelectorAll('.icon-option').forEach(el=>el.classList.remove('selected'));
-      // prepend a clearbit option
-      const slug=name.toLowerCase().trim().replace(/\s+/g,'-');
-      const preview=document.createElement('div');
-      preview.className='icon-option selected';
-      preview.title=name;
-      preview.innerHTML=`<img src="https://logo.clearbit.com/${slug}.com" width="16" height="16" style="opacity:.82" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'⚡',style:'font-size:.9rem;opacity:.32'}))" />`;
-      grid.prepend(preview);
-    }
   }
-}
-
-// iconImg for clearbit dynamic ids
-function iconImgById(id,slug,size=22){
-  if(!id)return`<span style="font-size:.9rem;opacity:.32">⚡</span>`;
-  if(id.startsWith('_clearbit_')){
-    const s=decodeURIComponent(id.replace('_clearbit_',''));
-    return`<img src="https://logo.clearbit.com/${s}.com" width="${size}" height="${size}" style="opacity:.82" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'⚡',style:'font-size:.9rem;opacity:.32'}))" />`;
-  }
-  const ic=ICONS.find(i=>i.id===id)||null;
-  return iconImg(ic,size);
 }
 
 // ── TYPE CONFIG ──────────────────────────────────
@@ -743,7 +764,9 @@ function fppAddCode(){
   renderFPPList();
 }
 function fppConfirm(){
-  // Push all FPP codes into pendingCodes and close the page
+  // Sync any live edits from input fields first
+  document.querySelectorAll('#fpp-list .fpp-row input,#fpp-code-list .fpp-code-row input').forEach((inp,i)=>{if(i<_fppCodes.length)_fppCodes[i]=inp.value.trim()});
+  _fppCodes=_fppCodes.filter(Boolean);
   const type=document.getElementById('f-type')?.value;
   let added=0;
   _fppCodes.forEach(c=>{
@@ -752,7 +775,7 @@ function fppConfirm(){
   });
   renderPendingChips();
   closeFPP();
-  showToast(`Added ${added} codes from file`);
+  showToast(`Added ${added} code${added!==1?'s':''} from file`);
 }
 
 // Drag and drop
@@ -1005,17 +1028,17 @@ function renderEntries(){
     const codes=e.codes.map((c,ci)=>`<div class="code-chip${c.used&&!noToggle?' used':''} ${noToggle?'no-toggle':''}" ${noToggle?'':(`onclick="toggleCodeUsed('${e.id}',${ci})"`)}>
       <span class="code-chip-text">${esc(c.code)}</span>${noToggle?'':`<span class="code-tick">${c.used?'↩':'✓'}</span>`}
     </div>`).join('');
-    const border=e.color&&e.color!=='white'?`border-color:${COLOR_BORDER[e.color]||''}`:'';
-    return`<div class="entry-card${e.pinned?' pinned':''}" data-id="${e.id}" style="animation-delay:${i*.035}s;${border}">
+    const cbcls=e.color&&e.color!=='white'?` cb-${e.color}`:'';
+    return`<div class="entry-card${e.pinned?' pinned':''}${cbcls}" data-id="${e.id}" style="animation-delay:${i*.035}s">
       ${e.pinned?'<span class="pin-badge">📌</span>':''}
       <div class="card-header">
-        <div class="card-icon">${iconImgById(e.icon,null,22)}</div>
+        <div class="card-icon">${iconHTMLById(e.icon,22)}</div>
         <div class="card-meta"><div class="card-name">${esc(e.name)}</div><div class="card-note">${e.notes?esc(e.notes):'<span style="opacity:.22">No notes</span>'}</div></div>
         <div class="card-actions">
-          <div class="ca${e.pinned?' pinned-on':''}" onclick="togglePin('${e.id}')" title="${e.pinned?'Unpin':'Pin'}">📌</div>
-          <div class="ca" onclick="copyAll('${e.id}')" title="Copy unused">⎘</div>
-          <div class="ca" onclick="editEntry('${e.id}')" title="Edit">✎</div>
-          <div class="ca del" onclick="deleteEntry('${e.id}')" title="Delete">✕</div>
+          <div class="ca${e.pinned?' pin-on':''}" onclick="togglePin('${e.id}')" title="${e.pinned?'Unpin':'Pin'}"><svg width="11" height="11" viewBox="0 0 24 24" fill="${e.pinned?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div class="ca" onclick="copyAll('${e.id}')" title="Copy unused codes"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div>
+          <div class="ca" onclick="editEntry('${e.id}')" title="Edit"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+          <div class="ca del" onclick="deleteEntry('${e.id}')" title="Delete"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
         </div>
       </div>
       <div class="codes-list">${codes}</div>
