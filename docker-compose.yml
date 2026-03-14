@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     ports:
       - "3456:3000"   # HTTPS — access via https://your-server-ip:3456
-      - "3457:3001"   # HTTP redirect (optional, redirects to 3456)
+      # Port 3002 is NOT exposed — it's internal healthcheck only
     volumes:
       - andromeda-data:/data
     environment:
