@@ -145,8 +145,9 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 .form-input,.form-select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:12px;padding:.78rem 1rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.87rem;outline:none;margin-bottom:1.1rem;transition:border-color .2s,background .2s}
 .form-input:focus,.form-select:focus{border-color:rgba(255,255,255,.36);background:rgba(255,255,255,.09)}
 .form-input::placeholder{color:rgba(255,255,255,.2)}
-.form-select option{background:#111}
-.form-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;padding-right:2.4rem}
+.form-select option{background:#0d0d0d;color:#fff}
+.form-select option:checked,.form-select option:hover{background:#222;color:#fff}
+.form-select{appearance:none;-webkit-appearance:none;color-scheme:dark;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;padding-right:2.4rem}
 .pw-wrap{position:relative}
 .pw-toggle{position:absolute;right:.9rem;top:50%;transform:translateY(-55%);background:none;border:none;color:var(--dim);cursor:none;font-size:.9rem;transition:color .18s}
 .pw-toggle:hover{color:#fff}
@@ -278,7 +279,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
 <div id="welcome-page">
   <nav class="top-nav">
     <div class="nav-logo">
-      <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="3" fill="#a78bfa" opacity="0.9"/><ellipse cx="16" cy="16" rx="11" ry="3.5" fill="none" stroke="#a78bfa" stroke-width="1.3" opacity="0.6" transform="rotate(-30 16 16)"/><ellipse cx="16" cy="16" rx="7.5" ry="2.3" fill="none" stroke="#818cf8" stroke-width="0.9" opacity="0.45" transform="rotate(55 16 16)"/><circle cx="9" cy="11" r="1" fill="#c4b5fd" opacity="0.75"/><circle cx="23" cy="21" r="0.8" fill="#c4b5fd" opacity="0.7"/></svg>
+      <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="3" fill="#fff" opacity="0.9"/><ellipse cx="16" cy="16" rx="11" ry="3.5" fill="none" stroke="#fff" stroke-width="1.3" opacity="0.5" transform="rotate(-30 16 16)"/><ellipse cx="16" cy="16" rx="7.5" ry="2.3" fill="none" stroke="#fff" stroke-width="0.9" opacity="0.35" transform="rotate(55 16 16)"/><circle cx="9" cy="11" r="1" fill="#fff" opacity="0.6"/><circle cx="23" cy="21" r="0.8" fill="#fff" opacity="0.55"/></svg>
       Andromeda
     </div>
     <div class="nav-links">
@@ -317,7 +318,7 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div class="topbar-logo">
-      <svg width="14" height="14" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="3" fill="#a78bfa" opacity="0.9"/><ellipse cx="16" cy="16" rx="11" ry="3.5" fill="none" stroke="#a78bfa" stroke-width="1.3" opacity="0.6" transform="rotate(-30 16 16)"/><ellipse cx="16" cy="16" rx="7.5" ry="2.3" fill="none" stroke="#818cf8" stroke-width="0.9" opacity="0.45" transform="rotate(55 16 16)"/><circle cx="9" cy="11" r="1" fill="#c4b5fd" opacity="0.75"/><circle cx="23" cy="21" r="0.8" fill="#c4b5fd" opacity="0.7"/><circle cx="21" cy="9" r="0.6" fill="#e0e7ff" opacity="0.55"/><circle cx="11" cy="23" r="0.6" fill="#e0e7ff" opacity="0.5"/></svg>
+      <svg width="14" height="14" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="3" fill="#fff" opacity="0.9"/><ellipse cx="16" cy="16" rx="11" ry="3.5" fill="none" stroke="#fff" stroke-width="1.3" opacity="0.5" transform="rotate(-30 16 16)"/><ellipse cx="16" cy="16" rx="7.5" ry="2.3" fill="none" stroke="#fff" stroke-width="0.9" opacity="0.35" transform="rotate(55 16 16)"/><circle cx="9" cy="11" r="1" fill="#fff" opacity="0.6"/><circle cx="23" cy="21" r="0.8" fill="#fff" opacity="0.55"/><circle cx="21" cy="9" r="0.6" fill="#fff" opacity="0.45"/><circle cx="11" cy="23" r="0.6" fill="#fff" opacity="0.4"/></svg>
         Andromeda
       </div>
       <div class="topbar-search">
@@ -358,11 +359,20 @@ html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif
         <div class="sb-spacer"></div>
         <div class="sb-divider"></div>
         <div class="sb-item" onclick="exportVault()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export vault
         </div>
+        <div class="sb-item" onclick="triggerImport()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10" transform="scale(1,-1) translate(0,-24)"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import vault
+        </div>
+        <div class="sb-item" onclick="openSettings()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </div>
+        <div class="sb-divider"></div>
         <div class="sb-item" onclick="lockVault()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           Lock vault
         </div>
       </div>
@@ -585,6 +595,27 @@ const SVG = {
   docker:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.184-.186h-2.12a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 00-.75.748 11.376 11.376 0 00.692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 003.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288z"/></svg>`,
   notion:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>`,
   cloudflare:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.478 15.126l.367-1.246c.05-.17.073-.263.073-.296a.5.5 0 00-.5-.5h-9.58a.23.23 0 01-.222-.297l.375-1.257c.05-.165.073-.255.073-.287a.5.5 0 00-.5-.5H4.23a.5.5 0 00-.484.373l-.72 2.57A.5.5 0 003.51 14h12.484a.5.5 0 00.484-.374zm1.545-5.126l.733-2.543a.5.5 0 00-.484-.625H5.626a.5.5 0 00-.484.373l-1.479 5.13a.5.5 0 00.484.627h13.246a.5.5 0 00.484-.373l.146-.49z"/></svg>`,
+  bitwarden: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.504 1.464L12 0l8.496 1.464c.888.216 1.512.984 1.512 1.896v9.36c0 5.568-4.2 9.744-9.984 11.28C6.24 22.464 2.04 18.312 2.04 12.72V3.36c0-.912.576-1.68 1.464-1.896zm8.496 2.04v15.024c4.176-1.32 7.032-4.656 7.032-8.544V4.512L12 3.504z"/></svg>`,
+  proton:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-1.296 1.519-1.972 2.49-1.102L12 13.093l9.51-8.738C22.48 3.485 24 4.161 24 5.457z"/></svg>`,
+  google:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>`,
+  apple:     `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zm3.828-3.813c.787-.974 1.33-2.351 1.183-3.703-1.157.052-2.54.781-3.353 1.755-.733.853-1.38 2.234-1.196 3.546 1.287.104 2.602-.66 3.366-1.598z"/></svg>`,
+  microsoft: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.4 24H0V12.6h11.4V24zm12.6 0H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zm12.6 0H12.6V0H24v11.4z"/></svg>`,
+  windows:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.4 24H0V12.6h11.4V24zm12.6 0H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zm12.6 0H12.6V0H24v11.4z"/></svg>`,
+  twitter:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>`,
+  reddit:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>`,
+  youtube:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>`,
+  spotify:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`,
+  linkedin:  `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
+  twitch:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>`,
+  facebook:  `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
+  instagram: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>`,
+  netflix:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c-.043-7.86-.004-15.86.002-22.95zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22z"/></svg>`,
+  steam:     `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.663 0-3.015 1.353-3.015 3.015 0 1.663 1.352 3.015 3.015 3.015 1.663 0 3.015-1.352 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.252 0-2.265-1.014-2.265-2.265z"/></svg>`,
+  stripe:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/></svg>`,
+  paypal:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/></svg>`,
+  dropbox:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 6.453L6.001 10.12 12 13.786l-6 3.667L0 13.786l6.001-3.667L0 6.453 6.001 2.787zm-12 10.667l6.001 3.667L12 17.12l6 3.667 6.001-3.667L18 13.453l6.001-3.667-6.001-3.667L12 9.786 6.001 6.12 0 9.787l6.001 3.666zm12-14.333L18 6.453l-5.999 3.667L18 13.786l6-3.667-6-3.666z"/></svg>`,
+  nextcloud: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.8a7.2 7.2 0 1 1 0 14.4A7.2 7.2 0 0 1 12 4.8zm0 1.8a5.4 5.4 0 1 0 0 10.8A5.4 5.4 0 0 0 12 6.6z"/></svg>`,
+  wordpress: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.11m-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.649-.03 1.234-.1 1.234-.1.585-.075.516-.93-.065-.896 0 0-1.746.138-2.874.138-.2 0-.438-.008-.69-.015C4.911 3.15 8.235 1.215 12 1.215c2.809 0 5.365 1.072 7.286 2.833-.046-.003-.091-.009-.141-.009-1.06 0-1.812.923-1.812 1.914 0 .89.513 1.643 1.06 2.531.411.72.89 1.643.89 2.977 0 .915-.354 1.994-.843 3.479l-1.105 3.699-4.04-11.99zm-9.608 13.042C2.446 18.319 1.2 15.298 1.2 12c0-1.312.212-2.577.6-3.762L7.2 23.982c-1.326-.6-2.52-1.44-3.32-4.01zM12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12z"/></svg>`,
 };
 
 // Icon definitions — svg key = uses SVG above, else letter avatar
@@ -612,8 +643,8 @@ const ICONS = [
   {id:'joplin',       label:'Joplin',         svg:null,letter:'J', bg:'#2CB5E8'},
   {id:'standardnotes',label:'Standard Notes', svg:null,letter:'SN',bg:'#0D6EFD'},
   // ── OS / platforms ────────────────────────────────────────────────────
-  {id:'windows',      label:'Windows',        svg:null,letter:'⊞', bg:'#0078D4'},
-  {id:'apple',        label:'Apple / macOS',  svg:null,letter:'',  bg:'#555'},
+  {id:'windows',      label:'Windows',        svg:'windows'},
+  {id:'apple',        label:'Apple / macOS',  svg:'apple'},
   {id:'linux',        label:'Linux',          svg:null,letter:'🐧',bg:'#333'},
   {id:'ubuntu',       label:'Ubuntu',         svg:null,letter:'U', bg:'#E95420'},
   {id:'android',      label:'Android',        svg:null,letter:'⚙', bg:'#3DDC84'},
@@ -626,46 +657,46 @@ const ICONS = [
   {id:'messenger',    label:'Messenger',      svg:null,letter:'m', bg:'#0084FF'},
   {id:'matrix',       label:'Matrix / Element',svg:null,letter:'M',bg:'#0DBD8B'},
   {id:'mastodon',     label:'Mastodon',       svg:null,letter:'M', bg:'#6364FF'},
-  {id:'twitter',      label:'X / Twitter',    svg:null,letter:'𝕏', bg:'#111'},
-  {id:'reddit',       label:'Reddit',         svg:null,letter:'r', bg:'#FF4500'},
-  {id:'facebook',     label:'Facebook',       svg:null,letter:'f', bg:'#1877F2'},
-  {id:'instagram',    label:'Instagram',      svg:null,letter:'▣', bg:'#C13584'},
-  {id:'linkedin',     label:'LinkedIn',       svg:null,letter:'in',bg:'#0A66C2'},
-  {id:'youtube',      label:'YouTube',        svg:null,letter:'▶', bg:'#FF0000'},
-  {id:'twitch',       label:'Twitch',         svg:null,letter:'T', bg:'#9146FF'},
+  {id:'twitter',      label:'X / Twitter',    svg:'twitter'},
+  {id:'reddit',       label:'Reddit',         svg:'reddit'},
+  {id:'facebook',     label:'Facebook',       svg:'facebook'},
+  {id:'instagram',    label:'Instagram',      svg:'instagram'},
+  {id:'linkedin',     label:'LinkedIn',       svg:'linkedin'},
+  {id:'youtube',      label:'YouTube',        svg:'youtube'},
+  {id:'twitch',       label:'Twitch',         svg:'twitch'},
   {id:'tiktok',       label:'TikTok',         svg:null,letter:'Tt',bg:'#010101'},
   // ── Email / Google ────────────────────────────────────────────────────
-  {id:'google',       label:'Google',         svg:null,letter:'G', bg:'#4285F4'},
+  {id:'google',       label:'Google',         svg:'google'},
   {id:'gmail',        label:'Gmail',          svg:null,letter:'M', bg:'#EA4335'},
-  {id:'proton',       label:'Proton Mail',    svg:null,letter:'P', bg:'#6D4AFF'},
+  {id:'proton',       label:'Proton Mail',    svg:'proton'},
   {id:'tutanota',     label:'Tuta',           svg:null,letter:'Tu',bg:'#C80000'},
   {id:'fastmail',     label:'Fastmail',       svg:null,letter:'Fm',bg:'#0068FF'},
-  {id:'microsoft',    label:'Microsoft',      svg:null,letter:'⊞', bg:'#0078D4'},
+  {id:'microsoft',    label:'Microsoft',      svg:'microsoft'},
   {id:'outlook',      label:'Outlook',        svg:null,letter:'Ot',bg:'#0078D4'},
   // ── Password managers / auth ──────────────────────────────────────────
-  {id:'bitwarden',    label:'Bitwarden',      svg:null,letter:'🔑',bg:'#175DDC'},
+  {id:'bitwarden',    label:'Bitwarden',      svg:'bitwarden'},
   {id:'1password',    label:'1Password',      svg:null,letter:'1', bg:'#1A8CFF'},
   {id:'keepass',      label:'KeePass',        svg:null,letter:'KP',bg:'#6CAC4D'},
   {id:'authy',        label:'Authy',          svg:null,letter:'A', bg:'#EC1C24'},
   {id:'aegis',        label:'Aegis',          svg:null,letter:'Ae',bg:'#F96900'},
   // ── Finance / crypto ──────────────────────────────────────────────────
-  {id:'paypal',       label:'PayPal',         svg:null,letter:'PP',bg:'#003087'},
-  {id:'stripe',       label:'Stripe',         svg:null,letter:'S', bg:'#635BFF'},
+  {id:'paypal',       label:'PayPal',         svg:'paypal'},
+  {id:'stripe',       label:'Stripe',         svg:'stripe'},
   {id:'binance',      label:'Binance',        svg:null,letter:'B', bg:'#F3BA2F'},
   {id:'coinbase',     label:'Coinbase',       svg:null,letter:'C', bg:'#0052FF'},
   {id:'kraken',       label:'Kraken',         svg:null,letter:'Kr',bg:'#5741D9'},
   {id:'revolut',      label:'Revolut',        svg:null,letter:'R', bg:'#191C1F'},
   // ── Cloud storage / files ─────────────────────────────────────────────
-  {id:'dropbox',      label:'Dropbox',        svg:null,letter:'📦',bg:'#0061FF'},
+  {id:'dropbox',      label:'Dropbox',        svg:'dropbox'},
   {id:'gdrive',       label:'Google Drive',   svg:null,letter:'G▸',bg:'#34A853'},
   {id:'onedrive',     label:'OneDrive',       svg:null,letter:'⬡', bg:'#0078D4'},
-  {id:'nextcloud',    label:'Nextcloud',      svg:null,letter:'☁', bg:'#0082C9'},
+  {id:'nextcloud',    label:'Nextcloud',      svg:'nextcloud'},
   {id:'synology',     label:'Synology',       svg:null,letter:'Sy',bg:'#444'},
   {id:'backblaze',    label:'Backblaze',      svg:null,letter:'B', bg:'#EF3B2C'},
   // ── Entertainment / media ─────────────────────────────────────────────
-  {id:'netflix',      label:'Netflix',        svg:null,letter:'N', bg:'#E50914'},
-  {id:'spotify',      label:'Spotify',        svg:null,letter:'♪', bg:'#1DB954'},
-  {id:'steam',        label:'Steam',          svg:null,letter:'S', bg:'#1b2838'},
+  {id:'netflix',      label:'Netflix',        svg:'netflix'},
+  {id:'spotify',      label:'Spotify',        svg:'spotify'},
+  {id:'steam',        label:'Steam',          svg:'steam'},
   {id:'epic',         label:'Epic Games',     svg:null,letter:'E', bg:'#313131'},
   {id:'gog',          label:'GOG',            svg:null,letter:'G', bg:'#7B2FBE'},
   {id:'nintendo',     label:'Nintendo',       svg:null,letter:'N', bg:'#E4000F'},
@@ -682,7 +713,7 @@ const ICONS = [
   {id:'porkbun',      label:'Porkbun',        svg:null,letter:'Pb',bg:'#EF7C3D'},
   {id:'godaddy',      label:'GoDaddy',        svg:null,letter:'GD',bg:'#1BDBAD'},
   {id:'cloudron',     label:'Cloudron',       svg:null,letter:'Cr',bg:'#03A9F4'},
-  {id:'wordpress',    label:'WordPress',      svg:null,letter:'W', bg:'#21759B'},
+  {id:'wordpress',    label:'WordPress',      svg:'wordpress'},
   // ── Self-hosted / homelab ─────────────────────────────────────────────
   {id:'proxmox',      label:'Proxmox',        svg:null,letter:'Px',bg:'#E57000'},
   {id:'truenas',      label:'TrueNAS',        svg:null,letter:'TN',bg:'#0095D5'},
