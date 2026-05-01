@@ -1,811 +1,1426 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Andromeda — Documentation</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Andromeda — My Vault</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%222.5%22%20fill%3D%22%23a78bfa%22/%3E%3Cellipse%20cx%3D%2216%22%20cy%3D%2216%22%20rx%3D%2210%22%20ry%3D%224%22%20fill%3D%22none%22%20stroke%3D%22%23a78bfa%22%20stroke-width%3D%221.5%22%20opacity%3D%22.7%22%20transform%3D%22rotate%28-30%2016%2016%29%22/%3E%3Cellipse%20cx%3D%2216%22%20cy%3D%2216%22%20rx%3D%227%22%20ry%3D%222.5%22%20fill%3D%22none%22%20stroke%3D%22%23818cf8%22%20stroke-width%3D%221%22%20opacity%3D%22.5%22%20transform%3D%22rotate%2860%2016%2016%29%22/%3E%3Ccircle%20cx%3D%2210%22%20cy%3D%2212%22%20r%3D%22.8%22%20fill%3D%22%23c4b5fd%22%20opacity%3D%22.8%22/%3E%3Ccircle%20cx%3D%2222%22%20cy%3D%2220%22%20r%3D%22.6%22%20fill%3D%22%23c4b5fd%22%20opacity%3D%22.7%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2210%22%20r%3D%22.5%22%20fill%3D%22%23e0e7ff%22%20opacity%3D%22.6%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2222%22%20r%3D%22.5%22%20fill%3D%22%23e0e7ff%22%20opacity%3D%22.5%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#fff;--dim:rgba(255,255,255,.5);--faint:rgba(255,255,255,.2);--fainter:rgba(255,255,255,.08);
+  --glass:rgba(255,255,255,.08);--gb:rgba(255,255,255,.15);
+  --c-red:rgba(255,107,107,.6);--c-amber:rgba(251,191,36,.6);--c-blue:rgba(96,165,250,.6);
+  --c-purple:rgba(167,139,250,.6);--c-green:rgba(52,211,153,.6);--c-pink:rgba(244,114,182,.6);
+}
+html,body{height:100%;background:#000;color:#fff;font-family:'Outfit',sans-serif;overflow-x:hidden}
 
-  :root {
-    --bg: #000;
-    --surface: rgba(255,255,255,0.04);
-    --surface2: rgba(255,255,255,0.07);
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --text: rgba(255,255,255,0.9);
-    --muted: rgba(255,255,255,0.45);
-    --dim: rgba(255,255,255,0.25);
-    --white: #fff;
-  }
+/* ── CURSOR ── */
 
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Outfit', sans-serif;
-    font-weight: 300;
-    line-height: 1.75;
-    cursor: none;
-  }
+#star-svg{position:fixed;inset:0;z-index:0;pointer-events:none;width:100%;height:100%}
 
-  #cursor {
-    position: fixed; pointer-events: none; z-index: 9999;
-    width: 18px; height: 18px;
-    border: 1.5px solid rgba(255,255,255,0.6);
-    border-radius: 50%;
-    transform: translate(-50%,-50%);
-    transition: width 0.2s, height 0.2s;
-    mix-blend-mode: difference;
-  }
-  #cursor.h { width: 32px; height: 32px; background: rgba(255,255,255,0.08); }
+/* ── ANIMATIONS ── */
+@keyframes fadeUp  {from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn  {from{opacity:0}to{opacity:1}}
+@keyframes modalPop{from{transform:scale(.93) translateY(18px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+@keyframes slideIn {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cardIn  {from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes chipIn  {from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 
-  canvas#stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+/* ══════════════ WELCOME PAGE ══════════════ */
+#welcome-page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.top-nav{width:100%;padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;animation:fadeDown .8s ease .2s both}
+.nav-logo{display:flex;align-items:center;gap:.55rem;font-size:.88rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.nav-links{display:flex;gap:.4rem}
+.nav-link{padding:.38rem .95rem;border-radius:30px;font-size:.8rem;color:var(--dim);text-decoration:none;background:var(--fainter);border:1px solid transparent;transition:all .25s;cursor:pointer}
+.nav-link:hover{color:#fff;background:var(--glass);border-color:var(--gb)}
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem 2rem}
+.hero-constellation{width:72px;height:72px;margin-bottom:2.2rem;animation:fadeUp .9s ease .4s both}
+.hero-eyebrow{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--faint);margin-bottom:1.1rem;animation:fadeUp .9s ease .5s both}
+.hero-title{font-family:'DM Serif Display',serif;font-size:clamp(3.8rem,10vw,7.5rem);font-weight:400;line-height:.93;margin-bottom:1.4rem;animation:fadeUp .9s ease .6s both}
+.hero-sub{font-size:.98rem;font-weight:300;color:var(--dim);max-width:400px;line-height:1.75;margin-bottom:2.8rem;animation:fadeUp .9s ease .75s both}
+.enter-btn{padding:.95rem 2.6rem;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.22);border-radius:50px;color:#fff;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:500;cursor:pointer;text-decoration:none;backdrop-filter:blur(20px);transition:all .35s cubic-bezier(.34,1.56,.64,1);animation:fadeUp .9s ease .9s both}
+.enter-btn:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.45);transform:translateY(-3px) scale(1.02);box-shadow:0 18px 55px rgba(255,255,255,.07)}
+.features-section{width:100%;max-width:1100px;padding:4rem 2rem 6rem;animation:fadeUp .9s ease 1.1s both}
+.section-label{text-align:center;font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);margin-bottom:2.8rem}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.06);border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,.07)}
+.feature-card{background:rgba(0,0,0,.8);padding:1.8rem 1.6rem;transition:background .28s}
+.feature-card:hover{background:rgba(255,255,255,.04)}
+.feature-icon{font-size:1.4rem;margin-bottom:.85rem;display:block}
+.feature-name{font-size:.88rem;font-weight:500;margin-bottom:.45rem}
+.feature-desc{font-size:.78rem;font-weight:300;color:var(--dim);line-height:1.65}
 
-  /* ── SIDEBAR ── */
-  .sidebar {
-    position: fixed; left: 0; top: 0; bottom: 0;
-    width: 240px;
-    background: rgba(0,0,0,0.7);
-    border-right: 1px solid var(--border);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    z-index: 50;
-    padding: 2rem 0;
-    display: flex; flex-direction: column;
-    overflow-y: auto;
-  }
+/* ══════════════ APP SHELL ══════════════ */
+#app-page{display:none;position:fixed;inset:0;z-index:1;flex-direction:column}
+#app-page.active{display:flex;animation:fadeIn .25s ease}
 
-  .sidebar-logo {
-    padding: 0 1.5rem 2rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1.5rem;
-  }
-  .sidebar-logo h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem; font-weight: 400;
-    margin-bottom: 0.15rem;
-  }
-  .sidebar-logo span {
-    font-size: 0.72rem; color: var(--muted);
-    letter-spacing: 0.1em; text-transform: uppercase;
-  }
+/* Top bar */
+.app-topbar{height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 1.4rem;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.75);backdrop-filter:blur(30px);z-index:50}
+.topbar-left{display:flex;align-items:center;gap:.8rem}
+.topbar-logo{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:.45rem}
+.topbar-search{position:relative}
+.topbar-search svg{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);opacity:.3;pointer-events:none}
+.topbar-search input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.38rem .85rem .38rem 2.2rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.87rem;outline:none;width:230px;transition:all .22s}
+.topbar-search input:focus{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.09);width:260px}
+.topbar-search input::placeholder{color:rgba(255,255,255,.22)}
+.topbar-right{display:flex;align-items:center;gap:.5rem}
+.icon-btn{width:30px;height:30px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:var(--dim)}
+.icon-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)}
+.add-btn-top{padding:.38rem 1rem;background:rgba(255,255,255,.88);border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.87rem;font-weight:600;color:#000;cursor:pointer;transition:all .25s;white-space:nowrap}
+.add-btn-top:hover{background:#fff;transform:translateY(-1px);box-shadow:0 4px 16px rgba(255,255,255,.1)}
 
-  .nav-section { padding: 0 1rem 1.5rem; }
-  .nav-section-label {
-    font-size: 0.65rem; font-weight: 600;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--dim); padding: 0 0.5rem;
-    margin-bottom: 0.4rem;
-  }
-  .nav-link {
-    display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.45rem 0.75rem;
-    border-radius: 10px;
-    font-size: 0.83rem; font-weight: 400;
-    color: var(--muted);
-    text-decoration: none;
-    transition: all 0.2s;
-    cursor: none;
-  }
-  .nav-link:hover { color: var(--white); background: var(--surface2); }
-  .nav-link.active { color: var(--white); background: var(--surface2); }
+/* Main area */
+.app-body{display:flex;flex:1;overflow:hidden}
 
-  /* ── CONTENT ── */
-  .content {
-    margin-left: 240px;
-    padding: 4rem 4rem 4rem 4rem;
-    max-width: 900px;
-    position: relative; z-index: 1;
-  }
+/* ── SIDEBAR ── */
+.sidebar{width:210px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(0,0,0,.55);border-right:1px solid rgba(255,255,255,.06);overflow-y:auto;overflow-x:hidden;transition:width .28s cubic-bezier(.4,0,.2,1)}
+.sidebar.collapsed{width:0}
+.sidebar-inner{width:210px;padding:1rem .75rem;display:flex;flex-direction:column;height:100%}
+.sb-section{font-size:.67rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:.6rem .5rem .3rem;white-space:nowrap}
+.sb-item{display:flex;align-items:center;gap:.6rem;padding:.52rem .65rem;border-radius:9px;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease;color:rgba(255,255,255,.42);font-size:.88rem;border:1px solid transparent;white-space:nowrap;overflow:hidden}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-item.active{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.1)}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-count{margin-left:auto;font-size:.66rem;opacity:.38;background:rgba(255,255,255,.08);padding:.1rem .38rem;border-radius:20px;min-width:18px;text-align:center}
+.sb-spacer{flex:1}
+.sb-divider{height:1px;background:rgba(255,255,255,.06);margin:.6rem 0}
+/* Category dot colours */
+.dot-all   {background:rgba(255,255,255,.35)}
+.dot-pin   {background:#fbbf24}
+.dot-rec   {background:#60a5fa}
+.dot-pass  {background:#a78bfa}
+.dot-bit   {background:#ff6b6b}
+.dot-other {background:rgba(255,255,255,.22)}
 
-  /* ── SECTIONS ── */
-  .doc-section {
-    margin-bottom: 5rem;
-    scroll-margin-top: 2rem;
-  }
+/* ── CONTENT ── */
+.vault-content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.content-header{padding:.9rem 1.6rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0}
+.content-title{font-family:'DM Serif Display',serif;font-size:1.5rem;font-weight:400}
+.content-meta{font-size:.82rem;color:rgba(255,255,255,.28);margin-top:.1rem}
+.filter-chips{display:flex;gap:.35rem;flex-wrap:wrap}
+.fc{padding:.28rem .75rem;border-radius:6px;font-size:.72rem;font-weight:500;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:var(--dim);cursor:pointer;transition:all .18s}
+.fc:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+.fc.active{color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.cards-area{flex:1;overflow-y:auto;padding:1.4rem 1.6rem}
+.entries-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:.9rem}
 
-  .hero-doc {
-    text-align: center;
-    padding: 5rem 0 4rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 5rem;
-  }
-  .hero-doc .badge-row {
-    display: flex; gap: 0.5rem; justify-content: center;
-    flex-wrap: wrap; margin-bottom: 2rem;
-  }
-  .badge {
-    padding: 0.3rem 0.85rem;
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    font-size: 0.72rem; color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.04em;
-  }
-  .badge.green { border-color: rgba(100,255,180,0.25); color: rgba(100,255,180,0.7); }
-  .badge.blue { border-color: rgba(100,180,255,0.25); color: rgba(100,180,255,0.7); }
+/* ── CARDS ── */
+.entry-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.15rem 1.2rem;transition:border-color .35s ease,background .35s ease,transform .3s cubic-bezier(.2,0,.2,1),box-shadow .35s ease;position:relative;overflow:hidden;cursor:pointer;animation:cardIn .3s ease both}
+.
+.entry-card:hover{border-color:rgba(255,255,255,.13);background:rgba(255,255,255,.06);transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.
+.entry-card.pinned{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.03)}
+.pin-badge{position:absolute;top:.7rem;right:.7rem;font-size:.6rem;opacity:.4;pointer-events:none}
+.card-header{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.9rem}
+.card-icon{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.card-meta{flex:1;min-width:0;padding-top:.1rem}
+.card-name{font-size:1rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.1rem}
+.card-note{font-size:.82rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-actions{display:flex;gap:.25rem;opacity:0;transition:opacity .15s;flex-shrink:0}
+.entry-card:hover .card-actions{opacity:1}
+.ca{width:26px;height:26px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:var(--dim);font-size:.7rem}
+.ca:hover{background:rgba(255,255,255,.13);color:#fff;border-color:rgba(255,255,255,.2)}
+.ca.del:hover{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.07)}
+.ca.pinned-on{color:rgba(251,191,36,.8)}
+.codes-list{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.85rem}
+.code-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:.36rem .65rem;font-family:monospace;font-size:.85rem;color:rgba(255,255,255,.62);display:flex;align-items:center;justify-content:space-between;gap:.4rem;cursor:pointer;transition:all .15s}
+.code-chip:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.13);transition:background .2s,border-color .2s}
+.code-chip.used{opacity:.28;text-decoration:line-through}
+.code-chip.no-toggle{cursor:pointer}
+.code-chip.no-toggle:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.07)}
+.code-chip-text{font-family:monospace;letter-spacing:.07em;flex:1}
+.code-tick{font-size:.58rem;opacity:0;transition:opacity .15s;flex-shrink:0}
+.code-chip:not(.no-toggle):hover .code-tick{opacity:1}
+  .code-chip.no-toggle:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18);cursor:pointer}
+  .code-chip.no-toggle .copy-hint{font-size:.55rem;opacity:0;transition:opacity .14s;flex-shrink:0;color:rgba(255,255,255,.5)}
+  .code-chip.no-toggle:hover .copy-hint{opacity:1}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.05)}
+.card-rem{font-size:.77rem;color:var(--dim)}
+.type-badge{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .55rem;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.38)}
 
-  .hero-doc h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(3rem, 6vw, 5rem);
-    font-weight: 400; line-height: 1;
-    margin-bottom: 1rem;
-  }
-  .hero-doc .tagline {
-    font-size: 1.05rem; font-weight: 300;
-    color: var(--muted); max-width: 500px; margin: 0 auto 2.5rem;
-  }
+/* ── FORMS ── */
+.form-label{display:block;font-size:.76rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:.42rem}
+.form-label small{font-size:.63rem;font-weight:300;text-transform:none;letter-spacing:0;color:rgba(255,255,255,.2);margin-left:.4rem}
+.form-input,.form-select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:12px;padding:.78rem 1rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.95rem;outline:none;margin-bottom:1.1rem;transition:border-color .2s,background .2s}
+.form-input:focus,.form-select:focus{border-color:rgba(255,255,255,.36);background:rgba(255,255,255,.09)}
+.form-input::placeholder{color:rgba(255,255,255,.2)}
+.form-select option{background:#0d0d0d;color:#fff}
+.form-select option:checked,.form-select option:hover{background:#222;color:#fff}
+.form-select{appearance:none;-webkit-appearance:none;color-scheme:dark;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;padding-right:2.4rem}
+.pw-wrap{position:relative}
+.pw-toggle{position:absolute;right:.9rem;top:50%;transform:translateY(-55%);background:none;border:none;color:var(--dim);cursor:pointer;font-size:.9rem;transition:color .18s}
+.pw-toggle:hover{color:#fff}
+.btn-next,.btn-back{font-family:'Outfit',sans-serif;font-size:.86rem;font-weight:500;cursor:pointer;border-radius:50px;padding:.75rem 1.8rem;transition:all .25s;border:1px solid}
+.btn-next{background:rgba(255,255,255,.88);border-color:rgba(255,255,255,.88);color:#000}
+.btn-next:hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 26px rgba(255,255,255,.16)}
+.btn-next:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-back{background:transparent;border-color:rgba(255,255,255,.13);color:var(--dim)}
+.btn-back:hover{border-color:rgba(255,255,255,.3);color:#fff}
 
-  .btn-doc {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    padding: 0.75rem 1.8rem;
-    border-radius: 50px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.88rem; font-weight: 500;
-    text-decoration: none; cursor: none;
-    transition: all 0.3s;
-  }
-  .btn-doc.primary {
-    background: rgba(255,255,255,0.88);
-    border: 1px solid rgba(255,255,255,0.88);
-    color: #000;
-  }
-  .btn-doc.primary:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.15); }
-  .btn-doc.secondary {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    color: var(--muted);
-  }
-  .btn-doc.secondary:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:flex-start;justify-content:center;padding:3vh 1rem;overflow-y:auto}
+.modal-overlay.open{display:flex;animation:fadeIn .18s ease}
+.modal{background:rgba(12,12,12,.97);border:1px solid rgba(255,255,255,.11);border-radius:24px;padding:2.2rem;width:100%;max-width:460px;margin:auto;box-shadow:0 50px 120px rgba(0,0,0,.9);animation:modalPop .3s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(40px)}
+.modal h2{font-family:'DM Serif Display',serif;font-size:1.6rem;font-weight:400;margin-bottom:1.5rem}
+.modal-actions{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1.5rem;padding-top:1.1rem;border-top:1px solid rgba(255,255,255,.07)}
 
-  /* ── TYPOGRAPHY ── */
-  h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem; font-weight: 400;
-    margin-bottom: 0.6rem; line-height: 1.2;
-  }
-  h3 {
-    font-size: 1rem; font-weight: 600;
-    margin: 2rem 0 0.6rem;
-    color: var(--text);
-  }
-  p { color: var(--muted); margin-bottom: 1rem; }
-  a { color: var(--text); text-underline-offset: 3px; }
+/* Icon picker */
+.icon-picker-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:.85rem;margin-bottom:1.1rem}
+.icon-picker-search{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.48rem .82rem;color:#fff;font-family:'Outfit',sans-serif;font-size:.8rem;outline:none;margin-bottom:.7rem;transition:border-color .2s}
+.icon-picker-search:focus{border-color:rgba(255,255,255,.3)}
+.icon-picker-search::placeholder{color:rgba(255,255,255,.22)}
+.icon-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.32rem;max-height:150px;overflow-y:auto}
+.icon-option{aspect-ratio:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .16s;padding:.32rem}
+.icon-option:hover{background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.2);transform:scale(1.08)}
+.icon-option.selected{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45)}
 
-  .section-intro {
-    font-size: 0.92rem; color: var(--muted);
-    margin-bottom: 2rem; max-width: 600px;
-  }
+/* Colour swatches */
+.color-row{display:flex;gap:.5rem;margin-bottom:1.1rem;align-items:center}
+.csw{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .16s;flex-shrink:0}
+.csw:hover{transform:scale(1.2)}
+.csw.selected{border-color:#fff;transform:scale(1.18)}
 
-  /* ── CODE BLOCKS ── */
-  .code-block {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.25rem 1.5rem;
-    margin: 1rem 0 1.5rem;
-    position: relative; overflow: hidden;
-  }
-  .code-block::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-  }
-  .code-block pre {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.82rem;
-    color: rgba(255,255,255,0.7);
-    line-height: 1.8;
-    overflow-x: auto;
-    white-space: pre;
-  }
-  .code-block .copy-btn {
-    position: absolute; top: 0.75rem; right: 0.75rem;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 8px;
-    padding: 0.3rem 0.7rem;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.72rem; color: var(--muted);
-    cursor: none; transition: all 0.2s;
-  }
-  .code-block .copy-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+/* Code chip input */
+.codes-chips-list{display:flex;flex-direction:column;gap:.24rem;margin-bottom:.42rem}
+.code-input-chip{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:.36rem .68rem;font-family:monospace;font-size:.85rem;color:rgba(255,255,255,.78);display:flex;align-items:center;justify-content:space-between;gap:.5rem;animation:chipIn .16s ease both}
+.chip-text{flex:1;letter-spacing:.05em}
+.chip-remove{opacity:.32;cursor:pointer;font-size:.68rem;transition:opacity .14s;flex-shrink:0;padding:.1rem .2rem}
+.chip-remove:hover{opacity:.9}
+.code-entry-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:9px;padding:.65rem .95rem;color:#fff;font-family:monospace;font-size:.85rem;outline:none;transition:border-color .2s}
+.code-entry-input:focus{border-color:rgba(255,255,255,.36)}
+.code-entry-input::placeholder{color:rgba(255,255,255,.17);font-family:'Outfit',sans-serif;font-size:.8rem}
+.code-hint{font-size:.68rem;color:rgba(255,255,255,.17);margin-top:.28rem}
 
-  .code-lang {
-    font-size: 0.65rem; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--dim); margin-bottom: 0.5rem;
-    font-family: 'JetBrains Mono', monospace;
-  }
+/* Upload */
+.upload-zone{border:1px dashed rgba(255,255,255,.17);border-radius:12px;padding:1.2rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:1.1rem}
+.upload-zone:hover,.upload-zone.drag{border-color:rgba(255,255,255,.42);background:rgba(255,255,255,.03)}
+.upload-zone p{font-size:.78rem;color:var(--dim)}
+.upload-zone strong{color:#fff}
+.upload-result-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:.68rem .92rem;margin-bottom:.5rem;font-size:.77rem;color:var(--dim);animation:slideIn .18s ease}
+.upload-result-box strong{color:#fff;display:block;margin-bottom:.2rem}
 
-  code {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.82em;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 0.1em 0.4em;
-    color: rgba(255,255,255,0.8);
-  }
+/* File preview/edit page */
+.file-preview-page{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.9);backdrop-filter:blur(12px);display:none;flex-direction:column;animation:fadeIn .2s ease}
+.file-preview-page.open{display:flex}
+.fpp-header{padding:1.4rem 2rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.fpp-title{font-family:'DM Serif Display',serif;font-size:1.4rem}
+.fpp-sub{font-size:.78rem;color:var(--dim);margin-top:.2rem}
+.fpp-body{flex:1;overflow-y:auto;padding:1.6rem 2rem;max-width:700px;width:100%;margin:0 auto}
+.fpp-code-list{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.5rem}
+.fpp-code-row{display:flex;align-items:center;gap:.6rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:.5rem .75rem;animation:cardIn .25s ease both}
+.fpp-code-row input{flex:1;background:transparent;border:none;color:#fff;font-family:monospace;font-size:.85rem;outline:none;padding:0}
+.fpp-code-row input::placeholder{color:rgba(255,255,255,.2)}
+.fpp-code-row .fpp-del{opacity:.3;cursor:pointer;font-size:.7rem;transition:opacity .15s;flex-shrink:0}
+.fpp-code-row .fpp-del:hover{opacity:.9}
+.fpp-add-row{display:flex;gap:.5rem}
+.fpp-add-row input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:9px;padding:.6rem .9rem;color:#fff;font-family:monospace;font-size:.85rem;outline:none;transition:border-color .2s}
+.fpp-add-row input:focus{border-color:rgba(255,255,255,.35)}
+.fpp-add-row button{padding:.6rem 1.1rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#fff;font-family:'Outfit',sans-serif;font-size:.8rem;cursor:pointer;transition:all .18s}
+.fpp-add-row button:hover{background:rgba(255,255,255,.16)}
+.fpp-footer{padding:1.2rem 2rem;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:.75rem;justify-content:flex-end;flex-shrink:0}
 
-  /* ── CALLOUTS ── */
-  .callout {
-    border-radius: 14px;
-    padding: 1.1rem 1.4rem;
-    margin: 1.5rem 0;
-    display: flex; gap: 0.75rem;
-    font-size: 0.85rem; line-height: 1.65;
-  }
-  .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
-  .callout.info { background: rgba(100,180,255,0.06); border: 1px solid rgba(100,180,255,0.15); color: rgba(180,210,255,0.75); }
-  .callout.warn { background: rgba(255,200,80,0.06); border: 1px solid rgba(255,200,80,0.18); color: rgba(255,220,130,0.75); }
-  .callout.danger { background: rgba(255,100,100,0.06); border: 1px solid rgba(255,100,100,0.18); color: rgba(255,160,160,0.75); }
-  .callout.success { background: rgba(80,255,160,0.06); border: 1px solid rgba(80,255,160,0.18); color: rgba(140,255,190,0.75); }
+/* Toast */
+#toast{position:fixed;bottom:1.8rem;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(20px);border-radius:30px;padding:.58rem 1.4rem;font-size:.82rem;color:#fff;z-index:9999;opacity:0;transition:all .3s cubic-bezier(.34,1.3,.64,1);pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  /* ── STEPS ── */
-  .steps { counter-reset: step; margin: 1.5rem 0; }
-  .step {
-    display: flex; gap: 1.25rem;
-    margin-bottom: 2rem; position: relative;
-  }
-  .step::before {
-    content: '';
-    position: absolute; left: 19px; top: 40px;
-    width: 1px; height: calc(100% - 10px);
-    background: var(--border);
-  }
-  .step:last-child::before { display: none; }
-  .step-num {
-    width: 40px; height: 40px; flex-shrink: 0;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem; color: var(--muted);
-    counter-increment: step;
-  }
-  .step-body { flex: 1; padding-top: 0.5rem; }
-  .step-title { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
-  .step-desc { font-size: 0.83rem; color: var(--muted); }
+/* Lock screen */
+#lock-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.9);backdrop-filter:blur(22px);display:none;align-items:center;justify-content:center}
+#lock-overlay.active{display:flex;animation:fadeIn .22s ease}
+.lock-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:24px;padding:2.6rem;width:100%;max-width:370px;text-align:center;backdrop-filter:blur(40px);animation:modalPop .4s cubic-bezier(.34,1.56,.64,1)}
+.lock-card h2{font-family:'DM Serif Display',serif;font-size:1.7rem;margin-bottom:.35rem}
+.lock-card p{color:var(--dim);font-size:.82rem;margin-bottom:1.7rem}
 
-  /* ── TABLE ── */
-  table {
-    width: 100%; border-collapse: collapse;
-    margin: 1.5rem 0; font-size: 0.83rem;
-  }
-  th {
-    text-align: left; padding: 0.6rem 1rem;
-    font-size: 0.7rem; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--dim);
-    border-bottom: 1px solid var(--border);
-  }
-  td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: var(--muted);
-    vertical-align: top;
-  }
-  tr:hover td { background: var(--surface); }
-  td:first-child { color: rgba(255,255,255,0.65); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+/* Setup overlay */
+.setup-overlay{position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;padding:2rem;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);animation:fadeIn .25s ease both}
+.setup-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:24px;padding:2.6rem;width:100%;max-width:490px;backdrop-filter:blur(40px);box-shadow:0 40px 100px rgba(0,0,0,.85);animation:modalPop .45s cubic-bezier(.34,1.56,.64,1) both}
+.step-bar{display:flex;gap:.36rem;margin-bottom:2rem}
+.step-seg{height:2px;border-radius:2px;background:rgba(255,255,255,.12);flex:1;transition:background .4s}
+.step-seg.done{background:rgba(255,255,255,.72)}
+.step-seg.active{background:rgba(255,255,255,.4)}
+.setup-step{display:none;animation:slideIn .28s ease both}
+.setup-step.active{display:block}
+.setup-title{font-family:'DM Serif Display',serif;font-size:1.85rem;margin-bottom:.42rem;line-height:1.1}
+.setup-sub{font-size:.82rem;font-weight:300;color:var(--dim);margin-bottom:1.8rem;line-height:1.65}
 
-  /* ── FEATURES LIST ── */
-  .features-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
-  .feat-row {
-    display: flex; align-items: flex-start; gap: 1rem;
-    padding: 1rem 1.25rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    transition: border-color 0.25s;
-    cursor: none;
-  }
-  .feat-row:hover { border-color: var(--border2); }
-  .feat-emoji { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.05rem; }
-  .feat-text h4 { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
-  .feat-text p { font-size: 0.8rem; color: var(--muted); margin: 0; line-height: 1.55; }
+/* Empty state */
+.empty-state{grid-column:1/-1;text-align:center;padding:6rem 2rem;animation:fadeIn .4s ease}
+.empty-icon{font-size:2.8rem;margin-bottom:.85rem;opacity:.16}
+.empty-title{font-size:.92rem;color:var(--dim);margin-bottom:.36rem}
+.empty-sub{font-size:.78rem;color:rgba(255,255,255,.18)}
 
-  /* ── FOOTER NOTE ── */
-  .footer-note {
-    margin-top: 8rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-    text-align: center;
-  }
-  .footer-note p {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.18);
-    font-weight: 300;
-    line-height: 1.7;
-    font-style: italic;
-  }
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
 
-  /* ── TOAST ── */
-  #toast {
-    position: fixed; bottom: 2rem; right: 2rem;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(20px);
-    border-radius: 30px; padding: 0.6rem 1.4rem;
-    font-size: 0.82rem; color: var(--white);
-    z-index: 999; opacity: 0;
-    transition: all 0.3s cubic-bezier(0.34,1.3,0.64,1);
-    transform: translateY(10px);
-    pointer-events: none;
-  }
-  #toast.show { opacity: 1; transform: translateY(0); }
-
-  @media (max-width: 900px) {
-    .sidebar { display: none; }
-    .content { margin-left: 0; padding: 2rem 1.5rem; }
-  }
+@media(max-width:768px){
+  .features-grid{grid-template-columns:1fr}
+  .hero-title{font-size:3.2rem}
+  .top-nav{padding:1.4rem 1.5rem}
+  .nav-links{display:none}
+  .sidebar{display:none}
+  .topbar-search input{width:160px}
+}
+/* ── colour border classes for cards ── */
+.cb-red   {border-color:rgba(255,107,107,.55)!important}
+.cb-amber {border-color:rgba(251,191,36,.55)!important}
+.cb-blue  {border-color:rgba(96,165,250,.55)!important}
+.cb-purple{border-color:rgba(167,139,250,.55)!important}
+.cb-green {border-color:rgba(52,211,153,.55)!important}
+/* pin active */
+.ca.pin-on{color:rgba(251,191,36,.75)}
 </style>
 </head>
 <body>
-<div id="cursor"></div>
-<canvas id="stars"></canvas>
+<svg id="star-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+
+<!-- ══════════ WELCOME ══════════ -->
+<div id="welcome-page">
+  <nav class="top-nav">
+    <div class="nav-logo">
+      <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="3" fill="#fff" opacity="0.9"/><ellipse cx="16" cy="16" rx="11" ry="3.5" fill="none" stroke="#fff" stroke-width="1.3" opacity="0.5" transform="rotate(-30 16 16)"/><ellipse cx="16" cy="16" rx="7.5" ry="2.3" fill="none" stroke="#fff" stroke-width="0.9" opacity="0.35" transform="rotate(55 16 16)"/><circle cx="9" cy="11" r="1" fill="#fff" opacity="0.6"/><circle cx="23" cy="21" r="0.8" fill="#fff" opacity="0.55"/></svg>
+      Andromeda
+    </div>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="readme.html" class="nav-link">Docs</a>
+      <a href="https://github.com/matejselko/andromeda" class="nav-link" target="_blank">GitHub</a>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="hero-constellation" id="hero-svg"></div>
+    <p class="hero-eyebrow">Self-hosted · Encrypted · Offline</p>
+    <h1 class="hero-title">Andromeda</h1>
+    <p class="hero-sub">Your recovery codes, secured locally. AES-256 encrypted. No cloud. No tracking. Just yours.</p>
+    <a href="#" class="enter-btn" id="enter-btn">Enter Andromeda →</a>
+  </div>
+  <div class="features-section" id="features">
+    <p class="section-label">Everything you need</p>
+    <div class="features-grid">
+      <div class="feature-card"><span class="feature-icon">🔒</span><div class="feature-name">AES-256-GCM Encryption</div><div class="feature-desc">Military-grade with PBKDF2 key derivation. Unreadable without your master password.</div></div>
+      <div class="feature-card"><span class="feature-icon">🌐</span><div class="feature-name">Fully Offline</div><div class="feature-desc">All encryption happens locally. No telemetry, no cloud sync unless you want it.</div></div>
+      <div class="feature-card"><span class="feature-icon">🎨</span><div class="feature-name">Real Brand Icons</div><div class="feature-desc">GitHub, Google, Discord, Bitwarden — actual logos via Simple Icons + Clearbit fallback.</div></div>
+      <div class="feature-card"><span class="feature-icon">🐳</span><div class="feature-name">Docker Native</div><div class="feature-desc">One command deployment. Persistent encrypted volume. Runs anywhere Docker runs.</div></div>
+      <div class="feature-card"><span class="feature-icon">📌</span><div class="feature-name">Sidebar Navigation</div><div class="feature-desc">Pin entries, filter by category with live counts, search instantly.</div></div>
+      <div class="feature-card"><span class="feature-icon">📁</span><div class="feature-name">File Import + Edit</div><div class="feature-desc">Upload .txt/.json/.csv files — preview, edit every code, then save to vault.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="app-page">
+
+  <!-- Top bar -->
+  <div class="app-topbar">
+    <div class="topbar-left">
+      <button class="icon-btn" id="sb-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-logo">
+      <svg width="14" height="14" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="3" fill="#fff" opacity="0.9"/><ellipse cx="16" cy="16" rx="11" ry="3.5" fill="none" stroke="#fff" stroke-width="1.3" opacity="0.5" transform="rotate(-30 16 16)"/><ellipse cx="16" cy="16" rx="7.5" ry="2.3" fill="none" stroke="#fff" stroke-width="0.9" opacity="0.35" transform="rotate(55 16 16)"/><circle cx="9" cy="11" r="1" fill="#fff" opacity="0.6"/><circle cx="23" cy="21" r="0.8" fill="#fff" opacity="0.55"/><circle cx="21" cy="9" r="0.6" fill="#fff" opacity="0.45"/><circle cx="11" cy="23" r="0.6" fill="#fff" opacity="0.4"/></svg>
+        Andromeda
+      </div>
+      <div class="topbar-search">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="search-input" placeholder="Search…" oninput="renderEntries()" autocomplete="off"/>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="add-btn-top" onclick="openAddModal()">+ Add Entry</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sb-section">Vault</div>
+        <div class="sb-item active" id="sbi-all" onclick="setSidebarFilter('all',this)">
+          <div class="sb-dot dot-all"></div>All entries<span class="sb-count" id="sc-all"></span>
+        </div>
+        <div class="sb-item" id="sbi-pinned" onclick="setSidebarFilter('pinned',this)">
+          <div class="sb-dot dot-pin"></div>Pinned<span class="sb-count" id="sc-pinned"></span>
+        </div>
+        <div class="sb-divider"></div>
+        <div class="sb-section">Categories</div>
+        <div class="sb-item" id="sbi-recovery" onclick="setSidebarFilter('recovery',this)">
+          <div class="sb-dot dot-rec"></div>Recovery Codes<span class="sb-count" id="sc-recovery"></span>
+        </div>
+        <div class="sb-item" id="sbi-passphrase" onclick="setSidebarFilter('passphrase',this)">
+          <div class="sb-dot dot-pass"></div>Passphrases<span class="sb-count" id="sc-passphrase"></span>
+        </div>
+        <div class="sb-item" id="sbi-bitlocker" onclick="setSidebarFilter('bitlocker',this)">
+          <div class="sb-dot dot-bit"></div>BitLocker<span class="sb-count" id="sc-bitlocker"></span>
+        </div>
+        <div class="sb-item" id="sbi-other" onclick="setSidebarFilter('other',this)">
+          <div class="sb-dot dot-other"></div>Other<span class="sb-count" id="sc-other"></span>
+        </div>
+        <div class="sb-spacer"></div>
+        <div class="sb-divider"></div>
+        <div class="sb-item" onclick="openSettings()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </div>
+        <div class="sb-divider"></div>
+        <div class="sb-item" onclick="lockVault()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Lock vault
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="vault-content">
+      <div class="content-header">
+        <div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.28);margin-bottom:.2rem;letter-spacing:.03em">Welcome home, <span id="welcome-name">User</span></div>
+          <div class="content-title" id="content-title">All entries</div>
+          <div class="content-meta" id="content-meta"></div>
+        </div>
+
+      </div>
+      <div class="cards-area">
+        <div class="entries-grid" id="entries-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ LOCK SCREEN ══════════ -->
+<div id="lock-overlay">
+  <div class="lock-card">
+    <div style="margin-bottom:1.1rem;animation:fadeUp .5s ease both">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h2>Vault Locked</h2>
+    <p>Enter your master password to unlock</p>
+    <div class="pw-wrap" style="margin-bottom:1rem">
+      <input class="form-input" type="password" id="unlock-pw" placeholder="Master password…"
+        onkeydown="if(event.key==='Enter')unlockVault()" style="margin-bottom:0"/>
+      <button class="pw-toggle" onclick="togglePw('unlock-pw',this)">👁</button>
+    </div>
+    <div style="color:#ff6b6b;font-size:.76rem;margin-bottom:.85rem;min-height:1.1em" id="unlock-error"></div>
+    <button class="btn-next" id="unlock-btn" style="width:100%" onclick="unlockVault()">Unlock</button>
+  </div>
+</div>
+
+<!-- ══════════ FILE PREVIEW / EDIT PAGE ══════════ -->
+<div class="file-preview-page" id="file-preview-page">
+  <div class="fpp-header">
+    <div>
+      <div class="fpp-title">Review imported codes</div>
+      <div class="fpp-sub" id="fpp-filename"></div>
+    </div>
+    <button class="btn-back" onclick="closeFPP()">✕ Cancel</button>
+  </div>
+  <div class="fpp-body">
+    <div class="fpp-code-list" id="fpp-code-list"></div>
+    <div class="fpp-add-row">
+      <input type="text" id="fpp-new-code" placeholder="Add another code…" onkeydown="if(event.key==='Enter')fppAddCode()" autocomplete="off"/>
+      <button onclick="fppAddCode()">+ Add</button>
+    </div>
+  </div>
+  <div class="fpp-footer">
+    <button class="btn-back" onclick="closeFPP()">Cancel</button>
+    <button class="btn-next" onclick="fppConfirm()">Use these codes in modal →</button>
+  </div>
+</div>
+
+<!-- ══════════ ADD/EDIT MODAL ══════════ -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modal-title">Add Entry</h2>
+    <input type="hidden" id="edit-id"/>
+
+    <label class="form-label">Service Name</label>
+    <input class="form-input" id="f-name" placeholder="GitHub, Google, Proton…" autocomplete="off" oninput="autoDetectIcon(this.value)"/>
+
+    <label class="form-label">Icon</label>
+    <div class="icon-picker-wrap">
+      <input class="icon-picker-search" id="icon-search" placeholder="Search icons…" oninput="renderIconGrid(this.value)" autocomplete="off"/>
+      <div class="icon-grid" id="icon-grid"></div>
+    </div>
+
+    <label class="form-label">Type</label>
+    <select class="form-select" id="f-type" onchange="onTypeChange()">
+      <option value="recovery">Recovery Codes</option>
+      <option value="passphrase">Passphrases</option>
+      <option value="bitlocker">BitLocker</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label class="form-label">Card Colour</label>
+    <div class="color-row" id="color-swatches">
+      <div class="csw selected" data-c="white"  style="background:#fff;opacity:.35"  onclick="selectColor('white',this)"  title="Default"></div>
+      <div class="csw"         data-c="red"    style="background:#ff6b6b"            onclick="selectColor('red',this)"    title="Red"></div>
+      <div class="csw"         data-c="amber"  style="background:#fbbf24"            onclick="selectColor('amber',this)"  title="Amber"></div>
+      <div class="csw"         data-c="blue"   style="background:#60a5fa"            onclick="selectColor('blue',this)"   title="Blue"></div>
+      <div class="csw"         data-c="purple" style="background:#a78bfa"            onclick="selectColor('purple',this)" title="Purple"></div>
+      <div class="csw"         data-c="green"  style="background:#34d399"            onclick="selectColor('green',this)"  title="Green"></div>
+    </div>
+
+    <label class="form-label" id="codes-label">Codes <small>Press Enter after each</small></label>
+    <div class="codes-chips-list" id="codes-chips"></div>
+    <input class="code-entry-input" id="code-entry" placeholder="Type a code and press Enter…" autocomplete="off"/>
+    <div class="code-hint" id="code-hint">Paste multiple codes at once — all will be added</div>
+
+    <label class="form-label" style="margin-top:.9rem">Import from file <small>optional</small></label>
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+      <p><strong>Click to upload</strong> or drag & drop</p>
+      <p style="font-size:.7rem;margin-top:.22rem;opacity:.55">.txt · .json · .csv</p>
+      <input type="file" id="file-input" accept=".txt,.json,.csv,.bek" style="display:none" onchange="handleFile(this)"/>
+    </div>
+    <div id="upload-result"></div>
+
+    <label class="form-label">Notes <small>email, username…</small></label>
+    <input class="form-input" id="f-notes" placeholder="Optional notes" autocomplete="off"/>
+
+    <div class="modal-actions">
+      <button class="btn-back" onclick="closeModal()">Cancel</button>
+      <button class="btn-next" id="save-btn" onclick="saveEntry()">Save Entry</button>
+    </div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
-<nav class="sidebar">
-  <div class="sidebar-logo">
-    <h1>Andromeda</h1>
-    <span>Documentation</span>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-section-label">Overview</div>
-    <a href="#intro" class="nav-link active">✦ Introduction</a>
-    <a href="#features" class="nav-link">⊞ Features</a>
-    <a href="#security" class="nav-link">⊠ Security</a>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-section-label">For Image Hosters</div>
-    <a href="#setup-prereqs" class="nav-link">① Prerequisites</a>
-    <a href="#setup-build" class="nav-link">② Build Image</a>
-    <a href="#setup-publish" class="nav-link">③ Publish to GHCR</a>
-    <a href="#setup-config" class="nav-link">④ Configuration</a>
-    <a href="#setup-https" class="nav-link">⑤ HTTPS Setup</a>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-section-label">For Users</div>
-    <a href="#install-docker" class="nav-link">🐳 Docker Install</a>
-    <a href="#install-manual" class="nav-link">⚙ Manual Install</a>
-    <a href="#first-run" class="nav-link">🚀 First Run</a>
-    <a href="#backup" class="nav-link">📦 Backup & Restore</a>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-section-label">Reference</div>
-    <a href="#env-vars" class="nav-link">⚡ Environment Vars</a>
-    <a href="#faq" class="nav-link">? FAQ</a>
-  </div>
-</nav>
-
-<div class="content">
-
-  <!-- HERO -->
-  <div class="hero-doc" id="intro">
-    <div class="badge-row">
-      <span class="badge green">✓ offline-first</span>
-      <span class="badge blue">AES-256-GCM</span>
-      <span class="badge">docker ready</span>
-      <span class="badge">self-hosted</span>
-      <span class="badge green">500+ icons</span>
-    </div>
-    <h1>Andromeda</h1>
-    <p class="tagline">A self-hosted, fully offline recovery code vault with end-to-end encryption. No cloud. No tracking. Just yours.</p>
-    <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
-      <a href="index.html" class="btn-doc primary">Open Vault →</a>
-      <a href="https://github.com/yourusername/andromeda" class="btn-doc secondary" target="_blank">GitHub</a>
+<!-- Custom confirm dialog -->
+<input type="file" id="import-input" accept=".json" style="display:none" onchange="importVault(this)"/>
+<div id="confirm-overlay" style="position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center">
+  <div style="background:rgba(14,14,14,.97);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:1.8rem 2rem;max-width:340px;width:90%;box-shadow:0 30px 80px rgba(0,0,0,.8);animation:modalPop .22s ease">
+    <div id="confirm-msg" style="font-size:.92rem;font-weight:400;margin-bottom:1.4rem;line-height:1.55;color:rgba(255,255,255,.88)">Are you sure?</div>
+    <div style="display:flex;gap:.6rem;justify-content:flex-end">
+      <button onclick="confirmCancel()" style="padding:.6rem 1.2rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:50px;color:rgba(255,255,255,.6);font-family:Outfit,sans-serif;font-size:.82rem;cursor:pointer;transition:all .18s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Cancel</button>
+      <button id="confirm-ok" onclick="confirmOK()" style="padding:.6rem 1.4rem;background:rgba(255,80,80,.18);border:1px solid rgba(255,80,80,.4);border-radius:50px;color:#ff6b6b;font-family:Outfit,sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .18s" onmouseover="this.style.background='rgba(255,80,80,.28)'" onmouseout="this.style.background='rgba(255,80,80,.18)'">Delete</button>
     </div>
   </div>
-
-  <!-- FEATURES -->
-  <div class="doc-section" id="features">
-    <h2>Features</h2>
-    <p class="section-intro">Everything you need to store recovery codes safely — and nothing you don't.</p>
-    <div class="features-list">
-      <div class="feat-row"><span class="feat-emoji">🔒</span><div class="feat-text"><h4>AES-256-GCM Encryption</h4><p>All vault data is encrypted in your browser using the Web Crypto API before anything touches the server. PBKDF2-SHA256 with 310,000 iterations derives your key. The server stores only an opaque blob.</p></div></div>
-      <div class="feat-row"><span class="feat-emoji">🌐</span><div class="feat-text"><h4>Fully Offline After Setup</h4><p>Zero outbound network calls. No telemetry, no analytics, no CDN dependencies after initial load. DNS resolves to your machine only.</p></div></div>
-      <div class="feat-row"><span class="feat-emoji">🎨</span><div class="feat-text"><h4>500+ Service Icons</h4><p>Built-in icon library covering Proton, Ente, Google, GitHub, AWS, Cloudflare, Bitwarden, Discord and hundreds more — all locally served as emoji or SVG.</p></div></div>
-      <div class="feat-row"><span class="feat-emoji">🐳</span><div class="feat-text"><h4>Docker Native</h4><p>Single container. Runs on amd64 and arm64 (Raspberry Pi, Apple Silicon). One <code>docker run</code> or <code>docker compose up</code>.</p></div></div>
-      <div class="feat-row"><span class="feat-emoji">✓</span><div class="feat-text"><h4>Usage Tracking</h4><p>Click any code to mark it as used. Struck-through, dimmed, always visible. Remaining count shown on each card.</p></div></div>
-      <div class="feat-row"><span class="feat-emoji">📦</span><div class="feat-text"><h4>Export Encrypted Backup</h4><p>Download your vault as a <code>.json</code> anytime. Re-import on another Andromeda instance. The backup is still encrypted — your password is never exported.</p></div></div>
-      <div class="feat-row"><span class="feat-emoji">🖥</span><div class="feat-text"><h4>Liquid Glass UI</h4><p>Pure black-and-white iOS-inspired interface with mouse-reactive glass panels, animated star field, and a custom cursor. No dependencies — no React, no Vue.</p></div></div>
-    </div>
-  </div>
-
-  <!-- SECURITY -->
-  <div class="doc-section" id="security">
-    <h2>Security Model</h2>
-    <p class="section-intro">The encryption happens entirely in your browser. The server is a dumb store.</p>
-    <table>
-      <thead><tr><th>Layer</th><th>Method</th><th>Notes</th></tr></thead>
-      <tbody>
-        <tr><td>Encryption</td><td>AES-256-GCM</td><td>Authenticated encryption with 128-bit auth tag</td></tr>
-        <tr><td>Key derivation</td><td>PBKDF2-SHA256</td><td>310,000 iterations, 256-bit random salt per save</td></tr>
-        <tr><td>IV</td><td>96-bit random</td><td>Generated fresh every save via <code>getRandomValues</code></td></tr>
-        <tr><td>Storage</td><td>Single blob</td><td>Server stores only ciphertext — useless without password</td></tr>
-        <tr><td>Transport</td><td>HTTPS (recommended)</td><td>Use Caddy or Traefik in front for TLS termination</td></tr>
-      </tbody>
-    </table>
-    <div class="callout danger">
-      <span class="callout-icon">⚠</span>
-      <div><strong>No password recovery.</strong> If you lose your master password, your data is gone. There is no backdoor. Keep your password somewhere safe.</div>
-    </div>
-  </div>
-
-  <!-- ══════════════ FOR IMAGE HOSTERS ══════════════ -->
-  <div class="doc-section" id="setup-prereqs">
-    <h2>For Image Hosters</h2>
-    <p class="section-intro">This section is for you — the person building and publishing the Docker image for others to use.</p>
-
-    <h3 id="setup-prereqs">① Prerequisites</h3>
-    <div class="features-list" style="gap:0.5rem">
-      <div class="feat-row"><span class="feat-emoji">🐳</span><div class="feat-text"><h4>Docker + Docker Buildx</h4><p>Install Docker Desktop or Docker Engine 24+. Buildx is bundled in Docker Desktop; for CLI installs run <code>docker buildx install</code>.</p></div></div>
-      <div class="feat-row"><span class="feat-emoji">🐙</span><div class="feat-text"><h4>GitHub account</h4><p>You'll push the image to GitHub Container Registry (GHCR). Create a repo and a Personal Access Token with <code>write:packages</code> scope.</p></div></div>
-      <div class="feat-row"><span class="feat-emoji">🖥</span><div class="feat-text"><h4>Node.js 20+ (optional)</h4><p>Only needed if you want to test locally before building the image.</p></div></div>
-    </div>
-  </div>
-
-  <div class="doc-section" id="setup-build">
-    <h3>② Clone & Build the Image</h3>
-    <div class="code-block">
-      <div class="code-lang">bash</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre># Clone the repo
-git clone https://github.com/yourusername/andromeda.git
-cd andromeda
-
-# Build multi-arch image (amd64 + arm64)
-docker buildx create --use --name andromeda-builder
-docker buildx build \
-  --platform linux/amd64,linux/arm64 \
-  --tag ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest \
-  --tag ghcr.io/YOUR_GITHUB_USERNAME/andromeda:1.0.0 \
-  --load \
-  .
-
-# Test locally first
-docker run -p 3000:3000 ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest</pre>
-    </div>
-    <div class="callout info">
-      <span class="callout-icon">ℹ</span>
-      <div>Replace <code>YOUR_GITHUB_USERNAME</code> with your actual GitHub username throughout.</div>
-    </div>
-  </div>
-
-  <div class="doc-section" id="setup-publish">
-    <h3>③ Publish to GitHub Container Registry</h3>
-    <div class="code-block">
-      <div class="code-lang">bash</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre># Log in to GHCR
-echo YOUR_GITHUB_PAT | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
-
-# Push the image
-docker buildx build \
-  --platform linux/amd64,linux/arm64 \
-  --tag ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest \
-  --tag ghcr.io/YOUR_GITHUB_USERNAME/andromeda:1.0.0 \
-  --push \
-  .</pre>
-    </div>
-    <p>After pushing, go to your GitHub repo → <strong>Packages</strong> → set the package visibility to <strong>Public</strong> so users can pull without authentication.</p>
-
-    <h3>Automated via GitHub Actions</h3>
-    <p>The repo includes <code>.github/workflows/docker.yml</code> which automatically builds and pushes on every push to <code>main</code> and on version tags. Just push your code — CI handles the rest.</p>
-    <div class="code-block">
-      <div class="code-lang">bash</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre># Tag a release to trigger a versioned build
-git tag v1.0.0
-git push origin v1.0.0</pre>
-    </div>
-  </div>
-
-  <div class="doc-section" id="setup-config">
-    <h3>④ Configuration Reference</h3>
-    <div id="env-vars">
-    <table>
-      <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
-      <tbody>
-        <tr><td>PORT</td><td>3000</td><td>HTTP port the server listens on</td></tr>
-        <tr><td>DATA_FILE</td><td>/data/vault.enc</td><td>Path to the encrypted vault file</td></tr>
-        <tr><td>NODE_ENV</td><td>production</td><td>Set to <code>development</code> for verbose logs</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <div class="callout success">
-      <span class="callout-icon">✓</span>
-      <div>Andromeda does <strong>not</strong> require any secrets or API keys to run. The encryption happens entirely in the browser.</div>
-    </div>
-  </div>
-
-  <div class="doc-section" id="setup-https">
-    <h3>⑤ HTTPS with Caddy (Recommended)</h3>
-    <p>Put Caddy in front of Andromeda for automatic TLS certificates via Let's Encrypt.</p>
-    <div class="code-block">
-      <div class="code-lang">Caddyfile</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre>vault.yourdomain.com {
-    reverse_proxy andromeda:3000
-}</pre>
-    </div>
-    <div class="code-block">
-      <div class="code-lang">docker-compose.yml — with Caddy</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre>version: '3.9'
-services:
-  andromeda:
-    image: ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest
-    expose: ["3000"]
-    volumes:
-      - andromeda-data:/data
-    restart: unless-stopped
-
-  caddy:
-    image: caddy:alpine
-    ports: ["80:80", "443:443"]
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy-data:/data
-      - caddy-config:/config
-    depends_on: [andromeda]
-    restart: unless-stopped
-
-volumes:
-  andromeda-data:
-  caddy-data:
-  caddy-config:</pre>
-    </div>
-  </div>
-
-  <!-- ══════════════ FOR USERS ══════════════ -->
-  <div class="doc-section" id="install-docker">
-    <h2>Installation — For Users</h2>
-    <p class="section-intro">Deploy Andromeda on your own machine in under 2 minutes.</p>
-
-    <h3>🐳 Option A — Docker Run (simplest)</h3>
-    <div class="code-block">
-      <div class="code-lang">bash</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre>docker run -d \
-  --name andromeda \
-  --restart unless-stopped \
-  -p 3000:3000 \
-  -v andromeda-data:/data \
-  ghcr.io/YOUR_GITHUB_USERNAME/andromeda:latest</pre>
-    </div>
-    <p>Then open <code>http://localhost:3000</code> in your browser.</p>
-
-    <h3>🐳 Option B — Docker Compose (recommended)</h3>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-title">Download the compose file</div>
-          <div class="code-block" style="margin-top:0.5rem">
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            <pre>curl -O https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/andromeda/main/docker-compose.yml</pre>
-          </div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Start Andromeda</div>
-          <div class="code-block" style="margin-top:0.5rem">
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            <pre>docker compose up -d</pre>
-          </div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">Open in browser</div>
-          <div class="step-desc">Navigate to <code>http://localhost:3000</code> and follow the first-run setup wizard.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="doc-section" id="install-manual">
-    <h3>⚙ Option C — Manual (Node.js)</h3>
-    <div class="code-block">
-      <div class="code-lang">bash</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre># Requires Node.js 20+
-git clone https://github.com/YOUR_GITHUB_USERNAME/andromeda.git
-cd andromeda/backend
-npm install
-node server.js</pre>
-    </div>
-    <p>The server serves the frontend from <code>../frontend/</code> automatically.</p>
-  </div>
-
-  <div class="doc-section" id="first-run">
-    <h3>🚀 First Run</h3>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-title">Open Andromeda</div>
-          <div class="step-desc">Navigate to your Andromeda URL. You'll see the welcome screen with stars.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Click "Enter Andromeda"</div>
-          <div class="step-desc">Since no vault exists yet, the setup wizard appears automatically.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">Create a master password</div>
-          <div class="step-desc">Choose a strong password. This is the <strong>only key</strong> to your vault. Write it down and store it somewhere safe (a password manager, for example).</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <div class="step-title">Add your first entry</div>
-          <div class="step-desc">Click <strong>+ Add Entry</strong>, select a service icon, paste your recovery codes one per line, and save.</div>
-        </div>
-      </div>
-    </div>
-    <div class="callout warn">
-      <span class="callout-icon">💡</span>
-      <div>On subsequent visits, clicking <em>Enter Andromeda</em> will show the unlock screen. Enter your master password to decrypt and access your vault.</div>
-    </div>
-  </div>
-
-  <div class="doc-section" id="backup">
-    <h3>📦 Backup & Restore</h3>
-    <h3>Export your vault</h3>
-    <p>Click <strong>⬇ Export</strong> in the top bar to download a <code>.json</code> backup. This file is encrypted — it's safe to store in cloud storage.</p>
-
-    <h3>Backup the Docker volume</h3>
-    <div class="code-block">
-      <div class="code-lang">bash</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre># Create a backup archive
-docker run --rm \
-  -v andromeda-data:/data \
-  -v $(pwd):/backup \
-  alpine tar czf /backup/andromeda-backup-$(date +%Y%m%d).tar.gz /data
-
-# Restore from backup
-docker run --rm \
-  -v andromeda-data:/data \
-  -v $(pwd):/backup \
-  alpine tar xzf /backup/andromeda-backup-YYYYMMDD.tar.gz -C /</pre>
-    </div>
-
-    <h3>Migrate to a new server</h3>
-    <div class="code-block">
-      <div class="code-lang">bash</div>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      <pre># On the old server: copy the vault file
-docker cp andromeda:/data/vault.enc ./vault.enc
-
-# On the new server: restore it
-docker cp ./vault.enc andromeda:/data/vault.enc</pre>
-    </div>
-  </div>
-
-  <!-- FAQ -->
-  <div class="doc-section" id="faq">
-    <h2>FAQ</h2>
-
-    <h3>Does Andromeda work without internet?</h3>
-    <p>Yes, completely. After the container starts, everything runs locally. No external requests are made. Even the fonts are embedded.</p>
-
-    <h3>Where is my data stored?</h3>
-    <p>In a Docker named volume (<code>andromeda-data</code>) at <code>/data/vault.enc</code> inside the container. The file is always encrypted — even reading it directly from disk reveals nothing without your master password.</p>
-
-    <h3>Can I run multiple instances?</h3>
-    <p>Yes, but each instance has its own separate vault file. There is no sync between instances.</p>
-
-    <h3>What happens if I forget my password?</h3>
-    <p>Your data is gone. This is by design — Andromeda has no password recovery, no server-side key escrow, and no backdoor. Keep your master password in another password manager.</p>
-
-    <h3>Can I use it without Docker?</h3>
-    <p>Yes. Clone the repo and run <code>node backend/server.js</code>. Node.js 20+ required. The vault file is saved to <code>/data/vault.enc</code> by default — change <code>DATA_FILE</code> to a local path.</p>
-  </div>
-
-  <!-- FOOTER NOTE -->
-  <div class="footer-note">
-    <p>
-      ───────────────────────────────────────────────────────────────────<br><br>
-      Note: This project is 100% generated with Claude.ai because I hate programming.
-    </p>
-  </div>
-
-</div><!-- /content -->
+</div>
 
 <script>
-// Stars
-const canvas = document.getElementById('stars');
-const ctx = canvas.getContext('2d');
-let stars = [];
-function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-function init() {
-  stars = Array.from({length: Math.floor(canvas.width*canvas.height/9000)}, () => ({
-    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
-    r: Math.random()*1.1+0.15, phase: Math.random()*Math.PI*2,
-    speed: Math.random()*0.004+0.001, cross: Math.random()>0.88
-  }));
+'use strict';
+
+// ── STARS — pure CSS, zero flicker ──────────────────────────────────
+// ── STARS — SVG SMIL — single element, zero flicker, compositor-only ──────────
+// SMIL <animate> on SVG opacity is processed entirely on the SVG compositor thread.
+// No JS loop, no CSS paint, no clearRect, no box-shadow — zero flicker guaranteed.
+(function buildStars(){
+  const svg = document.getElementById('star-svg');
+  if(!svg) return;
+  const W = innerWidth, H = innerHeight;
+  const n = Math.min(Math.floor(W * H / 7000), 150);
+  const ns = 'http://www.w3.org/2000/svg';
+  const frag = document.createDocumentFragment();
+
+  for(let i = 0; i < n; i++){
+    const c = document.createElementNS(ns, 'circle');
+    const x    = (Math.random() * W).toFixed(1);
+    const y    = (Math.random() * H).toFixed(1);
+    const r    = (Math.random() * 0.9 + 0.3).toFixed(2);
+    const dur  = (Math.random() * 7 + 3).toFixed(1) + 's';
+    const beg  = '-' + (Math.random() * 9).toFixed(1) + 's'; // negative = start mid-cycle
+    const peak = (Math.random() * 0.55 + 0.15).toFixed(2);   // max opacity 0.15–0.7
+
+    c.setAttribute('cx', x);
+    c.setAttribute('cy', y);
+    c.setAttribute('r',  r);
+    c.setAttribute('fill', '#fff');
+    c.setAttribute('opacity', '0.05');
+
+    const anim = document.createElementNS(ns, 'animate');
+    anim.setAttribute('attributeName', 'opacity');
+    anim.setAttribute('values', `0.05;${peak};0.05`);
+    anim.setAttribute('dur', dur);
+    anim.setAttribute('begin', beg);
+    anim.setAttribute('repeatCount', 'indefinite');
+    anim.setAttribute('calcMode', 'spline');
+    anim.setAttribute('keySplines', '0.4 0 0.6 1;0.4 0 0.6 1');
+    c.appendChild(anim);
+    frag.appendChild(c);
+  }
+  svg.appendChild(frag);
+})();
+
+let _starsPaused = false;
+function pauseStars(){
+  _starsPaused = true;
+  try { document.getElementById('star-svg')?.pauseAnimations(); } catch(e){}
 }
-let t=0;
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  t++;
-  stars.forEach(s => {
-    const a = (Math.sin(t*s.speed+s.phase)*0.5+0.5)*0.55+0.05;
-    ctx.globalAlpha = a;
-    if (s.cross) {
-      ctx.strokeStyle='white'; ctx.lineWidth=0.5; ctx.beginPath();
-      ctx.moveTo(s.x-s.r*2.5,s.y); ctx.lineTo(s.x+s.r*2.5,s.y);
-      ctx.moveTo(s.x,s.y-s.r*2.5); ctx.lineTo(s.x,s.y+s.r*2.5);
-      ctx.stroke();
+function resumeStars(){
+  if(!_starsPaused) return;
+  _starsPaused = false;
+  try { document.getElementById('star-svg')?.unpauseAnimations(); } catch(e){}
+}
+
+// Mouse glow — per-card listener only (fires ONLY when mouse is over that card)
+// No global mousemove → no querySelectorAll → no style recalc on every mouse move
+function attachCardGlow(card) {
+  card.addEventListener('mousemove', function(e) {
+    const r = this.getBoundingClientRect();
+    this.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+    this.style.setProperty('--my', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+  }, {passive:true});
+}
+
+// ── HERO SVG ──────────────────────────────────
+(function(){
+  const pts=[[40,10],[70,25],[60,55],[30,65],[15,40],[55,80]],lines=[[0,1],[1,2],[2,3],[3,4],[4,0],[2,5]];
+  let s=`<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">`;
+  lines.forEach(([a,b])=>s+=`<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/>`);
+  pts.forEach((p,i)=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="${i===0?2.4:1.4}" fill="white" opacity="${i===0?.85:.45}"/>`);
+  s+=`</svg>`;
+  const el=document.getElementById('hero-svg');if(el)el.innerHTML=s;
+})();
+// Check secure context — crypto.subtle needs HTTPS or localhost
+(function checkSecureContext(){
+  if(typeof crypto === 'undefined' || !crypto.subtle){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4444;color:#fff;text-align:center;padding:.75rem 1rem;font-size:.85rem;font-family:Outfit,sans-serif;line-height:1.5';
+    banner.innerHTML = '<strong>⚠ Encryption unavailable</strong> — You are accessing over plain HTTP.<br>Open <strong>https://</strong>' + location.host + ' instead (accept the self-signed certificate warning).';
+    document.body.prepend(banner);
+  }
+})();
+
+document.getElementById('enter-btn').addEventListener('click',e=>{e.preventDefault();navigateToApp()});
+
+// ── ICONS ──────────────────────────────────
+// ══════════════════════════════════════════════
+// ICON LIBRARY — fully offline, inline SVG + letter avatars
+// ══════════════════════════════════════════════
+const SVG = {
+  github:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>`,
+  discord:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>`,
+  telegram:  `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>`,
+  signal:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.003 0a12 12 0 100 24 12 12 0 000-24zm.54 6.17c2.95.35 5.3 2.7 5.64 5.65l-1.29.2a4.5 4.5 0 00-3.65-3.66l-.7-2.19zm-1.08 0l-.7 2.19a4.5 4.5 0 00-3.65 3.66l-2.19-.7c.35-2.95 2.7-5.3 5.64-5.65.3-.04.6-.06.9-.08v.58zm7.33 6.42c-.04 3.26-2.7 5.85-5.97 5.8l-.2-1.29a4.5 4.5 0 003.66-3.65l2.51-.86zm-14.56 0l2.51.86a4.5 4.5 0 003.66 3.65l-.2 1.29c-3.27.05-5.93-2.54-5.97-5.8zm7.83 7.5c-3.26 0-5.95-2.6-5.95-5.85h1.49a4.5 4.5 0 004.46 4.35v1.5zm.59 0v-1.5a4.5 4.5 0 004.46-4.35h1.49c0 3.25-2.69 5.85-5.95 5.85z"/></svg>`,
+  slack:     `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 01-2.52 2.523A2.528 2.528 0 010 15.165a2.527 2.527 0 012.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 012.521-2.52 2.527 2.527 0 012.521 2.52v6.313A2.528 2.528 0 018.834 24a2.528 2.528 0 01-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 01-2.521-2.52A2.528 2.528 0 018.834 0a2.527 2.527 0 012.521 2.522v2.52H8.834zm0 1.271a2.527 2.527 0 012.521 2.521 2.527 2.527 0 01-2.521 2.521H2.522A2.528 2.528 0 010 8.834a2.528 2.528 0 012.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 012.522-2.521A2.528 2.528 0 0124 8.834a2.527 2.527 0 01-2.522 2.521h-2.522V8.834zm-1.268 0a2.527 2.527 0 01-2.523 2.521 2.526 2.526 0 01-2.52-2.521V2.522A2.527 2.527 0 0115.165 0a2.528 2.528 0 012.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 012.523 2.522A2.528 2.528 0 0115.165 24a2.527 2.527 0 01-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 01-2.52-2.523 2.526 2.526 0 012.52-2.52h6.313A2.527 2.527 0 0124 15.165a2.528 2.528 0 01-2.522 2.523h-6.313z"/></svg>`,
+  docker:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.184-.186h-2.12a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 00-.75.748 11.376 11.376 0 00.692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 003.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288z"/></svg>`,
+  notion:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>`,
+  cloudflare:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.478 15.126l.367-1.246c.05-.17.073-.263.073-.296a.5.5 0 00-.5-.5h-9.58a.23.23 0 01-.222-.297l.375-1.257c.05-.165.073-.255.073-.287a.5.5 0 00-.5-.5H4.23a.5.5 0 00-.484.373l-.72 2.57A.5.5 0 003.51 14h12.484a.5.5 0 00.484-.374zm1.545-5.126l.733-2.543a.5.5 0 00-.484-.625H5.626a.5.5 0 00-.484.373l-1.479 5.13a.5.5 0 00.484.627h13.246a.5.5 0 00.484-.373l.146-.49z"/></svg>`,
+  bitwarden: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.504 1.464L12 0l8.496 1.464c.888.216 1.512.984 1.512 1.896v9.36c0 5.568-4.2 9.744-9.984 11.28C6.24 22.464 2.04 18.312 2.04 12.72V3.36c0-.912.576-1.68 1.464-1.896zm8.496 2.04v15.024c4.176-1.32 7.032-4.656 7.032-8.544V4.512L12 3.504z"/></svg>`,
+  proton:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-1.296 1.519-1.972 2.49-1.102L12 13.093l9.51-8.738C22.48 3.485 24 4.161 24 5.457z"/></svg>`,
+  google:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>`,
+  apple:     `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zm3.828-3.813c.787-.974 1.33-2.351 1.183-3.703-1.157.052-2.54.781-3.353 1.755-.733.853-1.38 2.234-1.196 3.546 1.287.104 2.602-.66 3.366-1.598z"/></svg>`,
+  microsoft: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.4 24H0V12.6h11.4V24zm12.6 0H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zm12.6 0H12.6V0H24v11.4z"/></svg>`,
+  windows:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.4 24H0V12.6h11.4V24zm12.6 0H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zm12.6 0H12.6V0H24v11.4z"/></svg>`,
+  twitter:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>`,
+  reddit:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>`,
+  youtube:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>`,
+  spotify:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`,
+  linkedin:  `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
+  twitch:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>`,
+  facebook:  `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
+  instagram: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>`,
+  netflix:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c-.043-7.86-.004-15.86.002-22.95zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22z"/></svg>`,
+  steam:     `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.663 0-3.015 1.353-3.015 3.015 0 1.663 1.352 3.015 3.015 3.015 1.663 0 3.015-1.352 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.252 0-2.265-1.014-2.265-2.265z"/></svg>`,
+  stripe:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/></svg>`,
+  paypal:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/></svg>`,
+  dropbox:   `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 6.453L6.001 10.12 12 13.786l-6 3.667L0 13.786l6.001-3.667L0 6.453 6.001 2.787zm-12 10.667l6.001 3.667L12 17.12l6 3.667 6.001-3.667L18 13.453l6.001-3.667-6.001-3.667L12 9.786 6.001 6.12 0 9.787l6.001 3.666zm12-14.333L18 6.453l-5.999 3.667L18 13.786l6-3.667-6-3.666z"/></svg>`,
+  nextcloud: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.8a7.2 7.2 0 1 1 0 14.4A7.2 7.2 0 0 1 12 4.8zm0 1.8a5.4 5.4 0 1 0 0 10.8A5.4 5.4 0 0 0 12 6.6z"/></svg>`,
+  wordpress: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.11m-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.649-.03 1.234-.1 1.234-.1.585-.075.516-.93-.065-.896 0 0-1.746.138-2.874.138-.2 0-.438-.008-.69-.015C4.911 3.15 8.235 1.215 12 1.215c2.809 0 5.365 1.072 7.286 2.833-.046-.003-.091-.009-.141-.009-1.06 0-1.812.923-1.812 1.914 0 .89.513 1.643 1.06 2.531.411.72.89 1.643.89 2.977 0 .915-.354 1.994-.843 3.479l-1.105 3.699-4.04-11.99zm-9.608 13.042C2.446 18.319 1.2 15.298 1.2 12c0-1.312.212-2.577.6-3.762L7.2 23.982c-1.326-.6-2.52-1.44-3.32-4.01zM12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12z"/></svg>`,
+  proton:    `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-1.296 1.519-1.972 2.49-1.102L12 13.093l9.51-8.738C22.48 3.485 24 4.161 24 5.457z"/></svg>`,
+  ente:      `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`,
+  homeassistant:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.8 13H20v7h-4v-4h-4v4H8v-7H6.2c-.5 0-.7-.6-.4-.9l7.4-7.4c.4-.4 1-.4 1.4 0l3.4 3.4V6h2v3.1l1.6 1.6c.4.3.2.9-.4.9zM4 21v-7.2L12 6l8 7.8V21H4z"/></svg>`,
+};
+
+// Icon definitions — svg key = uses SVG above, else letter avatar
+const ICONS = [
+  // ── Dev / infra ──────────────────────────────────────────────────────
+  {id:'github',       label:'GitHub',         svg:'github'},
+  {id:'gitlab',       label:'GitLab',         svg:null,letter:'GL',bg:'#FC6D26'},
+  {id:'bitbucket',    label:'Bitbucket',      svg:null,letter:'⎇', bg:'#0052CC'},
+  {id:'docker',       label:'Docker',         svg:'docker'},
+  {id:'cloudflare',   label:'Cloudflare',     svg:'cloudflare'},
+  {id:'digitalocean', label:'DigitalOcean',   svg:null,letter:'DO',bg:'#0080FF'},
+  {id:'hetzner',      label:'Hetzner',        svg:null,letter:'H', bg:'#D50C2D'},
+  {id:'vercel',       label:'Vercel',         svg:null,letter:'▲', bg:'#111'},
+  {id:'netlify',      label:'Netlify',        svg:null,letter:'◈', bg:'#00C7B7'},
+  {id:'aws',          label:'AWS',            svg:null,letter:'⛅',bg:'#FF9900'},
+  {id:'azure',        label:'Azure',          svg:null,letter:'Az',bg:'#0078D4'},
+  {id:'gcp',          label:'Google Cloud',   svg:null,letter:'GC',bg:'#4285F4'},
+  {id:'linode',       label:'Linode / Akamai',svg:null,letter:'L', bg:'#00A95C'},
+  {id:'vultr',        label:'Vultr',          svg:null,letter:'V', bg:'#007BFC'},
+  {id:'tailscale',    label:'Tailscale',       svg:null,letter:'T', bg:'#242424'},
+  // ── Productivity / notes ──────────────────────────────────────────────
+  {id:'notion',       label:'Notion',         svg:'notion'},
+  {id:'obsidian',     label:'Obsidian',       svg:null,letter:'⟁', bg:'#7C3AED'},
+  {id:'notesnook',    label:'Notesnook',      svg:null,letter:'Nn',bg:'#008837'},
+  {id:'joplin',       label:'Joplin',         svg:null,letter:'J', bg:'#2CB5E8'},
+  {id:'standardnotes',label:'Standard Notes', svg:null,letter:'SN',bg:'#0D6EFD'},
+  // ── OS / platforms ────────────────────────────────────────────────────
+  {id:'windows',      label:'Windows',        svg:'windows'},
+  {id:'apple',        label:'Apple / macOS',  svg:'apple'},
+  {id:'linux',        label:'Linux',          svg:null,letter:'🐧',bg:'#333'},
+  {id:'ubuntu',       label:'Ubuntu',         svg:null,letter:'U', bg:'#E95420'},
+  {id:'android',      label:'Android',        svg:null,letter:'⚙', bg:'#3DDC84'},
+  // ── Messaging / social ────────────────────────────────────────────────
+  {id:'discord',      label:'Discord',        svg:'discord'},
+  {id:'telegram',     label:'Telegram',       svg:'telegram'},
+  {id:'signal',       label:'Signal',         svg:'signal'},
+  {id:'slack',        label:'Slack',          svg:'slack'},
+  {id:'whatsapp',     label:'WhatsApp',       svg:null,letter:'W', bg:'#25D366'},
+  {id:'messenger',    label:'Messenger',      svg:null,letter:'m', bg:'#0084FF'},
+  {id:'matrix',       label:'Matrix / Element',svg:null,letter:'M',bg:'#0DBD8B'},
+  {id:'mastodon',     label:'Mastodon',       svg:null,letter:'M', bg:'#6364FF'},
+  {id:'twitter',      label:'X / Twitter',    svg:'twitter'},
+  {id:'reddit',       label:'Reddit',         svg:'reddit'},
+  {id:'facebook',     label:'Facebook',       svg:'facebook'},
+  {id:'instagram',    label:'Instagram',      svg:'instagram'},
+  {id:'linkedin',     label:'LinkedIn',       svg:'linkedin'},
+  {id:'youtube',      label:'YouTube',        svg:'youtube'},
+  {id:'twitch',       label:'Twitch',         svg:'twitch'},
+  {id:'tiktok',       label:'TikTok',         svg:null,letter:'Tt',bg:'#010101'},
+  // ── Email / Google ────────────────────────────────────────────────────
+  {id:'google',       label:'Google',         svg:'google'},
+  {id:'gmail',        label:'Gmail',          svg:null,letter:'M', bg:'#EA4335'},
+  {id:'proton',       label:'Proton Mail',    svg:'proton'},
+  {id:'tutanota',     label:'Tuta',           svg:null,letter:'Tu',bg:'#C80000'},
+  {id:'fastmail',     label:'Fastmail',       svg:null,letter:'Fm',bg:'#0068FF'},
+  {id:'microsoft',    label:'Microsoft',      svg:'microsoft'},
+  {id:'outlook',      label:'Outlook',        svg:null,letter:'Ot',bg:'#0078D4'},
+  // ── Password managers / auth ──────────────────────────────────────────
+  {id:'bitwarden',    label:'Bitwarden',      svg:'bitwarden'},
+  {id:'1password',    label:'1Password',      svg:null,letter:'1', bg:'#1A8CFF'},
+  {id:'keepass',      label:'KeePass',        svg:null,letter:'KP',bg:'#6CAC4D'},
+  {id:'authy',        label:'Authy',          svg:null,letter:'A', bg:'#EC1C24'},
+  {id:'aegis',        label:'Aegis',          svg:null,letter:'Ae',bg:'#F96900'},
+  // ── Finance / crypto ──────────────────────────────────────────────────
+  {id:'paypal',       label:'PayPal',         svg:'paypal'},
+  {id:'stripe',       label:'Stripe',         svg:'stripe'},
+  {id:'binance',      label:'Binance',        svg:null,letter:'B', bg:'#F3BA2F'},
+  {id:'coinbase',     label:'Coinbase',       svg:null,letter:'C', bg:'#0052FF'},
+  {id:'kraken',       label:'Kraken',         svg:null,letter:'Kr',bg:'#5741D9'},
+  {id:'revolut',      label:'Revolut',        svg:null,letter:'R', bg:'#191C1F'},
+  // ── Cloud storage / files ─────────────────────────────────────────────
+  {id:'dropbox',      label:'Dropbox',        svg:'dropbox'},
+  {id:'gdrive',       label:'Google Drive',   svg:null,letter:'G▸',bg:'#34A853'},
+  {id:'onedrive',     label:'OneDrive',       svg:null,letter:'⬡', bg:'#0078D4'},
+  {id:'nextcloud',    label:'Nextcloud',      svg:'nextcloud'},
+  {id:'synology',     label:'Synology',       svg:null,letter:'Sy',bg:'#444'},
+  {id:'backblaze',    label:'Backblaze',      svg:null,letter:'B', bg:'#EF3B2C'},
+  // ── Entertainment / media ─────────────────────────────────────────────
+  {id:'netflix',      label:'Netflix',        svg:'netflix'},
+  {id:'spotify',      label:'Spotify',        svg:'spotify'},
+  {id:'steam',        label:'Steam',          svg:'steam'},
+  {id:'epic',         label:'Epic Games',     svg:null,letter:'E', bg:'#313131'},
+  {id:'gog',          label:'GOG',            svg:null,letter:'G', bg:'#7B2FBE'},
+  {id:'nintendo',     label:'Nintendo',       svg:null,letter:'N', bg:'#E4000F'},
+  {id:'playstation',  label:'PlayStation',    svg:null,letter:'PS',bg:'#003087'},
+  {id:'xbox',         label:'Xbox',           svg:null,letter:'X', bg:'#107C10'},
+  // ── Privacy / VPN ─────────────────────────────────────────────────────
+  {id:'mullvad',      label:'Mullvad',        svg:null,letter:'M', bg:'#44AD4D'},
+  {id:'protonvpn',    label:'Proton VPN',     svg:null,letter:'VPN',bg:'#6D4AFF'},
+  {id:'nordvpn',      label:'NordVPN',        svg:null,letter:'N', bg:'#4687FF'},
+  {id:'ente',         label:'Ente',           svg:'ente'},
+  {id:'simplelogin',  label:'SimpleLogin',    svg:null,letter:'SL',bg:'#E85D04'},
+  // ── Domains / hosting ─────────────────────────────────────────────────
+  {id:'namecheap',    label:'Namecheap',      svg:null,letter:'NC',bg:'#DE3723'},
+  {id:'porkbun',      label:'Porkbun',        svg:null,letter:'Pb',bg:'#EF7C3D'},
+  {id:'godaddy',      label:'GoDaddy',        svg:null,letter:'GD',bg:'#1BDBAD'},
+  {id:'cloudron',     label:'Cloudron',       svg:null,letter:'Cr',bg:'#03A9F4'},
+  {id:'wordpress',    label:'WordPress',      svg:'wordpress'},
+  // ── Self-hosted / homelab ─────────────────────────────────────────────
+  {id:'proxmox',      label:'Proxmox',        svg:null,letter:'Px',bg:'#E57000'},
+  {id:'truenas',      label:'TrueNAS',        svg:null,letter:'TN',bg:'#0095D5'},
+  {id:'homeassistant',label:'Home Assistant', svg:'homeassistant'},
+  {id:'portainer',    label:'Portainer',      svg:null,letter:'Po',bg:'#13BEF9'},
+  {id:'pihole',       label:'Pi-hole',        svg:null,letter:'π', bg:'#CC0000'},
+  {id:'zoom',         label:'Zoom',           svg:null,letter:'Z', bg:'#2D8CFF'},
+  {id:'amazon',       label:'Amazon',         svg:null,letter:'a', bg:'#FF9900'},
+  // ── Catch-all ─────────────────────────────────────────────────────────
+  {id:'other',        label:'Other',          svg:null,letter:'?', bg:'rgba(255,255,255,.15)'},
+];
+
+function makeIcon(ic, size=22) {
+  if (!ic) return letterAvatar('?', 'rgba(255,255,255,.15)', size);
+  if (ic.svg && SVG[ic.svg]) {
+    return `<div style="width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;color:#fff">${SVG[ic.svg].replace('<svg ','<svg width="'+size+'" height="'+size+'" ')}</div>`;
+  }
+  return letterAvatar(ic.letter ?? ic.label[0], ic.bg ?? 'rgba(255,255,255,.15)', size);
+}
+function letterAvatar(letter, bg, size=22) {
+  const fs = Math.round(size * (letter.length > 1 ? 0.38 : 0.5));
+  return `<div style="width:${size}px;height:${size}px;border-radius:${Math.round(size*0.3)}px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:700;color:#fff;line-height:1;flex-shrink:0;font-family:system-ui,sans-serif">${letter}</div>`;
+}
+function iconHTMLById(id, size=22) {
+  return makeIcon(ICONS.find(i => i.id === id) || null, size);
+}
+
+let selectedIcon='other', selectedColor='white';
+const COLOR_BORDER={white:'',red:'rgba(255,107,107,.55)',amber:'rgba(251,191,36,.55)',blue:'rgba(96,165,250,.55)',purple:'rgba(167,139,250,.55)',green:'rgba(52,211,153,.55)'};
+
+function renderIconGrid(filter=''){
+  const grid=document.getElementById('icon-grid');if(!grid)return;
+  const f=filter?ICONS.filter(i=>i.label.toLowerCase().includes(filter.toLowerCase())):ICONS;
+  grid.innerHTML=f.map(ic=>`<div class="icon-option${selectedIcon===ic.id?' selected':''}" onclick="selectIconOpt('${ic.id}',this)" title="${ic.label}">${makeIcon(ic,15)}</div>`).join('');
+}
+function selectIconOpt(id,el){
+  selectedIcon=id;
+  document.querySelectorAll('.icon-option').forEach(e=>e.classList.remove('selected'));
+  if(el)el.classList.add('selected');
+}
+function selectColor(c,el){
+  selectedColor=c;
+  document.querySelectorAll('.csw').forEach(s=>s.classList.remove('selected'));
+  if(el)el.classList.add('selected');
+}
+function resetColorSwatches(c='white'){
+  selectedColor=c;
+  document.querySelectorAll('.csw').forEach(s=>s.classList.toggle('selected',s.dataset.c===c));
+}
+
+let _lastAutoName='';
+function autoDetectIcon(name){
+  if(!name||name===_lastAutoName)return;
+  _lastAutoName=name;
+  const q=name.toLowerCase().trim();
+  let m=ICONS.find(i=>i.label.toLowerCase()===q||i.id===q);
+  if(!m)m=ICONS.find(i=>i.label.toLowerCase().startsWith(q));
+  if(!m)m=ICONS.find(i=>i.label.toLowerCase().includes(q)||i.id.includes(q));
+  if(m&&m.id!=='other'){
+    selectedIcon=m.id;
+    renderIconGrid(document.getElementById('icon-search')?.value||'');
+  }
+}
+
+// ── TYPE CONFIG ──────────────────────────────────
+const TYPE_CFG={
+  recovery:   {label:'Recovery Codes', ph:'xxxx-xxxx-xxxx',          hint:'One code per line, or paste all at once'},
+  passphrase: {label:'Passphrases',    ph:'correct horse battery',   hint:'One passphrase per line'},
+  bitlocker:  {label:'BitLocker Keys', ph:'XXXXXX-XXXXXX-XXXXXX…',   hint:'48-digit key — auto-formatted into groups'},
+  other:      {label:'Keys / Codes',   ph:'Enter key or code',        hint:'One entry per line'},
+};
+function onTypeChange(){
+  const t=document.getElementById('f-type').value,cfg=TYPE_CFG[t]||TYPE_CFG.other;
+  const lbl=document.getElementById('codes-label'),inp=document.getElementById('code-entry'),hint=document.getElementById('code-hint');
+  if(lbl)lbl.innerHTML=`${cfg.label} <small>Press Enter after each</small>`;
+  if(inp)inp.placeholder=cfg.ph;
+  if(hint)hint.textContent=cfg.hint;
+}
+
+// ── CODE CHIP INPUT ──────────────────────────────────
+let pendingCodes=[];
+function setupCodeInput(){
+  const inp=document.getElementById('code-entry');if(!inp)return;
+  const fresh=inp.cloneNode(true);inp.parentNode.replaceChild(fresh,inp);
+  const el=document.getElementById('code-entry');
+  el.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key==='Tab'){e.preventDefault();const v=this.value.trim();if(v){addPendingCodes(v);this.value=''}}
+  });
+  el.addEventListener('paste',function(e){
+    e.preventDefault();addPendingCodes((e.clipboardData||window.clipboardData).getData('text'));this.value='';
+  });
+}
+function fmtBitLocker(raw){
+  const c=raw.replace(/[^0-9A-Fa-f]/g,''),g=[];
+  for(let i=0;i<c.length;i+=6)g.push(c.slice(i,i+6).toUpperCase());
+  return g.join('-');
+}
+function addPendingCodes(text){
+  const type=document.getElementById('f-type')?.value;
+  let added=0;
+  text.split(/[\n\r,;]+/).map(c=>c.trim()).filter(Boolean).forEach(c=>{
+    const f=type==='bitlocker'?fmtBitLocker(c):c;
+    if(f&&!pendingCodes.includes(f)){pendingCodes.push(f);added++}
+  });
+  renderPendingChips();return added;
+}
+function removePending(i){pendingCodes.splice(i,1);renderPendingChips()}
+function renderPendingChips(){
+  const w=document.getElementById('codes-chips');if(!w)return;
+  w.innerHTML=pendingCodes.map((c,i)=>`<div class="code-input-chip"><span class="chip-text">${esc(c)}</span><span class="chip-remove" onclick="removePending(${i})">✕</span></div>`).join('');
+}
+
+// ── FILE UPLOAD + PREVIEW/EDIT PAGE ──────────────────────────────────
+let _fppCodes=[];
+function handleFile(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const text=ev.target.result;
+    let codes=[];
+    try{
+      const j=JSON.parse(text);
+      if(Array.isArray(j))codes=j.map(x=>typeof x==='string'?x:(x.code||x.key||x.value||'').toString()).filter(Boolean);
+      else if(j.codes)codes=j.codes.map(x=>typeof x==='string'?x:x.code||'').filter(Boolean);
+      else if(j.keys)codes=j.keys.map(x=>typeof x==='string'?x:x.key||'').filter(Boolean);
+      else if(j.recovery_codes)codes=j.recovery_codes.map(x=>typeof x==='string'?x:x.code||'').filter(Boolean);
+    }catch{codes=text.split(/[\n\r]+/).map(c=>c.trim()).filter(c=>c.length>2&&!c.startsWith('#')&&!c.startsWith('//'))}
+    if(!codes.length){
+      document.getElementById('upload-result').innerHTML=`<div class="upload-result-box" style="color:#ff6b6b">Could not find any codes in this file.</div>`;
+      return;
+    }
+    // Open the file preview/edit page instead of showing inline
+    openFPP(file.name,codes);
+    document.getElementById('file-input').value='';
+    document.getElementById('upload-result').innerHTML='';
+  };
+  reader.readAsText(file);
+}
+
+function openFPP(filename,codes){
+  _fppCodes=[...codes];
+  document.getElementById('fpp-filename').textContent=`${filename} — ${codes.length} codes found`;
+  renderFPPList();
+  document.getElementById('file-preview-page').classList.add('open');
+}
+function closeFPP(){
+  document.getElementById('file-preview-page').classList.remove('open');
+  _fppCodes=[];
+}
+function renderFPPList(){
+  const list=document.getElementById('fpp-code-list');
+  list.innerHTML=_fppCodes.map((c,i)=>`
+    <div class="fpp-code-row" style="animation-delay:${i*.02}s">
+      <input type="text" value="${esc(c)}" onchange="_fppCodes[${i}]=this.value" autocomplete="off"/>
+      <span class="fpp-del" onclick="fppRemove(${i})" title="Remove">✕</span>
+    </div>`).join('');
+}
+function fppRemove(i){
+  _fppCodes.splice(i,1);
+  document.getElementById('fpp-filename').textContent=`${_fppCodes.length} codes`;
+  renderFPPList();
+}
+function fppAddCode(){
+  const inp=document.getElementById('fpp-new-code');
+  const v=inp.value.trim();if(!v)return;
+  _fppCodes.push(v);inp.value='';
+  renderFPPList();
+}
+function fppConfirm(){
+  // Sync any live edits from input fields first
+  document.querySelectorAll('#fpp-list .fpp-row input,#fpp-code-list .fpp-code-row input').forEach((inp,i)=>{if(i<_fppCodes.length)_fppCodes[i]=inp.value.trim()});
+  _fppCodes=_fppCodes.filter(Boolean);
+  const type=document.getElementById('f-type')?.value;
+  let added=0;
+  _fppCodes.forEach(c=>{
+    const f=type==='bitlocker'?fmtBitLocker(c):c;
+    if(f&&!pendingCodes.includes(f)){pendingCodes.push(f);added++}
+  });
+  renderPendingChips();
+  closeFPP();
+  showToast(`Added ${added} code${added!==1?'s':''} from file`);
+}
+
+// Drag and drop
+document.getElementById('upload-zone')?.addEventListener('dragover',e=>{e.preventDefault();e.currentTarget.classList.add('drag')});
+document.getElementById('upload-zone')?.addEventListener('dragleave',e=>e.currentTarget.classList.remove('drag'));
+document.getElementById('upload-zone')?.addEventListener('drop',e=>{
+  e.preventDefault();e.currentTarget.classList.remove('drag');
+  const f=e.dataTransfer.files[0];if(f)handleFile({files:[f]});
+});
+
+// ── CRYPTO ──────────────────────────────────
+async function deriveKey(pw,salt){
+  const enc=new TextEncoder(),km=await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:310000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function encryptData(data,pw){
+  const salt=crypto.getRandomValues(new Uint8Array(32)),iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(pw,salt),enc=new TextEncoder();
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(JSON.stringify(data)));
+  const out=new Uint8Array(32+12+ct.byteLength);
+  out.set(salt,0);out.set(iv,32);out.set(new Uint8Array(ct),44);
+  return btoa(String.fromCharCode(...out));
+}
+async function decryptData(b64,pw){
+  const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+  const key=await deriveKey(pw,raw.slice(0,32));
+  const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:raw.slice(32,44)},key,raw.slice(44));
+  return JSON.parse(new TextDecoder().decode(dec));
+}
+
+// ── VAULT STORAGE ──────────────────────────────────
+const LS_KEY='andromeda_vault';
+let state={unlocked:false,password:'',entries:[],filter:'all',userName:'User'};
+
+async function saveVault(){
+  if(!state.password)return;
+  const blob=await encryptData({entries:state.entries,userName:state.userName},state.password);
+  localStorage.setItem(LS_KEY,blob);
+  try{await fetch('/api/vault/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({blob})})}catch{}
+}
+async function loadVault(){
+  try{const res=await fetch('/api/vault/load');if(res.ok){const d=await res.json();if(d.blob)return decryptData(d.blob,state.password)}}catch{}
+  const raw=localStorage.getItem(LS_KEY);
+  if(!raw)throw new Error('no vault');
+  return decryptData(raw,state.password);
+}
+function hasVault(){return!!localStorage.getItem(LS_KEY)}
+
+// ── INIT / NAVIGATION ──────────────────────────────────
+async function init(){
+  if(hasVault()){
+    showAppLocked();return;
+  }
+  try{const res=await fetch('/api/vault/exists');if(res.ok){const d=await res.json();if(d.exists){showAppLocked();return}}}catch{}
+}
+function showAppLocked(){
+  document.getElementById('welcome-page').style.display='none';
+  document.getElementById('app-page').classList.add('active');
+  document.getElementById('lock-overlay').classList.add('active');
+  // Push history state so browser back button locks vault, not navigates to welcome
+  if(history.state?.page!=='vault') history.pushState({page:'vault'},'',location.href);
+}
+// Intercept browser back — lock vault instead of going back to welcome/setup
+window.addEventListener('popstate',function(){
+  const app=document.getElementById('app-page');
+  if(app&&app.classList.contains('active')){
+    lockVault();
+    history.pushState({page:'vault'},'',location.href);
+  }
+});
+init();
+
+// Pause ALL SVG animations while user is typing — eliminates any remaining flicker
+document.addEventListener('focusin', function(e){
+  if(e.target.matches('input,textarea,select')){
+    try{ document.getElementById('star-svg')?.pauseAnimations(); }catch(e){}
+  }
+});
+document.addEventListener('focusout', function(e){
+  if(e.target.matches('input,textarea,select')){
+    if(!_starsPaused) try{ document.getElementById('star-svg')?.unpauseAnimations(); }catch(e){}
+  }
+});
+
+async function navigateToApp(){
+  if(hasVault()){showAppLocked();return}
+  try{const res=await fetch('/api/vault/exists');if(res.ok){const d=await res.json();if(d.exists){showAppLocked();return}}}catch{}
+  document.getElementById('welcome-page').style.display='none';
+  showSetupModal();
+}
+
+// ── SETUP ──────────────────────────────────
+let _setupPw='';
+function showSetupModal(){
+  const div=document.createElement('div');
+  div.className='setup-overlay';div.id='setup-overlay';
+  div.innerHTML=`<div class="setup-card">
+    <div class="step-bar"><div class="step-seg active" id="ss0"></div><div class="step-seg" id="ss1"></div><div class="step-seg" id="ss2"></div></div>
+    <div class="setup-step active" id="st0">
+      <div class="setup-title">Welcome to<br/>Andromeda</div>
+      <div class="setup-sub">Set up your encrypted vault in 30 seconds.</div>
+      <button class="btn-next" onclick="setupGo(1)">Get Started →</button>
+    </div>
+    <div class="setup-step" id="st1">
+      <div class="setup-title">Master password</div>
+      <div class="setup-sub">Encrypts everything. No recovery option — store it safely.</div>
+      <label class="form-label">Password</label>
+      <div class="pw-wrap"><input class="form-input" type="password" id="spw1" placeholder="Choose a strong password…"/><button class="pw-toggle" onclick="togglePw('spw1',this)">👁</button></div>
+      <label class="form-label">Confirm</label>
+      <div class="pw-wrap"><input class="form-input" type="password" id="spw2" placeholder="Repeat password…"/><button class="pw-toggle" onclick="togglePw('spw2',this)">👁</button></div>
+      <div id="setup-err" style="color:#ff6b6b;font-size:.76rem;min-height:1em;margin-bottom:.9rem"></div>
+      <div style="display:flex;gap:.5rem"><button class="btn-back" onclick="setupGo(0)">← Back</button><button class="btn-next" onclick="setupGo(2)">Continue →</button></div>
+    </div>
+    <div class="setup-step" id="st2">
+      <div class="setup-title">All set!</div>
+      <div class="setup-sub">Your encrypted vault is ready.</div>
+      <div style="font-size:2.8rem;text-align:center;margin:1.5rem 0;opacity:.5">🔐</div>
+      <div id="setup-err" style="color:#ff6b6b;font-size:.76rem;min-height:1em;margin-bottom:.85rem;line-height:1.45"></div>
+      <button class="btn-next" style="width:100%" onclick="finishSetup()">Open Vault →</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+  pauseStars();
+}
+function setupGo(step){
+  if(step===2){
+    const p1=document.getElementById('spw1').value,p2=document.getElementById('spw2').value;
+    if(p1.length<6){document.getElementById('setup-err').textContent='Minimum 6 characters';return}
+    if(p1!==p2){document.getElementById('setup-err').textContent='Passwords do not match';return}
+    _setupPw=p1;
+  }
+  for(let i=0;i<3;i++){
+    document.getElementById('st'+i)?.classList.remove('active');
+    const sg=document.getElementById('ss'+i);if(sg){sg.classList.remove('active','done');if(i<step)sg.classList.add('done')}
+  }
+  document.getElementById('st'+step)?.classList.add('active');
+  document.getElementById('ss'+step)?.classList.add('active');
+}
+async function finishSetup(){
+  // Check crypto.subtle before trying to encrypt
+  if(typeof crypto==='undefined'||!crypto.subtle){
+    const err=document.getElementById('setup-err');
+    if(err)err.innerHTML='<strong>⚠ Encryption not available.</strong><br>Open this page via <strong>https://</strong> — accept the certificate warning once.';
+    return;
+  }
+  const btn=document.querySelector('#setup-overlay .btn-next[onclick*=finishSetup]');
+  if(btn){btn.textContent='Creating vault…';btn.disabled=true;}
+  try{
+    state.password=_setupPw;state.entries=[];state.unlocked=true;
+    await saveVault();
+    document.getElementById('setup-overlay')?.remove();
+    document.getElementById('app-page').classList.add('active');
+    document.getElementById('lock-overlay').classList.remove('active');
+    resumeStars();
+    renderEntries();
+    showToast('Vault created ✓');
+  }catch(err){
+    console.error('finishSetup error:',err);
+    const errEl=document.getElementById('setup-err');
+    if(errEl)errEl.textContent='Error: '+(err.message||'encryption failed. Use HTTPS.');
+    if(btn){btn.textContent='Open Vault →';btn.disabled=false;}
+    state.password='';state.unlocked=false;
+  }
+}
+
+// ── LOCK / UNLOCK ──────────────────────────────────
+async function unlockVault(){
+  const pw=document.getElementById('unlock-pw').value;if(!pw)return;
+  const btn=document.getElementById('unlock-btn');
+  btn.textContent='Unlocking…';btn.disabled=true;
+  try{
+    state.password=pw;
+    const vault=await loadVault();
+    state.entries=vault.entries||[];state.unlocked=true;
+    state.userName=vault.userName||state.userName||'User';
+    document.getElementById('lock-overlay').classList.remove('active');
+    document.getElementById('unlock-pw').value='';
+    document.getElementById('unlock-error').textContent='';
+    updateWelcome();
+    renderEntries();
+  }catch(e){
+    if(!crypto?.subtle){
+      document.getElementById('unlock-error').innerHTML='Use <strong>https://</strong>'+location.host+' — plain HTTP blocks encryption.';
     } else {
-      ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+      document.getElementById('unlock-error').textContent='Incorrect password';
     }
-    ctx.globalAlpha=1;
-  });
-  requestAnimationFrame(draw);
+    state.password='';
+  }finally{btn.textContent='Unlock';btn.disabled=false}
 }
-resize(); init(); draw();
-window.addEventListener('resize',()=>{resize();init();});
-
-// Cursor
-const cur = document.getElementById('cursor');
-document.addEventListener('mousemove', e => { cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
-document.addEventListener('mouseover', e => { if (e.target.matches('a,button,.feat-row,.nav-link')) cur.classList.add('h'); });
-document.addEventListener('mouseout', e => { if (e.target.matches('a,button,.feat-row,.nav-link')) cur.classList.remove('h'); });
-
-// Copy buttons
-function copyCode(btn) {
-  const pre = btn.closest('.code-block').querySelector('pre');
-  navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
-    btn.textContent = 'Copied!';
-    showToast('Copied to clipboard');
-    setTimeout(() => btn.textContent='Copy', 2000);
-  });
+function lockVault(){
+  state.password='';state.unlocked=false;state.entries=[];
+  document.getElementById('lock-overlay').classList.add('active');
+  document.getElementById('unlock-pw').value='';
+  document.getElementById('unlock-error').textContent='';
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
-}
-
-// Active nav on scroll
-const sections = document.querySelectorAll('[id]');
-const links = document.querySelectorAll('.nav-link');
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      links.forEach(l => l.classList.remove('active'));
-      const active = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
-      if (active) active.classList.add('active');
+// ── CRUD ──────────────────────────────────
+async function saveEntry(){
+  const inp=document.getElementById('code-entry');
+  if(inp&&inp.value.trim()){addPendingCodes(inp.value.trim());inp.value=''}
+  const name=document.getElementById('f-name').value.trim();
+  const type=document.getElementById('f-type').value;
+  const notes=document.getElementById('f-notes').value.trim();
+  const editId=document.getElementById('edit-id').value;
+  if(!name){showToast('Enter a service name');return}
+  if(!pendingCodes.length){showToast('Add at least one code');return}
+  const btn=document.getElementById('save-btn');
+  btn.textContent='Saving…';btn.disabled=true;
+  try{
+    const codes=pendingCodes.map(c=>({code:c,used:false}));
+    const entry={name,type,codes,notes,icon:selectedIcon,color:selectedColor};
+    if(editId){
+      const idx=state.entries.findIndex(e=>e.id===editId);
+      if(idx>-1){
+        const old=state.entries[idx].codes||[];
+        entry.codes=codes.map(c=>{const o=old.find(x=>x.code===c.code);return o?{...c,used:o.used}:c});
+        entry.pinned=state.entries[idx].pinned||false;
+        state.entries[idx]={...state.entries[idx],...entry,updatedAt:new Date().toISOString()};
+      }
+    }else{
+      state.entries.push({id:crypto.randomUUID(),...entry,pinned:false,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
     }
+    await saveVault();
+    closeModal();renderEntries();
+    showToast(editId?'Entry updated ✓':'Entry saved ✓');
+  }catch(err){console.error(err);showToast('Error saving — check console')}
+  finally{btn.textContent='Save Entry';btn.disabled=false}
+}
+async function deleteEntry(id){
+  const ok=await showConfirm('Delete this entry permanently? This cannot be undone.');
+  if(!ok)return;
+  state.entries=state.entries.filter(e=>e.id!==id);
+  saveVault();renderEntries();showToast('Deleted');
+}
+function toggleCodeUsed(entryId,idx){
+  const e=state.entries.find(e=>e.id===entryId);if(!e)return;
+  e.codes[idx].used=!e.codes[idx].used;
+  saveVault();renderEntries();
+}
+function togglePin(id){
+  const e=state.entries.find(e=>e.id===id);if(!e)return;
+  e.pinned=!e.pinned;saveVault();renderEntries();
+  showToast(e.pinned?'📌 Pinned':'Unpinned');
+}
+
+// ── SIDEBAR + RENDER ──────────────────────────────────
+let sidebarOpen=true;
+const TITLE_MAP={all:'All entries',pinned:'Pinned',recovery:'Recovery Codes',passphrase:'Passphrases',bitlocker:'BitLocker',other:'Other'};
+
+function toggleSidebar(){
+  sidebarOpen=!sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed',!sidebarOpen);
+}
+
+function setSidebarFilter(f,el){
+  state.filter=f;
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.fc').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(f==='all'?'all':f.slice(0,4))));
+  const titleEl=document.getElementById('content-title');
+  if(titleEl)titleEl.textContent=TITLE_MAP[f]||f;
+  renderEntries();
+}
+
+function updateCounts(){
+  const e=state.entries;
+  const m={all:e.length,pinned:e.filter(x=>x.pinned).length,recovery:e.filter(x=>x.type==='recovery').length,passphrase:e.filter(x=>x.type==='passphrase').length,bitlocker:e.filter(x=>x.type==='bitlocker').length,other:e.filter(x=>x.type==='other').length};
+  Object.entries(m).forEach(([k,v])=>{const el=document.getElementById('sc-'+k);if(el)el.textContent=v||''});
+  const meta=document.getElementById('content-meta');
+  if(meta){
+    const f=state.filter,cnt=f==='all'?e.length:f==='pinned'?m.pinned:(m[f]||0);
+    meta.textContent=cnt===1?'1 entry':`${cnt} entries`;
+  }
+}
+
+function renderEntries(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  let filtered=state.entries.filter(e=>{
+    if(state.filter==='pinned')return e.pinned;
+    if(state.filter!=='all'&&e.type!==state.filter)return false;
+    if(q&&!e.name.toLowerCase().includes(q)&&!(e.notes||'').toLowerCase().includes(q))return false;
+    return true;
   });
-}, { rootMargin: '-20% 0px -70% 0px' });
-sections.forEach(s => obs.observe(s));
+  if(state.filter!=='pinned')filtered=[...filtered.filter(e=>e.pinned),...filtered.filter(e=>!e.pinned)];
+
+  const grid=document.getElementById('entries-grid');if(!grid)return;
+  if(!filtered.length){
+    grid.innerHTML=`<div class="empty-state"><div class="empty-icon">◎</div><div class="empty-title">${q||state.filter!=='all'?'No results found':'Your vault is empty'}</div><div class="empty-sub">${q||state.filter!=='all'?'Try a different search or filter':'Click + Add Entry to get started'}</div></div>`;
+    updateCounts();return;
+  }
+
+  grid.innerHTML=filtered.map((e,i)=>{
+    const used=e.codes.filter(c=>c.used).length,total=e.codes.length,rem=total-used;
+    const date=new Date(e.createdAt).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    const noToggle=e.type==='passphrase'||e.type==='bitlocker';
+    const codes=e.codes.map((c,ci)=>`<div class="code-chip${c.used&&!noToggle?' used':''} ${noToggle?'no-toggle':''}" onclick="${noToggle?`copyChipText(this,'${e.id}',${ci})`:`toggleCodeUsed('${e.id}',${ci})`}">
+      <span class="code-chip-text">${esc(c.code)}</span>${noToggle?'<span class="copy-hint">copy</span>':`<span class="code-tick">${c.used?'↩':'✓'}</span>`}
+    </div>`).join('');
+    const cbcls=e.color&&e.color!=='white'?` cb-${e.color}`:'';
+    return`<div class="entry-card${e.pinned?' pinned':''}${cbcls}" data-id="${e.id}" style="animation-delay:${i*.035}s">
+      ${e.pinned?'<span class="pin-badge">📌</span>':''}
+      <div class="card-header">
+        <div class="card-icon">${iconHTMLById(e.icon,22)}</div>
+        <div class="card-meta"><div class="card-name">${esc(e.name)}</div><div class="card-note">${e.notes?esc(e.notes):'<span style="opacity:.22">No notes</span>'}</div></div>
+        <div class="card-actions">
+          <div class="ca${e.pinned?' pin-on':''}" onclick="togglePin('${e.id}')" title="${e.pinned?'Unpin':'Pin'}"><svg width="11" height="11" viewBox="0 0 24 24" fill="${e.pinned?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div class="ca" onclick="copyAll('${e.id}')" title="Copy unused codes"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div>
+          <div class="ca" onclick="editEntry('${e.id}')" title="Edit"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+          <div class="ca del" onclick="deleteEntry('${e.id}')" title="Delete"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+        </div>
+      </div>
+      <div class="codes-list">${codes}</div>
+      <div class="card-footer"><div class="card-rem">${noToggle?date:`${rem}/${total} remaining · ${date}`}</div><div class="type-badge">${e.type}</div></div>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('.entry-card').forEach(attachCardGlow);
+  updateCounts();
+}
+
+// ── MODAL OPEN/CLOSE ──────────────────────────────────
+function openAddModal(){
+  selectedIcon='other';selectedColor='white';pendingCodes=[];_lastAutoName='';
+  document.getElementById('modal-title').textContent='Add Entry';
+  document.getElementById('edit-id').value='';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-type').value='recovery';
+  document.getElementById('f-notes').value='';
+  document.getElementById('icon-search').value='';
+  document.getElementById('upload-result').innerHTML='';
+  document.getElementById('file-input').value='';
+  renderIconGrid();renderPendingChips();onTypeChange();resetColorSwatches();
+  document.getElementById('modal').classList.add('open');
+  pauseStars();setupCodeInput();
+  setTimeout(()=>document.getElementById('f-name').focus(),80);
+}
+function editEntry(id){
+  const e=state.entries.find(e=>e.id===id);if(!e)return;
+  selectedIcon=e.icon||'other';selectedColor=e.color||'white';
+  pendingCodes=e.codes.map(c=>c.code);_lastAutoName=e.name;
+  document.getElementById('modal-title').textContent='Edit Entry';
+  document.getElementById('edit-id').value=e.id;
+  document.getElementById('f-name').value=e.name;
+  document.getElementById('f-type').value=e.type;
+  document.getElementById('f-notes').value=e.notes||'';
+  document.getElementById('icon-search').value='';
+  document.getElementById('upload-result').innerHTML='';
+  document.getElementById('file-input').value='';
+  renderIconGrid();renderPendingChips();onTypeChange();resetColorSwatches(e.color||'white');
+  document.getElementById('modal').classList.add('open');
+  pauseStars();setupCodeInput();
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  pendingCodes=[];resumeStars();
+}
+
+// ── UTILS ──────────────────────────────────
+function copyAll(id){
+  const e=state.entries.find(e=>e.id===id);if(!e)return;
+  const codes=e.codes.filter(c=>!c.used).map(c=>c.code).join('\n');
+  navigator.clipboard.writeText(codes).then(()=>showToast(`Copied ${e.codes.filter(c=>!c.used).length} codes`));
+}
+function copyChipText(el,entryId,idx){
+  const e=state.entries.find(e=>e.id===entryId);if(!e)return;
+  const text=e.codes[idx]?.code;if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>{
+    // Flash the chip green briefly
+    el.style.transition='background .15s,border-color .15s';
+    el.style.background='rgba(52,211,153,.18)';
+    el.style.borderColor='rgba(52,211,153,.5)';
+    setTimeout(()=>{el.style.background='';el.style.borderColor='';},700);
+    showToast('Copied to clipboard ✓');
+  }).catch(()=>showToast('Copy failed'));
+}
+// ── SETTINGS PANEL ──────────────────────────────────────────────────────────
+function openSettings(){
+  if(document.getElementById('settings-panel')) return;
+  const panel = document.createElement('div');
+  panel.id = 'settings-panel';
+  const uname = state.userName || 'User';
+  panel.innerHTML = `
+    <div id="sp-overlay" onclick="closeSettings()" style="position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)"></div>
+    <div id="sp-drawer" style="position:fixed;right:0;top:0;bottom:0;width:360px;z-index:301;background:rgba(10,10,10,.98);border-left:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;animation:slideInRight .25s cubic-bezier(.4,0,.2,1)">
+      <div style="padding:1.4rem 1.6rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem">Settings</div>
+        <button onclick="closeSettings()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:1.1rem;cursor:pointer;transition:color .15s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'">✕</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:1.4rem 1.6rem;display:flex;flex-direction:column;gap:1.6rem">
+
+        <div>
+          <div style="font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:.75rem">Identity</div>
+          <label style="display:block;font-size:.68rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:.38rem">Your name</label>
+          <input id="sp-name" type="text" value="${esc(uname)}" placeholder="Your name…" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:10px;padding:.68rem .9rem;color:#fff;font-family:Outfit,sans-serif;font-size:.85rem;outline:none;transition:border-color .18s" onfocus="this.style.borderColor='rgba(255,255,255,.32)'" onblur="this.style.borderColor='rgba(255,255,255,.11)'" autocomplete="off"/>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.2);margin-top:.3rem">Shown as "Welcome home, [name]" in the vault</div>
+        </div>
+
+        <div>
+          <div style="font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:.75rem">Security</div>
+          <label style="display:block;font-size:.68rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:.38rem">New master password</label>
+          <div style="position:relative;margin-bottom:.6rem">
+            <input id="sp-pw1" type="password" placeholder="New password (min 6 chars)…" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:10px;padding:.68rem .9rem;color:#fff;font-family:Outfit,sans-serif;font-size:.85rem;outline:none;transition:border-color .18s" onfocus="this.style.borderColor='rgba(255,255,255,.32)'" onblur="this.style.borderColor='rgba(255,255,255,.11)'" autocomplete="new-password"/>
+          </div>
+          <div style="position:relative;margin-bottom:.4rem">
+            <input id="sp-pw2" type="password" placeholder="Confirm new password…" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:10px;padding:.68rem .9rem;color:#fff;font-family:Outfit,sans-serif;font-size:.85rem;outline:none;transition:border-color .18s" onfocus="this.style.borderColor='rgba(255,255,255,.32)'" onblur="this.style.borderColor='rgba(255,255,255,.11)'" autocomplete="new-password"/>
+          </div>
+          <div id="sp-pw-err" style="color:#ff6b6b;font-size:.72rem;min-height:1em;margin-bottom:.4rem"></div>
+        </div>
+
+        <div>
+          <div style="font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:.75rem">Data</div>
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <button onclick="exportVault()" style="display:flex;align-items:center;gap:.6rem;padding:.65rem .9rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:rgba(255,255,255,.6);font-family:Outfit,sans-serif;font-size:.82rem;cursor:pointer;transition:all .16s;text-align:left" onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.color='rgba(255,255,255,.6)';this.style.background='rgba(255,255,255,.06)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export vault backup</button>
+            <button onclick="triggerImport()" style="display:flex;align-items:center;gap:.6rem;padding:.65rem .9rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:rgba(255,255,255,.6);font-family:Outfit,sans-serif;font-size:.82rem;cursor:pointer;transition:all .16s;text-align:left" onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.color='rgba(255,255,255,.6)';this.style.background='rgba(255,255,255,.06)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><line x1="12" y1="3" x2="12" y2="15"/><polyline points="7 10 12 15 17 10" transform="rotate(180 12 12)"/></svg> Import vault backup</button>
+          </div>
+        </div>
+
+      </div>
+      <div style="padding:1rem 1.6rem;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:.6rem;justify-content:flex-end">
+        <button onclick="closeSettings()" style="padding:.62rem 1.3rem;background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:50px;color:rgba(255,255,255,.5);font-family:Outfit,sans-serif;font-size:.82rem;cursor:pointer;transition:all .18s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">Cancel</button>
+        <button onclick="saveSettings()" style="padding:.62rem 1.5rem;background:rgba(255,255,255,.88);border:none;border-radius:50px;color:#000;font-family:Outfit,sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#fff'" onmouseout="this.style.background='rgba(255,255,255,.88)'">Save</button>
+      </div>
+    </div>`;
+  // Add slide-in animation
+  if(!document.getElementById('sp-style')){
+    const s=document.createElement('style');s.id='sp-style';
+    s.textContent='@keyframes slideInRight{from{transform:translateX(100%)}to{transform:translateX(0)}}';
+    document.head.appendChild(s);
+  }
+  document.body.appendChild(panel);
+  pauseStars();
+  setTimeout(()=>document.getElementById('sp-name')?.focus(),80);
+}
+function closeSettings(){
+  document.getElementById('settings-panel')?.remove();
+  resumeStars();
+}
+async function saveSettings(){
+  const nameEl=document.getElementById('sp-name');
+  const pw1=document.getElementById('sp-pw1')?.value;
+  const pw2=document.getElementById('sp-pw2')?.value;
+  const errEl=document.getElementById('sp-pw-err');
+  // Save name
+  if(nameEl){state.userName=nameEl.value.trim()||'User';updateWelcome();}
+  // Change password if filled
+  if(pw1||pw2){
+    if(pw1.length<6){if(errEl)errEl.textContent='Minimum 6 characters';return;}
+    if(pw1!==pw2){if(errEl)errEl.textContent='Passwords do not match';return;}
+    state.password=pw1;
+  }
+  await saveVault();
+  closeSettings();
+  showToast('Settings saved ✓');
+}
+function updateWelcome(){
+  const el=document.getElementById('welcome-name');
+  if(el)el.textContent=state.userName||'User';
+}
+
+// ── IMPORT VAULT ──────────────────────────────────────────────────────────────
+function triggerImport(){
+  document.getElementById('import-input')?.click();
+}
+async function importVault(input){
+  const file=input.files[0];if(!file)return;
+  input.value='';
+  const reader=new FileReader();
+  reader.onload=async function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.entries||!Array.isArray(data.entries)){showToast('Invalid backup file');return;}
+      const ok=await showConfirm(`Import ${data.entries.length} entries? This will MERGE with your current vault.`);
+      if(!ok)return;
+      // Merge: add entries that don't already exist by id
+      const existingIds=new Set(state.entries.map(e=>e.id));
+      let added=0;
+      data.entries.forEach(e=>{
+        if(!existingIds.has(e.id)){state.entries.push(e);added++;}
+      });
+      await saveVault();renderEntries();
+      showToast(`Imported ${added} new entr${added===1?'y':'ies'}`);
+    }catch(err){
+      showToast('Import failed: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function exportVault(){
+  const data=JSON.stringify({entries:state.entries,exportedAt:new Date().toISOString()},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  Object.assign(document.createElement('a'),{href:url,download:`andromeda-backup-${Date.now()}.json`}).click();
+  URL.revokeObjectURL(url);showToast('Vault exported');
+}
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+function togglePw(id,btn){
+  const inp=document.getElementById(id);inp.type=inp.type==='password'?'text':'password';btn.textContent=inp.type==='password'?'👁':'🙈';
+}
+function esc(str){return String(str||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+// ── CUSTOM CONFIRM ──────────────────────────────────
+let _confirmResolve=null;
+function showConfirm(msg){
+  return new Promise(res=>{
+    _confirmResolve=res;
+    document.getElementById('confirm-msg').textContent=msg;
+    document.getElementById('confirm-overlay').style.display='flex';
+  });
+}
+function confirmOK(){
+  document.getElementById('confirm-overlay').style.display='none';
+  if(_confirmResolve){_confirmResolve(true);_confirmResolve=null;}
+}
+function confirmCancel(){
+  document.getElementById('confirm-overlay').style.display='none';
+  if(_confirmResolve){_confirmResolve(false);_confirmResolve=null;}
+}
 </script>
 </body>
 </html>
