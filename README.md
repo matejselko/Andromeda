@@ -85,6 +85,6 @@ Click **⬇ Export** inside the app to download a backup at any time.
 
 ✦ · · · ✦ · · · · ✦ · · ✦ · · · · · ✦ · · · ✦
 
-*Note: I hate programming.*
+*Note: This project uses gererative AI on a large scale.*
 
 </div>
