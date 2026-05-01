@@ -29,8 +29,7 @@ services:
     container_name: andromeda
     restart: unless-stopped
     ports:
-      - "3456:3000"   # HTTPS — access via https://your-server-ip:3456
-      # Port 3002 is NOT exposed — it's internal healthcheck only
+      - "3456:3000"
     volumes:
       - andromeda-data:/data
     environment:
@@ -41,19 +40,6 @@ volumes:
   andromeda-data:
 ```
 
----
-
-## Stop / Remove
-
-```bash
-docker stop andromeda
-docker rm andromeda
-
-# Remove data too (irreversible!)
-docker volume rm andromeda-data
-```
-
----
 
 ## Features
 
