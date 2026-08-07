@@ -71,6 +71,6 @@ Click **⬇ Export** inside the app to download a backup at any time.
 
 ✦ · · · ✦ · · · · ✦ · · ✦ · · · · · ✦ · · · ✦
 
-*Note: This project uses gererative AI on a large scale.*
+*Note: This project is vibe-coded.*
 
 </div>
